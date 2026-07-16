@@ -1,0 +1,202 @@
+import { createFileRoute, Link, useRouter } from "@tanstack/react-router";
+import { useEffect, useMemo, useState } from "react";
+import { useQuery } from "@tanstack/react-query";
+import { supabase } from "@/integrations/supabase/client";
+import { useMyFounder } from "@/hooks/useMyFounder";
+import { AppShell } from "@/components/AppShell";
+import { SkillTag, TierBadge, VerifiedBadges } from "@/components/FounderBits";
+import { MapPin, Briefcase, Sparkles, Send, X, Loader2 } from "lucide-react";
+import { toast } from "sonner";
+import { founderAvatar } from "@/lib/founder-types";
+import { useRequireAuth } from "@/hooks/useRequireAuth";
+
+export const Route = createFileRoute("/discover")({
+  component: Discover,
+});
+
+function Discover() {
+  const { ready } = useRequireAuth({ requireOnboarded: true });
+  const { data: me } = useMyFounder();
+  const [connectFor, setConnectFor] = useState<string | null>(null);
+
+  const { data: founders, isLoading } = useQuery({
+    queryKey: ["discover", me?.id],
+    enabled: !!me?.id,
+    queryFn: async () => {
+      const { data: fs } = await supabase.from("founders")
+        .select("*, founder_prompts(prompt_question, prompt_answer, display_order), profiles(full_name)")
+        .eq("profile_complete", true).neq("id", me!.id).limit(20);
+      return fs ?? [];
+    },
+  });
+
+  if (!ready) return null;
+
+  return (
+    <AppShell>
+      <div className="mx-auto max-w-2xl px-4 py-6 md:py-10">
+        <div className="mb-6">
+          <h1 className="text-3xl font-black tracking-tight">Discover</h1>
+          <p className="text-sm text-muted-text">Scroll through founders. Send a targeted request when someone resonates.</p>
+        </div>
+
+        {isLoading && (
+          <div className="grid place-items-center py-24 text-muted-text"><Loader2 className="h-6 w-6 animate-spin" /></div>
+        )}
+
+        <div className="space-y-6">
+          {founders?.map((f) => (
+            <FounderCard key={f.id} founder={f} onConnect={() => setConnectFor(f.id)} />
+          ))}
+          {founders && founders.length === 0 && (
+            <div className="rounded-2xl border-2 border-dashed p-12 text-center">
+              <div className="text-lg font-semibold">You've seen everyone</div>
+              <div className="mt-1 text-sm text-muted-text">New founders join weekly.</div>
+            </div>
+          )}
+        </div>
+
+        {connectFor && me && (
+          <ConnectModal founder={founders!.find((x) => x.id === connectFor)!} myFounderId={me.id} onClose={() => setConnectFor(null)} />
+        )}
+      </div>
+    </AppShell>
+  );
+}
+
+type F = Awaited<ReturnType<typeof supabase.from>> extends never ? never : any;
+
+function FounderCard({ founder, onConnect }: { founder: any; onConnect: () => void }) {
+  const name = founder.profiles?.full_name ?? founder.seed_name ?? "Founder";
+  const prompts = (founder.founder_prompts ?? []).sort((a: any, b: any) => (a.display_order ?? 0) - (b.display_order ?? 0));
+  const avatar = founderAvatar({ seed_avatar: founder.seed_avatar, seed_name: founder.seed_name, profile: founder.profiles });
+  const commitmentLabel = { full_time: "Full-time", part_time: "Part-time", exploring: "Exploring" }[founder.commitment as string] ?? "—";
+  const stageLabel = { idea: "Idea", mvp: "MVP", revenue: "Revenue", funded: "Funded" }[founder.idea_stage as string] ?? "";
+
+  return (
+    <article className="overflow-hidden rounded-3xl border bg-white shadow-card">
+      <div className="relative h-40 bg-hero-radial">
+        <div className="absolute left-6 top-6 flex items-center gap-3">
+          <img src={avatar} alt={name} className="h-16 w-16 rounded-2xl border-2 border-white/20 object-cover" />
+          <div>
+            <div className="text-lg font-bold text-white">{name}</div>
+            <div className="mt-0.5 flex items-center gap-2 text-xs text-white/70">
+              <MapPin className="h-3 w-3" /> {founder.location} · {founder.years_experience}y
+            </div>
+          </div>
+          <div className="ml-auto"><TierBadge tier={founder.trust_tier ?? "Builder"} /></div>
+        </div>
+      </div>
+      <div className="space-y-5 p-6">
+        <div>
+          <div className="text-sm font-semibold text-foreground">{founder.headline}</div>
+          <p className="mt-1 text-sm text-muted-text">{founder.bio}</p>
+        </div>
+        <VerifiedBadges f={founder} />
+        <div className="flex flex-wrap gap-1.5">
+          {(founder.skills ?? []).slice(0, 8).map((s: string) => <SkillTag key={s}>{s}</SkillTag>)}
+        </div>
+        <div className="flex flex-wrap gap-4 rounded-xl bg-surface p-4 text-xs">
+          <Fact label="Commitment" value={commitmentLabel} />
+          <Fact label="Stage" value={stageLabel} />
+          <Fact label="Equity offer" value={founder.equity_offer ?? "—"} />
+          <Fact label="Exit" value={{ lifestyle: "Lifestyle", acquisition: "Acquisition", ipo: "IPO" }[founder.exit_vision as string] ?? "—"} />
+        </div>
+
+        {founder.has_idea && founder.idea_description && (
+          <div className="rounded-xl border-l-4 border-indigo bg-indigo/5 p-4">
+            <div className="text-[10px] font-bold uppercase tracking-wider text-indigo">The idea</div>
+            <div className="mt-1 text-sm font-medium">{founder.idea_description}</div>
+            {founder.idea_industry && <div className="mt-1 text-xs text-muted-text">{founder.idea_industry}</div>}
+          </div>
+        )}
+
+        <div className="space-y-3">
+          {prompts.map((p: any) => (
+            <PromptCard key={p.prompt_question} question={p.prompt_question} answer={p.prompt_answer} onConnect={onConnect} />
+          ))}
+        </div>
+
+        <button onClick={onConnect} className="flex w-full items-center justify-center gap-2 rounded-xl bg-navy py-3 text-sm font-semibold text-white hover:bg-navy-light">
+          <Send className="h-4 w-4" /> Send a connection request
+        </button>
+      </div>
+    </article>
+  );
+}
+
+function PromptCard({ question, answer, onConnect }: { question: string; answer: string; onConnect: () => void }) {
+  return (
+    <div className="group relative rounded-2xl border bg-surface p-4">
+      <div className="text-[11px] font-semibold uppercase tracking-wider text-indigo">{question}</div>
+      <div className="mt-1 text-sm font-medium">{answer}</div>
+      <button onClick={onConnect} className="absolute right-3 top-3 hidden rounded-full bg-indigo p-1.5 text-white shadow-md group-hover:block">
+        <Sparkles className="h-3 w-3" />
+      </button>
+    </div>
+  );
+}
+
+function Fact({ label, value }: { label: string; value: string }) {
+  return (
+    <div className="min-w-[80px]">
+      <div className="text-[10px] font-semibold uppercase tracking-wider text-muted-text">{label}</div>
+      <div className="font-semibold">{value}</div>
+    </div>
+  );
+}
+
+function ConnectModal({ founder, myFounderId, onClose }: { founder: any; myFounderId: string; onClose: () => void }) {
+  const prompts = (founder.founder_prompts ?? []).sort((a: any, b: any) => a.display_order - b.display_order);
+  const [selectedPrompt, setSelectedPrompt] = useState<string>(prompts[0]?.prompt_question ?? "General");
+  const [message, setMessage] = useState("");
+  const [sending, setSending] = useState(false);
+  const name = founder.profiles?.full_name ?? founder.seed_name ?? "them";
+
+  async function send() {
+    if (message.trim().length < 20) return toast.error("Add a bit more context (20+ chars).");
+    setSending(true);
+    const { error } = await supabase.from("connection_requests").insert({
+      from_founder_id: myFounderId,
+      to_founder_id: founder.id,
+      prompt_question: selectedPrompt,
+      message: message.trim(),
+      status: "pending",
+    });
+    setSending(false);
+    if (error) return toast.error(error.message);
+    toast.success(`Request sent to ${name}!`);
+    onClose();
+  }
+
+  return (
+    <div className="fixed inset-0 z-40 grid place-items-center bg-navy/60 p-4" onClick={onClose}>
+      <div onClick={(e) => e.stopPropagation()} className="w-full max-w-lg rounded-2xl bg-white p-6 shadow-modal">
+        <div className="flex items-start justify-between">
+          <div>
+            <div className="text-xs font-semibold uppercase tracking-wider text-indigo">Send request</div>
+            <div className="mt-1 text-xl font-bold">Connect with {name}</div>
+          </div>
+          <button onClick={onClose}><X className="h-5 w-5 text-muted-text" /></button>
+        </div>
+        <div className="mt-5">
+          <div className="text-xs font-semibold text-muted-text">Reacting to</div>
+          <select value={selectedPrompt} onChange={(e) => setSelectedPrompt(e.target.value)} className="mt-1 w-full rounded-lg border px-3 py-2 text-sm">
+            {prompts.map((p: any) => <option key={p.prompt_question} value={p.prompt_question}>{p.prompt_question}</option>)}
+            <option value="General">General intro</option>
+          </select>
+        </div>
+        <div className="mt-4">
+          <div className="text-xs font-semibold text-muted-text">Your message</div>
+          <textarea rows={5} maxLength={400} value={message} onChange={(e) => setMessage(e.target.value)}
+            placeholder="Say something specific about what resonates. Vague opens get ignored."
+            className="mt-1 w-full rounded-lg border px-3 py-2 text-sm" />
+          <div className="mt-1 text-right text-[10px] text-muted-text">{message.length}/400</div>
+        </div>
+        <button onClick={send} disabled={sending} className="mt-4 flex w-full items-center justify-center gap-2 rounded-lg bg-indigo py-3 text-sm font-semibold text-white disabled:opacity-50">
+          {sending ? <Loader2 className="h-4 w-4 animate-spin" /> : <Send className="h-4 w-4" />} Send request
+        </button>
+      </div>
+    </div>
+  );
+}
