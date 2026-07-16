@@ -10,8 +10,15 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as OnboardingRouteImport } from './routes/onboarding'
+import { Route as InvestorFeedRouteImport } from './routes/investor-feed'
 import { Route as DiscoverRouteImport } from './routes/discover'
+import { Route as DashboardRouteImport } from './routes/dashboard'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as InboxIndexRouteImport } from './routes/inbox.index'
+import { Route as ForumIndexRouteImport } from './routes/forum.index'
+import { Route as ProfileMeRouteImport } from './routes/profile.me'
+import { Route as InboxConversationIdRouteImport } from './routes/inbox.$conversationId'
+import { Route as ForumPostIdRouteImport } from './routes/forum.$postId'
 import { Route as AuthSignupRouteImport } from './routes/auth.signup'
 import { Route as AuthLoginRouteImport } from './routes/auth.login'
 
@@ -20,14 +27,49 @@ const OnboardingRoute = OnboardingRouteImport.update({
   path: '/onboarding',
   getParentRoute: () => rootRouteImport,
 } as any)
+const InvestorFeedRoute = InvestorFeedRouteImport.update({
+  id: '/investor-feed',
+  path: '/investor-feed',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const DiscoverRoute = DiscoverRouteImport.update({
   id: '/discover',
   path: '/discover',
   getParentRoute: () => rootRouteImport,
 } as any)
+const DashboardRoute = DashboardRouteImport.update({
+  id: '/dashboard',
+  path: '/dashboard',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const InboxIndexRoute = InboxIndexRouteImport.update({
+  id: '/inbox/',
+  path: '/inbox/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ForumIndexRoute = ForumIndexRouteImport.update({
+  id: '/forum/',
+  path: '/forum/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ProfileMeRoute = ProfileMeRouteImport.update({
+  id: '/profile/me',
+  path: '/profile/me',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const InboxConversationIdRoute = InboxConversationIdRouteImport.update({
+  id: '/inbox/$conversationId',
+  path: '/inbox/$conversationId',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ForumPostIdRoute = ForumPostIdRouteImport.update({
+  id: '/forum/$postId',
+  path: '/forum/$postId',
   getParentRoute: () => rootRouteImport,
 } as any)
 const AuthSignupRoute = AuthSignupRouteImport.update({
@@ -43,46 +85,105 @@ const AuthLoginRoute = AuthLoginRouteImport.update({
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/dashboard': typeof DashboardRoute
   '/discover': typeof DiscoverRoute
+  '/investor-feed': typeof InvestorFeedRoute
   '/onboarding': typeof OnboardingRoute
   '/auth/login': typeof AuthLoginRoute
   '/auth/signup': typeof AuthSignupRoute
+  '/forum/$postId': typeof ForumPostIdRoute
+  '/inbox/$conversationId': typeof InboxConversationIdRoute
+  '/profile/me': typeof ProfileMeRoute
+  '/forum/': typeof ForumIndexRoute
+  '/inbox/': typeof InboxIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/dashboard': typeof DashboardRoute
   '/discover': typeof DiscoverRoute
+  '/investor-feed': typeof InvestorFeedRoute
   '/onboarding': typeof OnboardingRoute
   '/auth/login': typeof AuthLoginRoute
   '/auth/signup': typeof AuthSignupRoute
+  '/forum/$postId': typeof ForumPostIdRoute
+  '/inbox/$conversationId': typeof InboxConversationIdRoute
+  '/profile/me': typeof ProfileMeRoute
+  '/forum': typeof ForumIndexRoute
+  '/inbox': typeof InboxIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/dashboard': typeof DashboardRoute
   '/discover': typeof DiscoverRoute
+  '/investor-feed': typeof InvestorFeedRoute
   '/onboarding': typeof OnboardingRoute
   '/auth/login': typeof AuthLoginRoute
   '/auth/signup': typeof AuthSignupRoute
+  '/forum/$postId': typeof ForumPostIdRoute
+  '/inbox/$conversationId': typeof InboxConversationIdRoute
+  '/profile/me': typeof ProfileMeRoute
+  '/forum/': typeof ForumIndexRoute
+  '/inbox/': typeof InboxIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/discover' | '/onboarding' | '/auth/login' | '/auth/signup'
-  fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/discover' | '/onboarding' | '/auth/login' | '/auth/signup'
-  id:
-    | '__root__'
+  fullPaths:
     | '/'
+    | '/dashboard'
     | '/discover'
+    | '/investor-feed'
     | '/onboarding'
     | '/auth/login'
     | '/auth/signup'
+    | '/forum/$postId'
+    | '/inbox/$conversationId'
+    | '/profile/me'
+    | '/forum/'
+    | '/inbox/'
+  fileRoutesByTo: FileRoutesByTo
+  to:
+    | '/'
+    | '/dashboard'
+    | '/discover'
+    | '/investor-feed'
+    | '/onboarding'
+    | '/auth/login'
+    | '/auth/signup'
+    | '/forum/$postId'
+    | '/inbox/$conversationId'
+    | '/profile/me'
+    | '/forum'
+    | '/inbox'
+  id:
+    | '__root__'
+    | '/'
+    | '/dashboard'
+    | '/discover'
+    | '/investor-feed'
+    | '/onboarding'
+    | '/auth/login'
+    | '/auth/signup'
+    | '/forum/$postId'
+    | '/inbox/$conversationId'
+    | '/profile/me'
+    | '/forum/'
+    | '/inbox/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  DashboardRoute: typeof DashboardRoute
   DiscoverRoute: typeof DiscoverRoute
+  InvestorFeedRoute: typeof InvestorFeedRoute
   OnboardingRoute: typeof OnboardingRoute
   AuthLoginRoute: typeof AuthLoginRoute
   AuthSignupRoute: typeof AuthSignupRoute
+  ForumPostIdRoute: typeof ForumPostIdRoute
+  InboxConversationIdRoute: typeof InboxConversationIdRoute
+  ProfileMeRoute: typeof ProfileMeRoute
+  ForumIndexRoute: typeof ForumIndexRoute
+  InboxIndexRoute: typeof InboxIndexRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -94,6 +195,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof OnboardingRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/investor-feed': {
+      id: '/investor-feed'
+      path: '/investor-feed'
+      fullPath: '/investor-feed'
+      preLoaderRoute: typeof InvestorFeedRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/discover': {
       id: '/discover'
       path: '/discover'
@@ -101,11 +209,53 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof DiscoverRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/dashboard': {
+      id: '/dashboard'
+      path: '/dashboard'
+      fullPath: '/dashboard'
+      preLoaderRoute: typeof DashboardRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/': {
       id: '/'
       path: '/'
       fullPath: '/'
       preLoaderRoute: typeof IndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/inbox/': {
+      id: '/inbox/'
+      path: '/inbox'
+      fullPath: '/inbox/'
+      preLoaderRoute: typeof InboxIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/forum/': {
+      id: '/forum/'
+      path: '/forum'
+      fullPath: '/forum/'
+      preLoaderRoute: typeof ForumIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/profile/me': {
+      id: '/profile/me'
+      path: '/profile/me'
+      fullPath: '/profile/me'
+      preLoaderRoute: typeof ProfileMeRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/inbox/$conversationId': {
+      id: '/inbox/$conversationId'
+      path: '/inbox/$conversationId'
+      fullPath: '/inbox/$conversationId'
+      preLoaderRoute: typeof InboxConversationIdRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/forum/$postId': {
+      id: '/forum/$postId'
+      path: '/forum/$postId'
+      fullPath: '/forum/$postId'
+      preLoaderRoute: typeof ForumPostIdRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/auth/signup': {
@@ -127,10 +277,17 @@ declare module '@tanstack/react-router' {
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  DashboardRoute: DashboardRoute,
   DiscoverRoute: DiscoverRoute,
+  InvestorFeedRoute: InvestorFeedRoute,
   OnboardingRoute: OnboardingRoute,
   AuthLoginRoute: AuthLoginRoute,
   AuthSignupRoute: AuthSignupRoute,
+  ForumPostIdRoute: ForumPostIdRoute,
+  InboxConversationIdRoute: InboxConversationIdRoute,
+  ProfileMeRoute: ProfileMeRoute,
+  ForumIndexRoute: ForumIndexRoute,
+  InboxIndexRoute: InboxIndexRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

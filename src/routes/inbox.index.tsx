@@ -48,7 +48,7 @@ function Inbox() {
 
     if (action === "accepted" && me) {
       const { data: convo, error: cErr } = await supabase.from("conversations").insert({
-        founder_a_id: fromId, founder_b_id: me.id, request_id: reqId, stage: "chat_only",
+        founder_a_id: fromId, founder_b_id: me.id, request_id: reqId, stage: "talking",
       }).select().single();
       if (cErr) return toast.error(cErr.message);
       // Fire and forget AI report generation
