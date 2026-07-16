@@ -15,7 +15,7 @@ export const Route = createFileRoute("/discover")({
 });
 
 function Discover() {
-  const ready = useRequireAuth();
+  const { ready } = useRequireAuth({ requireOnboarded: true });
   const { data: me } = useMyFounder();
   const [connectFor, setConnectFor] = useState<string | null>(null);
 
