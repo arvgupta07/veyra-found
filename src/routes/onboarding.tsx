@@ -138,7 +138,7 @@ function Onboarding() {
     };
     const { data: founder } = await supabase.from("founders").select("id").eq("user_id", session!.user.id).maybeSingle();
     if (founder) {
-      await supabase.from("assessments").upsert({ founder_id: founder.id, ...scores, raw_answers: final as unknown as never }, { onConflict: "founder_id" });
+      await supabase.from("assessments").upsert({ founder_id: founder.id, ...scores, raw_answers: JSON.parse(JSON.stringify(final)) }, { onConflict: "founder_id" });
       await supabase.from("founders").update({ profile_complete: true }).eq("id", founder.id);
     }
     await new Promise((r) => setTimeout(r, 2500));
