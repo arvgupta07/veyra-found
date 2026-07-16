@@ -1,0 +1,8 @@
+# CoFound.ai
+
+> India's professional co-founder matching platform. Hinge-style, not Tinder — depth over swipes.
+
+## Pages
+- [Home](/): Landing page introducing CoFound.ai
+- [Sign up](/auth/signup): Create a founder or investor account
+- [Sign in](/auth/login): Log in to your account
