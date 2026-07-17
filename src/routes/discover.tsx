@@ -1,11 +1,11 @@
-import { createFileRoute, Link, useRouter } from "@tanstack/react-router";
-import { useEffect, useMemo, useState } from "react";
+import { createFileRoute } from "@tanstack/react-router";
+import { useEffect, useRef, useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { useMyFounder } from "@/hooks/useMyFounder";
 import { AppShell } from "@/components/AppShell";
 import { SkillTag, TierBadge, VerifiedBadges } from "@/components/FounderBits";
-import { MapPin, Briefcase, Sparkles, Send, X, Loader2 } from "lucide-react";
+import { MapPin, Sparkles, Send, X, Loader2, Keyboard } from "lucide-react";
 import { toast } from "sonner";
 import { founderAvatar } from "@/lib/founder-types";
 import { useRequireAuth } from "@/hooks/useRequireAuth";
@@ -20,6 +20,7 @@ function Discover() {
   const [connectFor, setConnectFor] = useState<string | null>(null);
   const [index, setIndex] = useState(0);
   const [skipped, setSkipped] = useState(0);
+  const [openPrompt, setOpenPrompt] = useState<{ founderId: string; question: string } | null>(null);
 
   const { data: founders, isLoading } = useQuery({
     queryKey: ["discover", me?.id],
@@ -32,10 +33,37 @@ function Discover() {
     },
   });
 
-  if (!ready) return null;
-
   const current = founders?.[index];
   const atEnd = !!founders && founders.length > 0 && index >= founders.length;
+
+  useEffect(() => {
+    function onKeyDown(e: KeyboardEvent) {
+      if (e.target instanceof HTMLInputElement || e.target instanceof HTMLTextAreaElement) return;
+      if (e.key === "s" || e.key === "S") {
+        e.preventDefault();
+        if (!atEnd && current) {
+          setSkipped((s) => s + 1);
+          setIndex((i) => i + 1);
+          setOpenPrompt(null);
+        }
+      }
+      if (e.key === "Enter") {
+        e.preventDefault();
+        if (!atEnd && current) {
+          const first = current.founder_prompts?.[0];
+          if (first) setOpenPrompt({ founderId: current.id, question: first.prompt_question });
+        }
+      }
+    }
+    window.addEventListener("keydown", onKeyDown);
+    return () => window.removeEventListener("keydown", onKeyDown);
+  }, [current, atEnd]);
+
+  useEffect(() => {
+    setOpenPrompt(null);
+  }, [index]);
+
+  if (!ready) return null;
 
   return (
     <AppShell>
@@ -58,13 +86,27 @@ function Discover() {
 
         {current && (
           <div className="space-y-4">
-            <FounderCard key={current.id} founder={{ ...current, __me: me?.id }} onConnect={() => setConnectFor(current.id)} />
+            <FounderCard
+              key={current.id}
+              founder={{ ...current, __me: me?.id }}
+              onConnect={() => setConnectFor(current.id)}
+              openPrompt={openPrompt}
+              onOpenPrompt={(q) => setOpenPrompt({ founderId: current.id, question: q })}
+              onClosePrompt={() => setOpenPrompt(null)}
+            />
             <button
               onClick={() => { setSkipped((s) => s + 1); setIndex((i) => i + 1); }}
               className="flex w-full items-center justify-center gap-2 rounded-xl border-2 border-ink bg-white py-3 text-sm font-black text-ink shadow-brutal box-hover"
             >
               Skip <X className="h-4 w-4" /> Next founder
             </button>
+            <div className="flex items-center justify-center gap-3 text-[10px] font-black uppercase tracking-wider text-muted-text">
+              <span className="inline-flex items-center gap-1 rounded-md border border-ink bg-cream px-2 py-1"><Keyboard className="h-3 w-3" /> S</span>
+              <span>Skip</span>
+              <span className="text-muted-text/50">·</span>
+              <span className="inline-flex items-center gap-1 rounded-md border border-ink bg-cream px-2 py-1">Enter</span>
+              <span>Open reply</span>
+            </div>
           </div>
         )}
 
@@ -95,7 +137,19 @@ function Discover() {
 
 type F = Awaited<ReturnType<typeof supabase.from>> extends never ? never : any;
 
-function FounderCard({ founder, onConnect }: { founder: any; onConnect: () => void }) {
+function FounderCard({
+  founder,
+  onConnect,
+  openPrompt,
+  onOpenPrompt,
+  onClosePrompt,
+}: {
+  founder: any;
+  onConnect: () => void;
+  openPrompt: { founderId: string; question: string } | null;
+  onOpenPrompt: (question: string) => void;
+  onClosePrompt: () => void;
+}) {
   const name = founder.profiles?.full_name ?? founder.seed_name ?? "Founder";
   const prompts = (founder.founder_prompts ?? []).sort((a: any, b: any) => (a.display_order ?? 0) - (b.display_order ?? 0));
   const avatar = founderAvatar({ seed_avatar: founder.seed_avatar, seed_name: founder.seed_name, profile: founder.profiles });
@@ -149,6 +203,9 @@ function FounderCard({ founder, onConnect }: { founder: any; onConnect: () => vo
               myFounderId={/* injected via closure */ (founder as any).__me}
               toFounderId={founder.id}
               toName={name}
+              isOpen={openPrompt?.founderId === founder.id && openPrompt?.question === p.prompt_question}
+              onOpen={() => onOpenPrompt(p.prompt_question)}
+              onClose={onClosePrompt}
             />
           ))}
         </div>
@@ -167,16 +224,33 @@ function PromptCard({
   myFounderId,
   toFounderId,
   toName,
+  isOpen,
+  onOpen,
+  onClose,
 }: {
   question: string;
   answer: string;
   myFounderId?: string;
   toFounderId: string;
   toName: string;
+  isOpen: boolean;
+  onOpen: () => void;
+  onClose: () => void;
 }) {
-  const [open, setOpen] = useState(false);
+  const [open, setOpen] = useState(isOpen);
   const [reply, setReply] = useState("");
   const [sending, setSending] = useState(false);
+  const textareaRef = useRef<HTMLTextAreaElement>(null);
+
+  useEffect(() => {
+    setOpen(isOpen);
+  }, [isOpen]);
+
+  useEffect(() => {
+    if (open && textareaRef.current) {
+      textareaRef.current.focus();
+    }
+  }, [open]);
 
   async function send() {
     if (!myFounderId) return toast.error("Loading your profile…");
@@ -194,6 +268,7 @@ function PromptCard({
     toast.success(`Request sent to ${toName}!`);
     setReply("");
     setOpen(false);
+    onClose();
   }
 
   return (
@@ -203,7 +278,7 @@ function PromptCard({
 
       {!open ? (
         <button
-          onClick={() => setOpen(true)}
+          onClick={() => { setOpen(true); onOpen(); }}
           className="mt-3 inline-flex items-center gap-1.5 rounded-lg border-2 border-ink bg-white px-3 py-1.5 text-xs font-bold text-ink shadow-brutal-sm box-hover"
         >
           <Sparkles className="h-3 w-3" /> Reply to this prompt
@@ -211,6 +286,7 @@ function PromptCard({
       ) : (
         <div className="mt-3 space-y-2">
           <textarea
+            ref={textareaRef}
             rows={3}
             maxLength={400}
             value={reply}
@@ -222,7 +298,7 @@ function PromptCard({
           <div className="flex items-center justify-between">
             <div className="text-[10px] font-semibold text-muted-text">{reply.length}/400</div>
             <div className="flex gap-2">
-              <button onClick={() => { setOpen(false); setReply(""); }} className="rounded-lg border-2 border-ink bg-white px-3 py-1.5 text-xs font-bold">Cancel</button>
+              <button onClick={() => { setOpen(false); setReply(""); onClose(); }} className="rounded-lg border-2 border-ink bg-white px-3 py-1.5 text-xs font-bold">Cancel</button>
               <button
                 onClick={send}
                 disabled={sending}
