@@ -19,7 +19,31 @@ function MyProfile() {
   const { data: me } = useMyFounder();
   const { data: profile } = useMyProfile();
   const qc = useQueryClient();
+  const router = useRouter();
   const [editing, setEditing] = useState(false);
+  const [deleting, setDeleting] = useState(false);
+  const [confirmDelete, setConfirmDelete] = useState(false);
+
+  async function signOut() {
+    await supabase.auth.signOut();
+    toast.success("Signed out");
+    router.navigate({ to: "/auth/login" });
+  }
+  async function deleteAccount() {
+    setDeleting(true);
+    try {
+      const mod = await import("@/lib/account.functions");
+      await mod.deleteMyAccount();
+      await supabase.auth.signOut();
+      toast.success("Account deleted");
+      router.navigate({ to: "/" });
+    } catch (e) {
+      toast.error((e as Error).message);
+    } finally {
+      setDeleting(false);
+      setConfirmDelete(false);
+    }
+  }
   const { data: assessment } = useQuery({
     queryKey: ["assessment", me?.id],
     enabled: !!me?.id,
