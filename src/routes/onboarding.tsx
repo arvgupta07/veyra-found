@@ -46,6 +46,8 @@ function Onboarding() {
     idea_stage: "idea" as "idea"|"mvp"|"revenue"|"funded",
     has_idea: false, idea_industry: "", idea_description: "",
     equity_offer: 40, exit_vision: "ipo" as "lifestyle"|"acquisition"|"ipo",
+    remote_pref: "hybrid" as "onsite"|"hybrid"|"remote",
+    looking_for: [] as string[],
   });
   useEffect(() => { if (profile?.full_name) setF((x) => ({ ...x, full_name: profile.full_name ?? "" })); }, [profile]);
 
@@ -91,6 +93,8 @@ function Onboarding() {
       idea_description: f.has_idea ? f.idea_description : null,
       equity_offer: `${f.equity_offer}%`,
       exit_vision: f.exit_vision,
+      remote_pref: f.remote_pref,
+      looking_for: f.looking_for,
     }).eq("id", founder.id);
     setSaving(false);
     if (error) return toast.error(error.message);
