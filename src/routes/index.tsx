@@ -256,7 +256,7 @@ function Landing() {
       </section>
 
       {/* How it works */}
-      <section id="how" className="border-b-[3px] border-ink bg-sage">
+      <section id="how" className="cv-auto border-b-[3px] border-ink bg-sage">
         <div className="mx-auto max-w-7xl px-4 py-16 sm:px-6 md:py-24">
           <h2 className="text-4xl md:text-6xl">How it works</h2>
           <div className="mt-12 grid gap-6 md:grid-cols-4">
