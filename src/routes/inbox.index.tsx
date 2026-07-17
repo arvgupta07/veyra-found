@@ -215,8 +215,10 @@ function Inbox() {
             return (
               <div key={r.id} className="rounded-2xl border-2 border-ink bg-white p-5 shadow-brutal-sm">
                 <div className="flex items-start gap-4">
-                  <img src={founderAvatar({ seed_avatar: r.founder.seed_avatar, seed_name: r.founder.seed_name, profile: r.founder.profiles })}
-                    className="h-12 w-12 shrink-0 rounded-xl border-2 border-ink object-cover" alt="" />
+                  <Link to="/profile/$founderId" params={{ founderId: r.to_founder_id }}>
+                    <img src={founderAvatar({ seed_avatar: r.founder.seed_avatar, seed_name: r.founder.seed_name, profile: r.founder.profiles })}
+                      className="h-12 w-12 shrink-0 rounded-xl border-2 border-ink object-cover transition hover:scale-105" alt="" />
+                  </Link>
                   <div className="min-w-0 flex-1">
                     <div className="flex items-center justify-between gap-2">
                       <div className="min-w-0">
