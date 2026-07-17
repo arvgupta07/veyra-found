@@ -451,6 +451,7 @@ export type Database = {
         Row: {
           aadhaar_verified: boolean | null
           active_status: Database["public"]["Enums"]["founder_active"] | null
+          age: number | null
           background: Database["public"]["Enums"]["founder_background"] | null
           bio: string | null
           commitment: Database["public"]["Enums"]["founder_commitment"] | null
@@ -485,6 +486,7 @@ export type Database = {
         Insert: {
           aadhaar_verified?: boolean | null
           active_status?: Database["public"]["Enums"]["founder_active"] | null
+          age?: number | null
           background?: Database["public"]["Enums"]["founder_background"] | null
           bio?: string | null
           commitment?: Database["public"]["Enums"]["founder_commitment"] | null
@@ -519,6 +521,7 @@ export type Database = {
         Update: {
           aadhaar_verified?: boolean | null
           active_status?: Database["public"]["Enums"]["founder_active"] | null
+          age?: number | null
           background?: Database["public"]["Enums"]["founder_background"] | null
           bio?: string | null
           commitment?: Database["public"]["Enums"]["founder_commitment"] | null

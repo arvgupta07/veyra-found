@@ -1,6 +1,7 @@
 import { Link, useRouter, useRouterState } from "@tanstack/react-router";
-import { Compass, Inbox, MessagesSquare, User, LogOut, TrendingUp, Heart } from "lucide-react";
+import { Compass, Inbox, MessagesSquare, User, LogOut, TrendingUp, Heart, Moon, Sun } from "lucide-react";
 import { useMyProfile } from "@/hooks/useMyFounder";
+import { useDarkMode } from "@/hooks/useDarkMode";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { VeyraMark } from "@/components/VeyraLogo";
@@ -21,6 +22,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
   const router = useRouter();
   const pathname = useRouterState({ select: (s) => s.location.pathname });
   const { data: profile } = useMyProfile();
+  const { dark, toggle } = useDarkMode();
   const nav = profile?.role === "investor" ? investorNav : founderNav;
 
   async function signOut() {
@@ -55,6 +57,9 @@ export function AppShell({ children }: { children: React.ReactNode }) {
             <div className="text-xs text-white/50">Signed in as</div>
             <div className="truncate text-sm font-medium text-white">{profile?.full_name ?? "…"}</div>
           </div>
+          <button onClick={toggle} className="flex w-full items-center gap-2 rounded-lg px-3 py-2 text-sm text-white/70 hover:bg-white/5 hover:text-white">
+            {dark ? <Sun className="h-4 w-4" /> : <Moon className="h-4 w-4" />} {dark ? "Light mode" : "Dark mode"}
+          </button>
           <button onClick={signOut} className="flex w-full items-center gap-2 rounded-lg px-3 py-2 text-sm text-white/70 hover:bg-white/5 hover:text-white">
             <LogOut className="h-4 w-4" /> Sign out
           </button>
@@ -67,7 +72,12 @@ export function AppShell({ children }: { children: React.ReactNode }) {
           <div className="grid h-7 w-7 place-items-center border-2 border-ink bg-cream"><VeyraMark size={16} /></div>
           <span className="text-base font-black text-white">veyra</span>
         </Link>
-        <button onClick={signOut} className="text-xs text-white/70">Sign out</button>
+        <div className="flex items-center gap-3">
+          <button onClick={toggle} aria-label="Toggle dark mode" className="text-white/80">
+            {dark ? <Sun className="h-4 w-4" /> : <Moon className="h-4 w-4" />}
+          </button>
+          <button onClick={signOut} className="text-xs text-white/70">Sign out</button>
+        </div>
       </div>
 
       {/* Mobile bottom nav */}

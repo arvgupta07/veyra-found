@@ -65,6 +65,7 @@ function MyProfile() {
                 <div className="mt-1 text-sm text-white/70">{me.headline}</div>
                 <div className="mt-2 flex items-center gap-3 text-xs text-white/60">
                   <span className="inline-flex items-center gap-1"><MapPin className="h-3 w-3" /> {me.location}</span>
+                  {me.age && <span className="inline-flex items-center gap-1">🎂 {me.age}</span>}
                   <span className="inline-flex items-center gap-1"><Briefcase className="h-3 w-3" /> {me.years_experience}y</span>
                 </div>
               </div>
@@ -78,7 +79,7 @@ function MyProfile() {
           </div>
 
           {editing && <EditPanel
-            initial={{ full_name: profile?.full_name ?? "", headline: me.headline ?? "", bio: me.bio ?? "", location: me.location ?? "", skills: me.skills ?? [] }}
+            initial={{ full_name: profile?.full_name ?? "", headline: me.headline ?? "", bio: me.bio ?? "", location: me.location ?? "", age: me.age ?? 0, skills: me.skills ?? [] }}
             founderId={me.id}
             userId={me.user_id ?? ""}
             onClose={() => setEditing(false)}
@@ -136,7 +137,7 @@ function MyProfile() {
 }
 
 function EditPanel({ initial, founderId, userId, onClose, onSaved }: {
-  initial: { full_name: string; headline: string; bio: string; location: string; skills: string[] };
+  initial: { full_name: string; headline: string; bio: string; location: string; age: number; skills: string[] };
   founderId: string;
   userId: string;
   onClose: () => void;
@@ -152,6 +153,7 @@ function EditPanel({ initial, founderId, userId, onClose, onSaved }: {
     const [{ error: e1 }, { error: e2 }] = await Promise.all([
       supabase.from("founders").update({
         headline: form.headline, bio: form.bio, location: form.location, skills: form.skills,
+        age: form.age > 0 ? form.age : null,
       }).eq("id", founderId),
       userId ? supabase.from("profiles").update({ full_name: form.full_name }).eq("id", userId) : Promise.resolve({ error: null }),
     ]);
@@ -180,7 +182,15 @@ function EditPanel({ initial, founderId, userId, onClose, onSaved }: {
             <textarea rows={3} maxLength={280} value={form.bio} onChange={(e) => setForm({ ...form, bio: e.target.value })}
               className="mt-1 w-full rounded-lg border-2 border-ink bg-white px-3 py-2 text-sm" />
           </div>
-          <Field label="Location" v={form.location} onChange={(v) => setForm({ ...form, location: v })} />
+          <div className="grid grid-cols-2 gap-3">
+            <Field label="Location" v={form.location} onChange={(v) => setForm({ ...form, location: v })} />
+            <div>
+              <label className="text-[11px] font-black uppercase text-muted-text">Age</label>
+              <input type="number" min={16} max={100} value={form.age || ""}
+                onChange={(e) => setForm({ ...form, age: +e.target.value || 0 })}
+                className="mt-1 w-full rounded-lg border-2 border-ink bg-white px-3 py-2 text-sm" />
+            </div>
+          </div>
           <div>
             <label className="text-[11px] font-black uppercase text-muted-text">Skills</label>
             <div className="mt-2 flex flex-wrap gap-1.5">
