@@ -28,7 +28,7 @@ function Login() {
   async function demoSignIn(tier: "free" | "pro") {
     setLoading(true);
     const cfg = tier === "pro"
-      ? { email: "demo-pro@cofound.ai", password: "demo1234", name: "Priya Nair", founderId: "22222222-2222-2222-2222-222222222222", isPro: true }
+      ? { email: "demo-pro@cofound.ai", password: "demo1234", name: "Priya Nair", founderId: "44444444-4444-4444-4444-444444444444", isPro: true }
       : { email: "demo@cofound.ai",     password: "demo1234", name: "Arjun Sharma", founderId: "11111111-1111-1111-1111-111111111111", isPro: false };
 
     let { error } = await supabase.auth.signInWithPassword({ email: cfg.email, password: cfg.password });
