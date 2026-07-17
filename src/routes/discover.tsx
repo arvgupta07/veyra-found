@@ -46,7 +46,7 @@ function Discover() {
 
         <div className="space-y-6">
           {founders?.map((f) => (
-            <FounderCard key={f.id} founder={f} onConnect={() => setConnectFor(f.id)} />
+            <FounderCard key={f.id} founder={{ ...f, __me: me?.id }} onConnect={() => setConnectFor(f.id)} />
           ))}
           {founders && founders.length === 0 && (
             <div className="rounded-2xl border-2 border-dashed p-12 text-center">
