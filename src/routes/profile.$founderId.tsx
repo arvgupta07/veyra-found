@@ -1,5 +1,5 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { useMyFounder } from "@/hooks/useMyFounder";
@@ -7,7 +7,7 @@ import { AppShell } from "@/components/AppShell";
 import { useRequireAuth } from "@/hooks/useRequireAuth";
 import { SkillTag, TierBadge, VerifiedBadges } from "@/components/FounderBits";
 import { founderAvatar } from "@/lib/founder-types";
-import { ArrowLeft, MapPin, Briefcase, Loader2, Send, X } from "lucide-react";
+import { ArrowLeft, MapPin, Briefcase, Loader2, Send, X, Ban, ShieldCheck } from "lucide-react";
 import { toast } from "sonner";
 
 export const Route = createFileRoute("/profile/$founderId")({
