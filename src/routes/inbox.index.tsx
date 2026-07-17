@@ -6,7 +6,7 @@ import { useMyFounder } from "@/hooks/useMyFounder";
 import { AppShell } from "@/components/AppShell";
 import { useRequireAuth } from "@/hooks/useRequireAuth";
 import { founderAvatar } from "@/lib/founder-types";
-import { Check, X, Loader2, MessageSquare, Tag, Plus } from "lucide-react";
+import { Check, X, Loader2, MessageSquare, Tag, Plus, Pin, PinOff } from "lucide-react";
 import { toast } from "sonner";
 
 export const Route = createFileRoute("/inbox/")({
