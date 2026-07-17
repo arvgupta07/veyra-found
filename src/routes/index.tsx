@@ -280,7 +280,7 @@ function Landing() {
       </section>
 
       {/* Testimonial strip */}
-      <section className="border-b-[3px] border-ink bg-orange">
+      <section className="cv-auto border-b-[3px] border-ink bg-orange">
         <div className="mx-auto grid max-w-7xl gap-6 px-4 py-16 sm:px-6 md:grid-cols-3 md:py-20">
           {[
             { q: "Found my technical co-founder in 11 days. Shipped MVP in 3 weeks.", who: "Rahul, Fintech" },
