@@ -225,21 +225,3 @@ function ConversationView() {
     </AppShell>
   );
 }
-
-function ReportList({ title, items, color, icon: Icon }: { title: string; items: string[] | null; color: string; icon: React.ComponentType<{ className?: string }> }) {
-  if (!items?.length) return null;
-  const colorMap: Record<string, string> = { emerald: "text-emerald", amber: "text-amber", destructive: "text-destructive", indigo: "text-indigo" };
-  return (
-    <div>
-      <div className={`text-[10px] font-bold uppercase tracking-wider ${colorMap[color]}`}>{title}</div>
-      <ul className="mt-1 space-y-1">
-        {items.map((it, i) => (
-          <li key={i} className="flex items-start gap-2 text-xs">
-            <Icon className={`mt-0.5 h-3 w-3 flex-none ${colorMap[color]}`} />
-            <span>{it}</span>
-          </li>
-        ))}
-      </ul>
-    </div>
-  );
-}
