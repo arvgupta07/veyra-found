@@ -46,7 +46,7 @@ function Discover() {
 
         <div className="space-y-6">
           {founders?.map((f) => (
-            <FounderCard key={f.id} founder={f} onConnect={() => setConnectFor(f.id)} />
+            <FounderCard key={f.id} founder={{ ...f, __me: me?.id }} onConnect={() => setConnectFor(f.id)} />
           ))}
           {founders && founders.length === 0 && (
             <div className="rounded-2xl border-2 border-dashed p-12 text-center">
@@ -113,26 +113,98 @@ function FounderCard({ founder, onConnect }: { founder: any; onConnect: () => vo
 
         <div className="space-y-3">
           {prompts.map((p: any) => (
-            <PromptCard key={p.prompt_question} question={p.prompt_question} answer={p.prompt_answer} onConnect={onConnect} />
+            <PromptCard
+              key={p.prompt_question}
+              question={p.prompt_question}
+              answer={p.prompt_answer}
+              myFounderId={/* injected via closure */ (founder as any).__me}
+              toFounderId={founder.id}
+              toName={name}
+            />
           ))}
         </div>
 
         <button onClick={onConnect} className="flex w-full items-center justify-center gap-2 rounded-xl bg-navy py-3 text-sm font-semibold text-white hover:bg-navy-light">
-          <Send className="h-4 w-4" /> Send a connection request
+          <Send className="h-4 w-4" /> Send a general intro instead
         </button>
       </div>
     </article>
   );
 }
 
-function PromptCard({ question, answer, onConnect }: { question: string; answer: string; onConnect: () => void }) {
+function PromptCard({
+  question,
+  answer,
+  myFounderId,
+  toFounderId,
+  toName,
+}: {
+  question: string;
+  answer: string;
+  myFounderId?: string;
+  toFounderId: string;
+  toName: string;
+}) {
+  const [open, setOpen] = useState(false);
+  const [reply, setReply] = useState("");
+  const [sending, setSending] = useState(false);
+
+  async function send() {
+    if (!myFounderId) return toast.error("Loading your profile…");
+    if (reply.trim().length < 20) return toast.error("Add a bit more context (20+ chars).");
+    setSending(true);
+    const { error } = await supabase.from("connection_requests").insert({
+      from_founder_id: myFounderId,
+      to_founder_id: toFounderId,
+      prompt_question: question,
+      message: reply.trim(),
+      status: "pending",
+    });
+    setSending(false);
+    if (error) return toast.error(error.message);
+    toast.success(`Request sent to ${toName}!`);
+    setReply("");
+    setOpen(false);
+  }
+
   return (
-    <div className="group relative rounded-2xl border bg-surface p-4">
-      <div className="text-[11px] font-semibold uppercase tracking-wider text-indigo">{question}</div>
-      <div className="mt-1 text-sm font-medium">{answer}</div>
-      <button onClick={onConnect} className="absolute right-3 top-3 hidden rounded-full bg-indigo p-1.5 text-white shadow-md group-hover:block">
-        <Sparkles className="h-3 w-3" />
-      </button>
+    <div className="rounded-2xl border-2 border-ink bg-cream p-4 shadow-brutal-sm">
+      <div className="text-[11px] font-black uppercase tracking-wider text-orange">{question}</div>
+      <div className="mt-1 text-sm font-medium text-ink">{answer}</div>
+
+      {!open ? (
+        <button
+          onClick={() => setOpen(true)}
+          className="mt-3 inline-flex items-center gap-1.5 rounded-lg border-2 border-ink bg-white px-3 py-1.5 text-xs font-bold text-ink shadow-brutal-sm box-hover"
+        >
+          <Sparkles className="h-3 w-3" /> Reply to this prompt
+        </button>
+      ) : (
+        <div className="mt-3 space-y-2">
+          <textarea
+            rows={3}
+            maxLength={400}
+            value={reply}
+            onChange={(e) => setReply(e.target.value)}
+            autoFocus
+            placeholder={`Reply to "${question}"… be specific.`}
+            className="w-full rounded-lg border-2 border-ink bg-white px-3 py-2 text-sm outline-none focus:ring-0"
+          />
+          <div className="flex items-center justify-between">
+            <div className="text-[10px] font-semibold text-muted-text">{reply.length}/400</div>
+            <div className="flex gap-2">
+              <button onClick={() => { setOpen(false); setReply(""); }} className="rounded-lg border-2 border-ink bg-white px-3 py-1.5 text-xs font-bold">Cancel</button>
+              <button
+                onClick={send}
+                disabled={sending}
+                className="inline-flex items-center gap-1.5 rounded-lg border-2 border-ink bg-orange px-3 py-1.5 text-xs font-black text-white shadow-brutal-sm disabled:opacity-50"
+              >
+                {sending ? <Loader2 className="h-3 w-3 animate-spin" /> : <Send className="h-3 w-3" />} Send
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
