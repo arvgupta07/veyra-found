@@ -4,7 +4,7 @@ import { Loader2, Rocket, TrendingUp, Check } from "lucide-react";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { AVATAR_PRESETS } from "@/lib/founder-types";
-import { VeyraLogo } from "@/components/VeyraLogo";
+import { VeyraMark, VeyraWordmark } from "@/components/VeyraLogo";
 
 export const Route = createFileRoute("/auth/signup")({
   component: Signup,
