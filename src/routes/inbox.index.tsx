@@ -81,6 +81,37 @@ function Inbox() {
     },
   });
 
+  const { data: myPins } = useQuery({
+    queryKey: ["conv-pins", me?.id],
+    enabled: !!me?.id,
+    queryFn: async () => {
+      const { data } = await supabase.from("conversation_pins")
+        .select("id, conversation_id").eq("founder_id", me!.id);
+      return data ?? [];
+    },
+  });
+
+  const pinnedSet = useMemo(() => new Set((myPins ?? []).map((p) => p.conversation_id)), [myPins]);
+  const pinIdByConv = useMemo(() => {
+    const m = new Map<string, string>();
+    (myPins ?? []).forEach((p) => m.set(p.conversation_id, p.id));
+    return m;
+  }, [myPins]);
+
+  async function togglePin(convId: string) {
+    if (!me) return;
+    const existing = pinIdByConv.get(convId);
+    if (existing) {
+      const { error } = await supabase.from("conversation_pins").delete().eq("id", existing);
+      if (error) return toast.error(error.message);
+    } else {
+      const { error } = await supabase.from("conversation_pins").insert({ conversation_id: convId, founder_id: me.id });
+      if (error) return toast.error(error.message);
+      toast.success("Pinned");
+    }
+    qc.invalidateQueries({ queryKey: ["conv-pins", me.id] });
+  }
+
   const labelsByConv = useMemo(() => {
     const m = new Map<string, { id: string; label: string; color: string }[]>();
     (myLabels ?? []).forEach((l) => {
