@@ -106,10 +106,24 @@ function Forum() {
                   <h2 className="text-lg font-black hover:text-orange">{p.title}</h2>
                   <p className="mt-1 line-clamp-2 text-sm text-muted-text">{p.content}</p>
                 </Link>
-                <div className="mt-3 flex items-center gap-4 text-xs text-muted-text">
-                  <button onClick={() => upvote(p.id)} className="inline-flex items-center gap-1 hover:text-orange">
-                    <ArrowUp className="h-4 w-4" /> {p.upvotes ?? 0}
-                  </button>
+                <div className="mt-3 flex items-center gap-3 text-xs text-muted-text">
+                  <div className="inline-flex items-stretch overflow-hidden rounded-lg border-2 border-ink bg-white shadow-brutal-sm">
+                    <button
+                      onClick={() => vote(p.id, 1, p.my_value)}
+                      aria-label="Upvote"
+                      className={`grid w-8 place-items-center transition ${p.my_value === 1 ? "bg-sage text-ink" : "hover:bg-cream"}`}>
+                      <ArrowBigUp className={`h-4 w-4 ${p.my_value === 1 ? "fill-ink" : ""}`} />
+                    </button>
+                    <div className="grid min-w-[2.25rem] place-items-center border-x-2 border-ink px-1 text-[13px] font-black text-ink">
+                      {p.upvotes ?? 0}
+                    </div>
+                    <button
+                      onClick={() => vote(p.id, -1, p.my_value)}
+                      aria-label="Downvote"
+                      className={`grid w-8 place-items-center transition ${p.my_value === -1 ? "bg-red text-white" : "hover:bg-cream"}`}>
+                      <ArrowBigDown className={`h-4 w-4 ${p.my_value === -1 ? "fill-white" : ""}`} />
+                    </button>
+                  </div>
                   <Link to="/forum/$postId" params={{ postId: p.id }} className="inline-flex items-center gap-1 hover:text-orange">
                     <MessageCircle className="h-4 w-4" /> Reply
                   </Link>
