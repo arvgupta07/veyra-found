@@ -314,6 +314,7 @@ export type Database = {
           id: string
           industry_tag: string | null
           is_pinned: boolean | null
+          seeking_feedback: boolean
           title: string
           updated_at: string
           upvotes: number | null
@@ -326,6 +327,7 @@ export type Database = {
           id?: string
           industry_tag?: string | null
           is_pinned?: boolean | null
+          seeking_feedback?: boolean
           title: string
           updated_at?: string
           upvotes?: number | null
@@ -338,6 +340,7 @@ export type Database = {
           id?: string
           industry_tag?: string | null
           is_pinned?: boolean | null
+          seeking_feedback?: boolean
           title?: string
           updated_at?: string
           upvotes?: number | null
@@ -467,7 +470,9 @@ export type Database = {
           linkedin_url: string | null
           linkedin_verified: boolean | null
           location: string | null
+          looking_for: string[]
           profile_complete: boolean | null
+          remote_pref: Database["public"]["Enums"]["remote_pref"] | null
           seed_avatar: string | null
           seed_name: string | null
           skills: string[] | null
@@ -499,7 +504,9 @@ export type Database = {
           linkedin_url?: string | null
           linkedin_verified?: boolean | null
           location?: string | null
+          looking_for?: string[]
           profile_complete?: boolean | null
+          remote_pref?: Database["public"]["Enums"]["remote_pref"] | null
           seed_avatar?: string | null
           seed_name?: string | null
           skills?: string[] | null
@@ -531,7 +538,9 @@ export type Database = {
           linkedin_url?: string | null
           linkedin_verified?: boolean | null
           location?: string | null
+          looking_for?: string[]
           profile_complete?: boolean | null
+          remote_pref?: Database["public"]["Enums"]["remote_pref"] | null
           seed_avatar?: string | null
           seed_name?: string | null
           skills?: string[] | null
@@ -783,6 +792,7 @@ export type Database = {
           created_at: string
           full_name: string | null
           id: string
+          is_pro: boolean
           role: Database["public"]["Enums"]["user_role"]
         }
         Insert: {
@@ -790,6 +800,7 @@ export type Database = {
           created_at?: string
           full_name?: string | null
           id: string
+          is_pro?: boolean
           role?: Database["public"]["Enums"]["user_role"]
         }
         Update: {
@@ -797,6 +808,7 @@ export type Database = {
           created_at?: string
           full_name?: string | null
           id?: string
+          is_pro?: boolean
           role?: Database["public"]["Enums"]["user_role"]
         }
         Relationships: []
@@ -867,6 +879,7 @@ export type Database = {
       founder_exit: "lifestyle" | "acquisition" | "ipo"
       founder_stage: "idea" | "mvp" | "revenue" | "funded"
       listing_type: "standard" | "featured"
+      remote_pref: "onsite" | "hybrid" | "remote"
       request_status: "pending" | "accepted" | "declined" | "withdrawn"
       trust_tier: "Builder" | "Maker" | "Veteran"
       user_role: "founder" | "investor"
@@ -1012,6 +1025,7 @@ export const Constants = {
       founder_exit: ["lifestyle", "acquisition", "ipo"],
       founder_stage: ["idea", "mvp", "revenue", "funded"],
       listing_type: ["standard", "featured"],
+      remote_pref: ["onsite", "hybrid", "remote"],
       request_status: ["pending", "accepted", "declined", "withdrawn"],
       trust_tier: ["Builder", "Maker", "Veteran"],
       user_role: ["founder", "investor"],
