@@ -55,6 +55,7 @@ function FounderProfile() {
                 <div className="mt-1 text-sm text-white/80">{data.headline}</div>
                 <div className="mt-2 flex items-center gap-3 text-xs text-white/70">
                   <span className="inline-flex items-center gap-1"><MapPin className="h-3 w-3" /> {data.location}</span>
+                  {data.age && <span className="inline-flex items-center gap-1">🎂 {data.age}</span>}
                   <span className="inline-flex items-center gap-1"><Briefcase className="h-3 w-3" /> {data.years_experience}y</span>
                 </div>
               </div>
