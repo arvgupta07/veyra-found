@@ -80,7 +80,7 @@ function MatchesPage() {
 
         <div className="mt-6 space-y-3">
           {visible.map(({ f, score }, i) => (
-            <MatchRow key={f.id as string} f={f} score={score} rank={i + 1} />
+            <MatchRow key={(f as { id: string }).id} f={f as never} score={score} rank={i + 1} />
           ))}
         </div>
 
@@ -95,7 +95,7 @@ function MatchesPage() {
             </p>
             <div className="mt-4 space-y-2">
               {locked.slice(0, 5).map(({ f, score }) => (
-                <div key={f.id as string} className="flex items-center gap-3 rounded-lg border-2 border-ink bg-white/70 p-3 blur-[2px]">
+                <div key={(f as { id: string }).id} className="flex items-center gap-3 rounded-lg border-2 border-ink bg-white/70 p-3 blur-[2px]">
                   <div className="grid h-10 w-10 place-items-center rounded-md border-2 border-ink bg-cream font-black">?</div>
                   <div className="flex-1 text-sm font-bold">Hidden founder</div>
                   <div className="rounded-md border-2 border-ink bg-sage px-2 py-0.5 text-xs font-black">{score}%</div>
