@@ -28,21 +28,38 @@ function Forum() {
   const [composeOpen, setComposeOpen] = useState(false);
 
   const { data: posts, refetch } = useQuery({
-    queryKey: ["forum", cat],
+    queryKey: ["forum", cat, me?.id ?? "anon"],
     queryFn: async () => {
       let q = supabase.from("forum_posts")
-        .select("*, author:founders!forum_posts_author_id_fkey(*, profiles(full_name))")
+        .select("*, author:founders!forum_posts_author_id_fkey(*, profiles(full_name)), my_vote:forum_upvotes(value, founder_id)")
         .order("created_at", { ascending: false }).limit(50);
       if (cat !== "all") q = q.eq("category", cat as never);
       const { data } = await q;
-      return data ?? [];
+      // Reduce my_vote array (all voters) to just this user's vote for quick lookup.
+      return (data ?? []).map((p: any) => ({
+        ...p,
+        my_value: (p.my_vote ?? []).find((v: any) => v.founder_id === me?.id)?.value ?? 0,
+      }));
     },
   });
 
-  async function upvote(postId: string) {
+  async function vote(postId: string, next: 1 | -1, current: number) {
     if (!me) return;
-    const { error } = await supabase.from("forum_upvotes").insert({ post_id: postId, founder_id: me.id });
-    if (error && !error.message.includes("duplicate")) toast.error(error.message);
+    // Toggle off if user clicks their existing vote.
+    if (current === next) {
+      const { error } = await supabase.from("forum_upvotes").delete()
+        .eq("post_id", postId).eq("founder_id", me.id);
+      if (error) toast.error(error.message);
+    } else if (current === 0) {
+      const { error } = await supabase.from("forum_upvotes")
+        .insert({ post_id: postId, founder_id: me.id, value: next });
+      if (error) toast.error(error.message);
+    } else {
+      // Switching direction: update existing row.
+      const { error } = await supabase.from("forum_upvotes")
+        .update({ value: next }).eq("post_id", postId).eq("founder_id", me.id);
+      if (error) toast.error(error.message);
+    }
     refetch();
   }
 
