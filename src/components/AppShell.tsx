@@ -34,12 +34,12 @@ export function AppShell({ children }: { children: React.ReactNode }) {
   return (
     <div className="flex min-h-screen bg-surface">
       {/* Sidebar (desktop) */}
-      <aside className="fixed inset-y-0 left-0 hidden w-60 flex-col border-r border-white/5 bg-navy px-4 py-6 md:flex">
-        <Link to="/" className="flex items-center gap-2 px-2">
-          <div className="grid h-9 w-9 shrink-0 place-items-center border-[3px] border-ink bg-cream shadow-brutal-sm">
-            <VeyraMark size={20} />
+      <aside className="fixed inset-y-0 left-0 hidden w-60 flex-col border-r-[3px] border-ink bg-cream px-4 py-6 md:flex">
+        <Link to="/" className="flex items-center gap-2.5 px-1">
+          <div className="grid h-11 w-11 shrink-0 place-items-center border-[3px] border-ink bg-white shadow-brutal-sm">
+            <VeyraMark size={28} />
           </div>
-          <span className="text-lg font-black tracking-tight text-white">veyra</span>
+          <span className="text-2xl font-black tracking-tight text-ink lowercase">veyra</span>
         </Link>
         <nav className="mt-8 space-y-1">
           {nav.map((n) => {
