@@ -164,9 +164,11 @@ function FounderCard({
     <article className="overflow-hidden rounded-3xl border bg-white shadow-card">
       <div className="relative h-40 bg-hero-radial">
         <div className="absolute left-6 top-6 flex items-center gap-3">
-          <img src={avatar} alt={name} className="h-16 w-16 rounded-2xl border-2 border-white/20 object-cover" />
+          <Link to="/profile/$founderId" params={{ founderId: founder.id }}>
+            <img src={avatar} alt={name} className="h-16 w-16 rounded-2xl border-2 border-white/20 object-cover transition hover:scale-105" />
+          </Link>
           <div>
-            <div className="text-lg font-bold text-white">{name}</div>
+            <Link to="/profile/$founderId" params={{ founderId: founder.id }} className="text-lg font-bold text-white hover:text-orange">{name}</Link>
             <div className="mt-0.5 flex items-center gap-2 text-xs text-white/70">
               <MapPin className="h-3 w-3" /> {founder.location} · {founder.years_experience}y
             </div>
