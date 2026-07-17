@@ -93,31 +93,59 @@
   --ring: #FF7F11;
 }
 
+/*
+ * Dark mode strategy: keep --ink stable (it's used as the neo-brutalist
+ * border/shadow color in bg-ink/text-white contexts). Instead, flip the
+ * "paper" surfaces (cream/white/surface) to charcoal and let borders +
+ * shadows switch to cream via targeted utility overrides below.
+ */
 .dark {
-  --ink: #E2E8CE;
-  --ink-2: #cfd4bb;
-  --ink-3: #a8ad96;
   --surface: #1a1a1a;
-  --surface-2: #262626;
-  --cream: #2e2e2e;
-  --muted-text: #ACBFA4;
-  --light-text: #7a8a72;
+  --surface-2: #232323;
+  --cream: #2b2b2b;
+  --muted-text: #b8c2ab;
+  --light-text: #8f9987;
 
   --background: #1a1a1a;
   --foreground: #E2E8CE;
-  --card: #262626;
+  --card: #232323;
   --card-foreground: #E2E8CE;
-  --popover: #262626;
+  --popover: #232323;
   --popover-foreground: #E2E8CE;
   --primary: #FF7F11;
   --primary-foreground: #1a1a1a;
   --secondary: #ACBFA4;
   --secondary-foreground: #1a1a1a;
-  --muted: #262626;
-  --muted-foreground: #ACBFA4;
+  --muted: #232323;
+  --muted-foreground: #b8c2ab;
   --border: #E2E8CE;
   --input: #E2E8CE;
   --ring: #FF7F11;
+}
+
+/* Dark-mode utility overrides — flip paper/ink where components hardcoded them */
+.dark .bg-white { background-color: #232323 !important; }
+.dark .text-ink { color: #E2E8CE; }
+.dark .border-ink { border-color: #E2E8CE; }
+.dark .text-muted-text { color: #b8c2ab; }
+.dark .bg-hero-radial {
+  background: linear-gradient(135deg, #232323 0%, #1a1a1a 100%);
+}
+/* Brutal shadows use cream in dark for visibility on dark paper */
+.dark .shadow-brutal    { box-shadow: 6px 6px 0 0 #E2E8CE; }
+.dark .shadow-brutal-sm { box-shadow: 3px 3px 0 0 #E2E8CE; }
+.dark .shadow-brutal-lg { box-shadow: 10px 10px 0 0 #E2E8CE; }
+.dark .shadow-card      { box-shadow: 4px 4px 0 0 #E2E8CE; }
+.dark .shadow-modal     { box-shadow: 10px 10px 0 0 #E2E8CE; }
+.dark .box-hover:hover  { box-shadow: 9px 9px 0 0 #E2E8CE; }
+.dark .box-hover:active { box-shadow: 2px 2px 0 0 #E2E8CE; }
+.dark .box-press:hover  { box-shadow: 8px 8px 0 0 #E2E8CE; }
+.dark .box-press:active { box-shadow: 1px 1px 0 0 #E2E8CE; }
+.dark .bg-grid {
+  background-image:
+    linear-gradient(#E2E8CE 1px, transparent 1px),
+    linear-gradient(90deg, #E2E8CE 1px, transparent 1px);
+  opacity: 0.08;
 }
 
 @layer base {
