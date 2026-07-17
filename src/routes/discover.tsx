@@ -161,31 +161,35 @@ function FounderCard({
   const stageLabel = { idea: "Idea", mvp: "MVP", revenue: "Revenue", funded: "Funded" }[founder.idea_stage as string] ?? "";
 
   return (
-    <article className="overflow-hidden rounded-3xl border bg-white shadow-card">
-      <div className="relative h-40 bg-hero-radial">
-        <div className="absolute left-6 top-6 flex items-center gap-3">
+    <article className="overflow-hidden rounded-3xl border-2 border-ink bg-white shadow-brutal">
+      {/* Flat brutal header */}
+      <div className="border-b-2 border-ink bg-cream p-5">
+        <div className="flex items-start gap-4">
           <Link to="/profile/$founderId" params={{ founderId: founder.id }}>
-            <img src={avatar} alt={name} className="h-16 w-16 rounded-2xl border-2 border-white/20 object-cover transition hover:scale-105" />
+            <img src={avatar} alt={name}
+              className="h-16 w-16 rounded-2xl border-2 border-ink object-cover shadow-brutal-sm transition hover:-translate-x-0.5 hover:-translate-y-0.5" />
           </Link>
-          <div>
-            <Link to="/profile/$founderId" params={{ founderId: founder.id }} className="text-lg font-bold text-white hover:text-orange">{name}</Link>
-            <div className="mt-0.5 flex items-center gap-2 text-xs text-white/70">
-              <MapPin className="h-3 w-3" /> {founder.location} · {founder.years_experience}y
+          <div className="min-w-0 flex-1">
+            <Link to="/profile/$founderId" params={{ founderId: founder.id }}
+              className="block truncate text-xl font-black text-ink hover:text-orange">{name}</Link>
+            <div className="mt-1 truncate text-sm font-semibold text-ink/80">{founder.headline}</div>
+            <div className="mt-1.5 flex flex-wrap items-center gap-x-3 gap-y-1 text-[11px] font-bold text-ink/70">
+              <span className="inline-flex items-center gap-1"><MapPin className="h-3 w-3" /> {founder.location}</span>
+              {founder.age && <span>🎂 {founder.age}</span>}
+              <span>· {founder.years_experience}y exp</span>
             </div>
           </div>
-          <div className="ml-auto"><TierBadge tier={founder.trust_tier ?? "Builder"} /></div>
+          <TierBadge tier={founder.trust_tier ?? "Builder"} />
         </div>
       </div>
+
       <div className="space-y-5 p-6">
-        <div>
-          <div className="text-sm font-semibold text-foreground">{founder.headline}</div>
-          <p className="mt-1 text-sm text-muted-text">{founder.bio}</p>
-        </div>
+        <p className="text-sm text-ink/80">{founder.bio}</p>
         <VerifiedBadges f={founder} />
         <div className="flex flex-wrap gap-1.5">
           {(founder.skills ?? []).slice(0, 8).map((s: string) => <SkillTag key={s}>{s}</SkillTag>)}
         </div>
-        <div className="flex flex-wrap gap-4 rounded-xl bg-surface p-4 text-xs">
+        <div className="grid grid-cols-2 gap-3 rounded-xl border-2 border-ink bg-white p-4 text-xs sm:grid-cols-4">
           <Fact label="Commitment" value={commitmentLabel} />
           <Fact label="Stage" value={stageLabel} />
           <Fact label="Equity offer" value={founder.equity_offer ?? "—"} />
@@ -193,10 +197,10 @@ function FounderCard({
         </div>
 
         {founder.has_idea && founder.idea_description && (
-          <div className="rounded-xl border-l-4 border-indigo bg-indigo/5 p-4">
-            <div className="text-[10px] font-bold uppercase tracking-wider text-indigo">The idea</div>
-            <div className="mt-1 text-sm font-medium">{founder.idea_description}</div>
-            {founder.idea_industry && <div className="mt-1 text-xs text-muted-text">{founder.idea_industry}</div>}
+          <div className="rounded-xl border-2 border-ink bg-sage p-4">
+            <div className="text-[10px] font-black uppercase tracking-wider text-ink">The idea</div>
+            <div className="mt-1 text-sm font-semibold text-ink">{founder.idea_description}</div>
+            {founder.idea_industry && <div className="mt-1 text-xs text-ink/70">{founder.idea_industry}</div>}
           </div>
         )}
 
@@ -216,7 +220,7 @@ function FounderCard({
           ))}
         </div>
 
-        <button onClick={onConnect} className="flex w-full items-center justify-center gap-2 rounded-xl bg-navy py-3 text-sm font-semibold text-white hover:bg-navy-light">
+        <button onClick={onConnect} className="flex w-full items-center justify-center gap-2 rounded-xl border-2 border-ink bg-ink py-3 text-sm font-black text-white shadow-brutal-sm box-hover">
           <Send className="h-4 w-4" /> Send a general intro instead
         </button>
       </div>

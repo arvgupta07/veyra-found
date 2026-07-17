@@ -1,4 +1,4 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, useRouter } from "@tanstack/react-router";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
@@ -8,7 +8,7 @@ import { AppShell } from "@/components/AppShell";
 import { useRequireAuth } from "@/hooks/useRequireAuth";
 import { SkillTag, TierBadge, VerifiedBadges } from "@/components/FounderBits";
 import { founderAvatar, SKILLS_LIST } from "@/lib/founder-types";
-import { MapPin, Briefcase, Pencil, X, Loader2, Save } from "lucide-react";
+import { MapPin, Briefcase, Pencil, X, Loader2, Save, LogOut, Trash2 } from "lucide-react";
 
 export const Route = createFileRoute("/profile/me")({
   component: MyProfile,
@@ -19,7 +19,31 @@ function MyProfile() {
   const { data: me } = useMyFounder();
   const { data: profile } = useMyProfile();
   const qc = useQueryClient();
+  const router = useRouter();
   const [editing, setEditing] = useState(false);
+  const [deleting, setDeleting] = useState(false);
+  const [confirmDelete, setConfirmDelete] = useState(false);
+
+  async function signOut() {
+    await supabase.auth.signOut();
+    toast.success("Signed out");
+    router.navigate({ to: "/auth/login" });
+  }
+  async function deleteAccount() {
+    setDeleting(true);
+    try {
+      const mod = await import("@/lib/account.functions");
+      await mod.deleteMyAccount();
+      await supabase.auth.signOut();
+      toast.success("Account deleted");
+      router.navigate({ to: "/" });
+    } catch (e) {
+      toast.error((e as Error).message);
+    } finally {
+      setDeleting(false);
+      setConfirmDelete(false);
+    }
+  }
   const { data: assessment } = useQuery({
     queryKey: ["assessment", me?.id],
     enabled: !!me?.id,
@@ -131,7 +155,39 @@ function MyProfile() {
             )}
           </div>
         </div>
+
+        {/* Account actions */}
+        <div className="mt-6 rounded-2xl border-2 border-ink bg-white p-5 shadow-brutal-sm">
+          <div className="text-xs font-black uppercase tracking-wider text-muted-text">Account</div>
+          <div className="mt-3 flex flex-wrap gap-2">
+            <button onClick={signOut}
+              className="inline-flex items-center gap-2 rounded-lg border-2 border-ink bg-white px-4 py-2 text-xs font-black shadow-brutal-sm box-hover">
+              <LogOut className="h-4 w-4" /> Sign out
+            </button>
+            <button onClick={() => setConfirmDelete(true)}
+              className="inline-flex items-center gap-2 rounded-lg border-2 border-ink bg-red px-4 py-2 text-xs font-black text-white shadow-brutal-sm box-hover">
+              <Trash2 className="h-4 w-4" /> Delete account
+            </button>
+          </div>
+        </div>
       </div>
+
+      {confirmDelete && (
+        <div className="fixed inset-0 z-50 grid place-items-center bg-ink/60 p-4" onClick={() => !deleting && setConfirmDelete(false)}>
+          <div onClick={(e) => e.stopPropagation()} className="w-full max-w-md rounded-2xl border-2 border-ink bg-cream p-6 shadow-brutal">
+            <div className="text-xl font-black">Delete your account?</div>
+            <p className="mt-2 text-sm text-ink/80">This wipes your profile, prompts, requests, and conversations. Cannot be undone.</p>
+            <div className="mt-5 flex gap-2">
+              <button onClick={() => setConfirmDelete(false)} disabled={deleting}
+                className="flex-1 rounded-lg border-2 border-ink bg-white py-2 text-sm font-black">Cancel</button>
+              <button onClick={deleteAccount} disabled={deleting}
+                className="flex-1 inline-flex items-center justify-center gap-2 rounded-lg border-2 border-ink bg-red py-2 text-sm font-black text-white disabled:opacity-50">
+                {deleting ? <Loader2 className="h-4 w-4 animate-spin" /> : <Trash2 className="h-4 w-4" />} Delete
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </AppShell>
   );
 }

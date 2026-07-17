@@ -707,7 +707,10 @@ export type Database = {
           content: string
           conversation_id: string
           created_at: string
+          deleted_at: string | null
+          edited_at: string | null
           id: string
+          reactions: Json
           read: boolean | null
           seed_sender_founder_id: string | null
           sender_id: string | null
@@ -716,7 +719,10 @@ export type Database = {
           content: string
           conversation_id: string
           created_at?: string
+          deleted_at?: string | null
+          edited_at?: string | null
           id?: string
+          reactions?: Json
           read?: boolean | null
           seed_sender_founder_id?: string | null
           sender_id?: string | null
@@ -725,7 +731,10 @@ export type Database = {
           content?: string
           conversation_id?: string
           created_at?: string
+          deleted_at?: string | null
+          edited_at?: string | null
           id?: string
+          reactions?: Json
           read?: boolean | null
           seed_sender_founder_id?: string | null
           sender_id?: string | null
