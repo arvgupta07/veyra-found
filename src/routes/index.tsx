@@ -221,7 +221,7 @@ function Landing() {
       </section>
 
       {/* Features */}
-      <section id="founders" className="border-b-[3px] border-ink bg-cream">
+      <section id="founders" className="cv-auto border-b-[3px] border-ink bg-cream">
         <div className="mx-auto max-w-7xl px-4 py-16 sm:px-6 md:py-24">
           <div className="grid grid-cols-[minmax(0,1fr)_auto] items-end gap-4">
             <div className="min-w-0">
