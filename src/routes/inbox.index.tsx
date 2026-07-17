@@ -168,6 +168,10 @@ function Inbox() {
     if (!labelFilter) return true;
     const labels = labelsByConv.get(c.id) ?? [];
     return labels.some((l) => l.label === labelFilter);
+  }).slice().sort((a, b) => {
+    const ap = pinnedSet.has(a.id) ? 1 : 0;
+    const bp = pinnedSet.has(b.id) ? 1 : 0;
+    return bp - ap;
   });
 
   return (
