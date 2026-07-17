@@ -1,0 +1,1 @@
+ALTER TABLE public.founders ADD COLUMN IF NOT EXISTS age integer CHECK (age IS NULL OR (age >= 16 AND age <= 100));
