@@ -84,10 +84,11 @@ function Inbox() {
   const labelsByConv = useMemo(() => {
     const m = new Map<string, { id: string; label: string; color: string }[]>();
     (myLabels ?? []).forEach((l) => {
-      if (!l.conversation_id) return;
-      const arr = m.get(l.conversation_id) ?? [];
+      const cid = l.conversation_id;
+      if (!cid) return;
+      const arr = m.get(cid) ?? [];
       arr.push({ id: l.id, label: l.label, color: l.color ?? "" });
-      m.set(l.conversation_id, arr);
+      m.set(cid, arr);
     });
     return m;
   }, [myLabels]);
