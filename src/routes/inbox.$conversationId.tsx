@@ -33,7 +33,6 @@ function ConversationView() {
   const { data: me } = useMyFounder();
   const qc = useQueryClient();
   const bottomRef = useRef<HTMLDivElement>(null);
-  const [reportOpen, setReportOpen] = useState(true);
   const [text, setText] = useState("");
   const [activeMsg, setActiveMsg] = useState<string | null>(null);
   const [editingId, setEditingId] = useState<string | null>(null);
