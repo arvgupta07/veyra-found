@@ -5,7 +5,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { useMyFounder } from "@/hooks/useMyFounder";
 import { AppShell } from "@/components/AppShell";
 import { SkillTag, VerifiedBadges } from "@/components/FounderBits";
-import { MapPin, Sparkles, Send, X, Loader2, Keyboard } from "lucide-react";
+import { MapPin, Sparkles, Send, X, Loader2, Keyboard, ChevronDown, Check } from "lucide-react";
 import { toast } from "sonner";
 import { founderAvatar } from "@/lib/founder-types";
 import { useRequireAuth } from "@/hooks/useRequireAuth";
