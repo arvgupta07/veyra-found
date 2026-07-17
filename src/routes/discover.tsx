@@ -99,7 +99,7 @@ function Discover() {
               onClosePrompt={() => setOpenPrompt(null)}
             />
             <button
-              onClick={() => { setSkipped((s) => s + 1); setIndex((i) => i + 1); }}
+              onClick={advance}
               className="flex w-full items-center justify-center gap-2 rounded-xl border-2 border-ink bg-white py-3 text-sm font-black text-ink shadow-brutal box-hover"
             >
               Skip <X className="h-4 w-4" /> Next founder
