@@ -94,59 +94,81 @@
 }
 
 /*
- * Dark mode strategy: keep --ink stable (it's used as the neo-brutalist
- * border/shadow color in bg-ink/text-white contexts). Instead, flip the
- * "paper" surfaces (cream/white/surface) to charcoal and let borders +
- * shadows switch to cream via targeted utility overrides below.
+ * Dark mode — warm charcoal paper, cream ink. We invert the paper/ink
+ * relationship so neo-brutalist slabs still pop: what was ink-on-cream
+ * becomes cream-on-charcoal, and vice versa. Sage/orange/red are lightly
+ * desaturated for comfort but keep their identity.
  */
 .dark {
-  --surface: #1a1a1a;
-  --surface-2: #232323;
-  --cream: #2b2b2b;
-  --muted-text: #b8c2ab;
-  --light-text: #8f9987;
+  /* Warm charcoal stack (not flat grey — matches sage/orange warmth) */
+  --ink: #EDE7D1;          /* was dark; now cream — used for borders/shadows */
+  --ink-2: #D8D2BE;
+  --ink-3: #B8B29E;
 
-  --background: #1a1a1a;
-  --foreground: #E2E8CE;
-  --card: #232323;
-  --card-foreground: #E2E8CE;
-  --popover: #232323;
-  --popover-foreground: #E2E8CE;
-  --primary: #FF7F11;
-  --primary-foreground: #1a1a1a;
-  --secondary: #ACBFA4;
-  --secondary-foreground: #1a1a1a;
-  --muted: #232323;
-  --muted-foreground: #b8c2ab;
-  --border: #E2E8CE;
-  --input: #E2E8CE;
-  --ring: #FF7F11;
+  --sage: #8FA687;         /* slightly deepened for dark bg */
+  --cream: #1F1B17;        /* "cream paper" becomes warm charcoal card */
+  --orange: #FF8A2B;       /* touch warmer, less searing */
+  --red:    #FF3B3C;
+
+  --surface:   #14110F;    /* page background */
+  --surface-2: #1A1613;
+  --muted-text: #B8B29E;
+  --light-text: #8A8474;
+
+  --background: #14110F;
+  --foreground: #EDE7D1;
+  --card: #1F1B17;
+  --card-foreground: #EDE7D1;
+  --popover: #1F1B17;
+  --popover-foreground: #EDE7D1;
+  --primary: #FF8A2B;
+  --primary-foreground: #14110F;
+  --secondary: #8FA687;
+  --secondary-foreground: #14110F;
+  --muted: #241F1A;
+  --muted-foreground: #B8B29E;
+  --accent: #FF3B3C;
+  --accent-foreground: #14110F;
+  --destructive: #FF3B3C;
+  --destructive-foreground: #14110F;
+  --border: #EDE7D1;
+  --input: #EDE7D1;
+  --ring: #FF8A2B;
 }
 
-/* Dark-mode utility overrides — flip paper/ink where components hardcoded them */
-.dark .bg-white { background-color: #232323 !important; }
-.dark .text-ink { color: #E2E8CE; }
-.dark .border-ink { border-color: #E2E8CE; }
-.dark .text-muted-text { color: #b8c2ab; }
+/* Dark-mode utility overrides — since --ink now resolves to cream in dark mode,
+ * `border-ink`, `text-ink`, `bg-ink`, and shadow utilities that read var(--ink)
+ * automatically flip. We only need to patch the few places that hardcoded
+ * white/#E2E8CE/#262626 literals instead of using tokens. */
+.dark .bg-white { background-color: #1F1B17 !important; color: #EDE7D1; }
+.dark .text-white { color: #14110F; } /* text-white sits on bg-ink slabs, which are now cream */
+.dark .bg-cream { background-color: #1F1B17; }
+.dark .bg-surface { background-color: #14110F; }
+.dark .bg-surface-2 { background-color: #1A1613; }
+.dark .text-muted-text { color: #B8B29E; }
+
+/* Hero radial: warm charcoal gradient with a hint of sage */
 .dark .bg-hero-radial {
-  background: linear-gradient(135deg, #232323 0%, #1a1a1a 100%);
+  background:
+    radial-gradient(1200px 600px at 10% 0%, rgba(143,166,135,0.18), transparent 60%),
+    radial-gradient(900px 500px at 90% 100%, rgba(255,138,43,0.14), transparent 55%),
+    linear-gradient(135deg, #1A1613 0%, #14110F 100%);
 }
-/* Brutal shadows use cream in dark for visibility on dark paper */
-.dark .shadow-brutal    { box-shadow: 6px 6px 0 0 #E2E8CE; }
-.dark .shadow-brutal-sm { box-shadow: 3px 3px 0 0 #E2E8CE; }
-.dark .shadow-brutal-lg { box-shadow: 10px 10px 0 0 #E2E8CE; }
-.dark .shadow-card      { box-shadow: 4px 4px 0 0 #E2E8CE; }
-.dark .shadow-modal     { box-shadow: 10px 10px 0 0 #E2E8CE; }
-.dark .box-hover:hover  { box-shadow: 9px 9px 0 0 #E2E8CE; }
-.dark .box-hover:active { box-shadow: 2px 2px 0 0 #E2E8CE; }
-.dark .box-press:hover  { box-shadow: 8px 8px 0 0 #E2E8CE; }
-.dark .box-press:active { box-shadow: 1px 1px 0 0 #E2E8CE; }
-.dark .bg-grid {
-  background-image:
-    linear-gradient(#E2E8CE 1px, transparent 1px),
-    linear-gradient(90deg, #E2E8CE 1px, transparent 1px);
-  opacity: 0.08;
+
+/* Grid overlay reads cream now via var(--ink), but bump opacity for visibility */
+.dark .bg-grid { opacity: 0.05; }
+
+/* Striped tape patterns keep their color pop against dark paper */
+.dark .stripe-orange {
+  background-image: repeating-linear-gradient(45deg, #FF8A2B 0 12px, #14110F 12px 24px);
 }
+.dark .stripe-red {
+  background-image: repeating-linear-gradient(45deg, #FF3B3C 0 12px, #14110F 12px 24px);
+}
+
+/* Selection */
+.dark ::selection { background: #FF8A2B; color: #14110F; }
+
 
 @layer base {
   * { border-color: var(--color-border); }
