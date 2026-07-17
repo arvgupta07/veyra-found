@@ -6,7 +6,7 @@ import { useMyFounder } from "@/hooks/useMyFounder";
 import { AppShell } from "@/components/AppShell";
 import { useRequireAuth } from "@/hooks/useRequireAuth";
 import { founderAvatar } from "@/lib/founder-types";
-import { ArrowUp, MessageCircle, Plus, Loader2, X, MessageSquareText } from "lucide-react";
+import { ArrowBigUp, ArrowBigDown, MessageCircle, Plus, Loader2, X, MessageSquareText } from "lucide-react";
 import { toast } from "sonner";
 
 const CATEGORIES = [
