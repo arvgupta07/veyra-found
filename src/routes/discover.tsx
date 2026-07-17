@@ -137,7 +137,19 @@ function Discover() {
 
 type F = Awaited<ReturnType<typeof supabase.from>> extends never ? never : any;
 
-function FounderCard({ founder, onConnect }: { founder: any; onConnect: () => void }) {
+function FounderCard({
+  founder,
+  onConnect,
+  openPrompt,
+  onOpenPrompt,
+  onClosePrompt,
+}: {
+  founder: any;
+  onConnect: () => void;
+  openPrompt: { founderId: string; question: string } | null;
+  onOpenPrompt: (question: string) => void;
+  onClosePrompt: () => void;
+}) {
   const name = founder.profiles?.full_name ?? founder.seed_name ?? "Founder";
   const prompts = (founder.founder_prompts ?? []).sort((a: any, b: any) => (a.display_order ?? 0) - (b.display_order ?? 0));
   const avatar = founderAvatar({ seed_avatar: founder.seed_avatar, seed_name: founder.seed_name, profile: founder.profiles });
@@ -191,6 +203,9 @@ function FounderCard({ founder, onConnect }: { founder: any; onConnect: () => vo
               myFounderId={/* injected via closure */ (founder as any).__me}
               toFounderId={founder.id}
               toName={name}
+              isOpen={openPrompt?.founderId === founder.id && openPrompt?.question === p.prompt_question}
+              onOpen={() => onOpenPrompt(p.prompt_question)}
+              onClose={onClosePrompt}
             />
           ))}
         </div>
