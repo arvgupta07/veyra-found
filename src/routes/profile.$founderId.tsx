@@ -65,7 +65,7 @@ function FounderProfile() {
           <div className="-mt-8 space-y-6 p-6">
             <div className="rounded-2xl border-2 border-ink bg-white p-5 shadow-brutal-sm">
               <div className="text-sm">{data.bio}</div>
-              <div className="mt-3"><VerifiedBadges f={data} /></div>
+              <div className="mt-3"><VerifiedBadges f={data as never} /></div>
             </div>
 
             <div>
