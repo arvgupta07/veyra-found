@@ -137,7 +137,7 @@ function MyProfile() {
 }
 
 function EditPanel({ initial, founderId, userId, onClose, onSaved }: {
-  initial: { full_name: string; headline: string; bio: string; location: string; skills: string[] };
+  initial: { full_name: string; headline: string; bio: string; location: string; age: number; skills: string[] };
   founderId: string;
   userId: string;
   onClose: () => void;
