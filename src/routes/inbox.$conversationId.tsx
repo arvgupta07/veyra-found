@@ -6,8 +6,7 @@ import { useMyFounder } from "@/hooks/useMyFounder";
 import { AppShell } from "@/components/AppShell";
 import { useRequireAuth } from "@/hooks/useRequireAuth";
 import { founderAvatar } from "@/lib/founder-types";
-import { ScoreRing } from "@/components/FounderBits";
-import { Send, ArrowLeft, Sparkles, ChevronDown, Loader2, AlertTriangle, CheckCircle2, MessageCircle, Pencil, Trash2, Smile, Check, X } from "lucide-react";
+import { Send, ArrowLeft, Pencil, Trash2, Smile, Check, X } from "lucide-react";
 import { toast } from "sonner";
 
 export const Route = createFileRoute("/inbox/$conversationId")({
