@@ -6,6 +6,7 @@ export type Founder = {
   location: string | null;
   background: "technical" | "business" | "design" | "other" | null;
   years_experience: number | null;
+  age: number | null;
   commitment: "full_time" | "part_time" | "exploring" | null;
   has_idea: boolean;
   idea_description: string | null;
