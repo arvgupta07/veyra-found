@@ -153,6 +153,7 @@ function EditPanel({ initial, founderId, userId, onClose, onSaved }: {
     const [{ error: e1 }, { error: e2 }] = await Promise.all([
       supabase.from("founders").update({
         headline: form.headline, bio: form.bio, location: form.location, skills: form.skills,
+        age: form.age > 0 ? form.age : null,
       }).eq("id", founderId),
       userId ? supabase.from("profiles").update({ full_name: form.full_name }).eq("id", userId) : Promise.resolve({ error: null }),
     ]);
