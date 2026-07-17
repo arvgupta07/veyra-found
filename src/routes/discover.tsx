@@ -5,7 +5,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { useMyFounder } from "@/hooks/useMyFounder";
 import { AppShell } from "@/components/AppShell";
 import { SkillTag, VerifiedBadges } from "@/components/FounderBits";
-import { MapPin, Sparkles, Send, X, Loader2, Keyboard } from "lucide-react";
+import { MapPin, Sparkles, Send, X, Loader2, Keyboard, ChevronDown, Check } from "lucide-react";
 import { toast } from "sonner";
 import { founderAvatar } from "@/lib/founder-types";
 import { useRequireAuth } from "@/hooks/useRequireAuth";
@@ -370,33 +370,95 @@ function ConnectModal({ founder, myFounderId, onClose }: { founder: any; myFound
   }
 
   return (
-    <div className="fixed inset-0 z-40 grid place-items-center bg-navy/60 p-4" onClick={onClose}>
-      <div onClick={(e) => e.stopPropagation()} className="w-full max-w-lg rounded-2xl bg-white p-6 shadow-modal">
+    <div className="fixed inset-0 z-40 grid place-items-center bg-ink/70 p-4" onClick={onClose}>
+      <div onClick={(e) => e.stopPropagation()} className="w-full max-w-lg rounded-2xl border-[3px] border-ink bg-white p-6 shadow-brutal-lg">
         <div className="flex items-start justify-between">
           <div>
-            <div className="text-xs font-semibold uppercase tracking-wider text-indigo">Send request</div>
-            <div className="mt-1 text-xl font-bold">Connect with {name}</div>
+            <div className="text-[10px] font-black uppercase tracking-[0.2em] text-orange">Send request</div>
+            <div className="mt-1 text-2xl font-black tracking-tight">Connect with {name}</div>
           </div>
-          <button onClick={onClose}><X className="h-5 w-5 text-muted-text" /></button>
+          <button onClick={onClose} className="grid h-8 w-8 place-items-center border-2 border-ink bg-cream box-hover"><X className="h-4 w-4" /></button>
         </div>
         <div className="mt-5">
-          <div className="text-xs font-semibold text-muted-text">Reacting to</div>
-          <select value={selectedPrompt} onChange={(e) => setSelectedPrompt(e.target.value)} className="mt-1 w-full rounded-lg border px-3 py-2 text-sm">
-            {prompts.map((p: any) => <option key={p.prompt_question} value={p.prompt_question}>{p.prompt_question}</option>)}
-            <option value="General">General intro</option>
-          </select>
+          <div className="text-[10px] font-black uppercase tracking-wider text-muted-text">Reacting to</div>
+          <PromptDropdown
+            value={selectedPrompt}
+            onChange={setSelectedPrompt}
+            options={[
+              ...prompts.map((p: any) => ({ value: p.prompt_question, label: p.prompt_question })),
+              { value: "General", label: "General intro" },
+            ]}
+          />
         </div>
         <div className="mt-4">
-          <div className="text-xs font-semibold text-muted-text">Your message</div>
+          <div className="text-[10px] font-black uppercase tracking-wider text-muted-text">Your message</div>
           <textarea rows={5} maxLength={400} value={message} onChange={(e) => setMessage(e.target.value)}
             placeholder="Say something specific about what resonates. Vague opens get ignored."
-            className="mt-1 w-full rounded-lg border px-3 py-2 text-sm" />
-          <div className="mt-1 text-right text-[10px] text-muted-text">{message.length}/400</div>
+            className="mt-1 w-full rounded-lg border-2 border-ink bg-white px-3 py-2 text-sm outline-none focus:shadow-brutal-sm" />
+          <div className="mt-1 text-right text-[10px] font-semibold text-muted-text">{message.length}/400</div>
         </div>
-        <button onClick={send} disabled={sending} className="mt-4 flex w-full items-center justify-center gap-2 rounded-lg bg-indigo py-3 text-sm font-semibold text-white disabled:opacity-50">
+        <button onClick={send} disabled={sending} className="mt-4 flex w-full items-center justify-center gap-2 rounded-lg border-2 border-ink bg-orange py-3 text-sm font-black uppercase text-white shadow-brutal-sm box-hover disabled:opacity-50">
           {sending ? <Loader2 className="h-4 w-4 animate-spin" /> : <Send className="h-4 w-4" />} Send request
         </button>
       </div>
     </div>
   );
 }
+
+function PromptDropdown({
+  value, onChange, options,
+}: {
+  value: string;
+  onChange: (v: string) => void;
+  options: { value: string; label: string }[];
+}) {
+  const [open, setOpen] = useState(false);
+  const ref = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    function onDoc(e: MouseEvent) {
+      if (ref.current && !ref.current.contains(e.target as Node)) setOpen(false);
+    }
+    function onKey(e: KeyboardEvent) { if (e.key === "Escape") setOpen(false); }
+    document.addEventListener("mousedown", onDoc);
+    document.addEventListener("keydown", onKey);
+    return () => {
+      document.removeEventListener("mousedown", onDoc);
+      document.removeEventListener("keydown", onKey);
+    };
+  }, []);
+
+  const current = options.find((o) => o.value === value) ?? options[0];
+
+  return (
+    <div ref={ref} className="relative mt-1">
+      <button
+        type="button"
+        onClick={() => setOpen((o) => !o)}
+        className="flex w-full items-center justify-between gap-2 rounded-lg border-2 border-ink bg-cream px-3 py-2.5 text-left text-sm font-bold text-ink shadow-brutal-sm box-hover"
+      >
+        <span className="truncate">{current?.label ?? "Pick a prompt"}</span>
+        <ChevronDown className={`h-4 w-4 shrink-0 transition-transform ${open ? "rotate-180" : ""}`} />
+      </button>
+      {open && (
+        <div className="absolute left-0 right-0 top-full z-50 mt-2 max-h-64 overflow-auto rounded-lg border-2 border-ink bg-white shadow-brutal animate-pop-in">
+          {options.map((o) => {
+            const active = o.value === value;
+            return (
+              <button
+                key={o.value}
+                type="button"
+                onClick={() => { onChange(o.value); setOpen(false); }}
+                className={`flex w-full items-center justify-between gap-2 border-b-2 border-ink/10 px-3 py-2.5 text-left text-sm font-semibold last:border-b-0 ${active ? "bg-orange text-white" : "bg-white hover:bg-cream"}`}
+              >
+                <span className="truncate">{o.label}</span>
+                {active && <Check className="h-4 w-4 shrink-0" />}
+              </button>
+            );
+          })}
+        </div>
+      )}
+    </div>
+  );
+}
+

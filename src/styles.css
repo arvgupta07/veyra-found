@@ -178,6 +178,15 @@
     color: var(--color-foreground);
     -webkit-font-smoothing: antialiased;
   }
+  /* Smooth theme transitions — only color-related properties to avoid layout jank */
+  html, body, aside, nav, main, header, section, article, div, button, a, span, p, h1, h2, h3, h4, h5, h6, input, textarea, select, svg, img {
+    transition: background-color 320ms ease, color 320ms ease, border-color 320ms ease, box-shadow 320ms ease, fill 320ms ease, stroke 320ms ease;
+  }
+  @media (prefers-reduced-motion: reduce) {
+    html, body, aside, nav, main, header, section, article, div, button, a, span, p, h1, h2, h3, h4, h5, h6, input, textarea, select, svg, img {
+      transition: none !important;
+    }
+  }
   h1,h2,h3,h4 {
     font-family: var(--font-display);
     letter-spacing: -0.02em;
