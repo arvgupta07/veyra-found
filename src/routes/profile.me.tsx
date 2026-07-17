@@ -134,3 +134,86 @@ function MyProfile() {
     </AppShell>
   );
 }
+
+function EditPanel({ initial, founderId, userId, onClose, onSaved }: {
+  initial: { full_name: string; headline: string; bio: string; location: string; skills: string[] };
+  founderId: string;
+  userId: string;
+  onClose: () => void;
+  onSaved: () => void;
+}) {
+  const [form, setForm] = useState(initial);
+  const [custom, setCustom] = useState("");
+  const [saving, setSaving] = useState(false);
+  useEffect(() => setForm(initial), [initial]);
+
+  async function save() {
+    setSaving(true);
+    const [{ error: e1 }, { error: e2 }] = await Promise.all([
+      supabase.from("founders").update({
+        headline: form.headline, bio: form.bio, location: form.location, skills: form.skills,
+      }).eq("id", founderId),
+      userId ? supabase.from("profiles").update({ full_name: form.full_name }).eq("id", userId) : Promise.resolve({ error: null }),
+    ]);
+    setSaving(false);
+    if (e1 || e2) return toast.error(e1?.message ?? e2?.message ?? "Save failed");
+    toast.success("Profile updated");
+    onSaved();
+  }
+
+  function toggleSkill(s: string) {
+    setForm((f) => ({ ...f, skills: f.skills.includes(s) ? f.skills.filter((x) => x !== s) : [...f.skills, s] }));
+  }
+
+  return (
+    <div className="fixed inset-0 z-40 grid place-items-center bg-ink/60 p-4" onClick={onClose}>
+      <div onClick={(e) => e.stopPropagation()} className="max-h-[85vh] w-full max-w-lg overflow-y-auto rounded-2xl border-2 border-ink bg-cream p-6 shadow-brutal">
+        <div className="flex items-start justify-between">
+          <div className="text-xl font-black">Customize profile</div>
+          <button onClick={onClose}><X className="h-5 w-5" /></button>
+        </div>
+        <div className="mt-4 space-y-3">
+          <Field label="Full name" v={form.full_name} onChange={(v) => setForm({ ...form, full_name: v })} />
+          <Field label="Headline" v={form.headline} onChange={(v) => setForm({ ...form, headline: v })} />
+          <div>
+            <label className="text-[11px] font-black uppercase text-muted-text">Bio</label>
+            <textarea rows={3} maxLength={280} value={form.bio} onChange={(e) => setForm({ ...form, bio: e.target.value })}
+              className="mt-1 w-full rounded-lg border-2 border-ink bg-white px-3 py-2 text-sm" />
+          </div>
+          <Field label="Location" v={form.location} onChange={(v) => setForm({ ...form, location: v })} />
+          <div>
+            <label className="text-[11px] font-black uppercase text-muted-text">Skills</label>
+            <div className="mt-2 flex flex-wrap gap-1.5">
+              {[...new Set([...SKILLS_LIST, ...form.skills])].map((s) => {
+                const on = form.skills.includes(s);
+                return <button key={s} type="button" onClick={() => toggleSkill(s)}
+                  className={`rounded-md border-2 border-ink px-2 py-1 text-xs font-black ${on ? "bg-orange text-white" : "bg-white"}`}>{s}</button>;
+              })}
+            </div>
+            <div className="mt-2 flex gap-2">
+              <input value={custom} onChange={(e) => setCustom(e.target.value)} placeholder="Add a custom skill"
+                className="flex-1 rounded-lg border-2 border-ink bg-white px-3 py-2 text-sm" />
+              <button type="button" onClick={() => {
+                const s = custom.trim(); if (!s) return;
+                setForm((f) => ({ ...f, skills: [...new Set([...f.skills, s])] })); setCustom("");
+              }} className="rounded-lg border-2 border-ink bg-ink px-4 py-2 text-sm font-black text-white">Add</button>
+            </div>
+          </div>
+        </div>
+        <button onClick={save} disabled={saving} className="mt-5 flex w-full items-center justify-center gap-2 rounded-lg border-2 border-ink bg-orange py-2.5 text-sm font-black text-white shadow-brutal-sm disabled:opacity-50">
+          {saving ? <Loader2 className="h-4 w-4 animate-spin" /> : <Save className="h-4 w-4" />} Save changes
+        </button>
+      </div>
+    </div>
+  );
+}
+
+function Field({ label, v, onChange }: { label: string; v: string; onChange: (v: string) => void }) {
+  return (
+    <div>
+      <label className="text-[11px] font-black uppercase text-muted-text">{label}</label>
+      <input value={v} onChange={(e) => onChange(e.target.value)}
+        className="mt-1 w-full rounded-lg border-2 border-ink bg-white px-3 py-2 text-sm" />
+    </div>
+  );
+}
