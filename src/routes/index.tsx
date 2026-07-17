@@ -258,12 +258,12 @@ function Landing() {
         <div className="mx-auto max-w-7xl px-4 py-16 sm:px-6 md:py-24">
           <h2 className="text-4xl md:text-6xl">How it works</h2>
           <div className="mt-12 grid gap-6 md:grid-cols-4">
-            {[
+            {([
               ["01", "Build profile", "Prompts, verified skills, video intro.", Users],
               ["02", "Take the quiz", "20 questions. 4 minutes. Locked after.", BarChart3],
               ["03", "Browse & connect", "Tap a prompt you loved. Skip small talk.", MessagesSquare],
               ["04", "Confirm & ship", "Log stages. Get in front of investors.", Rocket],
-            ].map(([n, t, b, Icon]: [string, string, string, typeof Users], i) => (
+            ] as const).map(([n, t, b, Icon], i) => (
               <div key={n} className={`border-[3px] border-ink bg-cream p-5 shadow-brutal box-hover`} style={{ transform: `rotate(${i % 2 === 0 ? -1 : 1}deg)` }}>
                 <div className="flex items-center justify-between">
                   <div className="border-2 border-ink bg-orange px-2 py-0.5 text-xs font-black">{n}</div>
