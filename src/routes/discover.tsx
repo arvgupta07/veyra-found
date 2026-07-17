@@ -18,6 +18,8 @@ function Discover() {
   const { ready } = useRequireAuth({ requireOnboarded: true });
   const { data: me } = useMyFounder();
   const [connectFor, setConnectFor] = useState<string | null>(null);
+  const [index, setIndex] = useState(0);
+  const [skipped, setSkipped] = useState(0);
 
   const { data: founders, isLoading } = useQuery({
     queryKey: ["discover", me?.id],
@@ -32,32 +34,59 @@ function Discover() {
 
   if (!ready) return null;
 
+  const current = founders?.[index];
+  const atEnd = !!founders && founders.length > 0 && index >= founders.length;
+
   return (
     <AppShell>
       <div className="mx-auto max-w-2xl px-4 py-6 md:py-10">
-        <div className="mb-6">
-          <h1 className="text-3xl font-black tracking-tight">Discover</h1>
-          <p className="text-sm text-muted-text">Scroll through founders. Send a targeted request when someone resonates.</p>
+        <div className="mb-6 flex items-end justify-between gap-4">
+          <div>
+            <h1 className="text-3xl font-black tracking-tight">Discover</h1>
+            <p className="text-sm text-muted-text">Take your time. Skip when you're ready for the next founder.</p>
+          </div>
+          {founders && founders.length > 0 && !atEnd && (
+            <div className="rounded-lg border-2 border-ink bg-cream px-3 py-1 text-xs font-black shadow-brutal-sm">
+              {index + 1} / {founders.length}
+            </div>
+          )}
         </div>
 
         {isLoading && (
           <div className="grid place-items-center py-24 text-muted-text"><Loader2 className="h-6 w-6 animate-spin" /></div>
         )}
 
-        <div className="space-y-6">
-          {founders?.map((f) => (
-            <FounderCard key={f.id} founder={{ ...f, __me: me?.id }} onConnect={() => setConnectFor(f.id)} />
-          ))}
-          {founders && founders.length === 0 && (
-            <div className="rounded-2xl border-2 border-dashed p-12 text-center">
-              <div className="text-lg font-semibold">You've seen everyone</div>
-              <div className="mt-1 text-sm text-muted-text">New founders join weekly.</div>
-            </div>
-          )}
-        </div>
+        {current && (
+          <div className="space-y-4">
+            <FounderCard key={current.id} founder={{ ...current, __me: me?.id }} onConnect={() => setConnectFor(current.id)} />
+            <button
+              onClick={() => { setSkipped((s) => s + 1); setIndex((i) => i + 1); }}
+              className="flex w-full items-center justify-center gap-2 rounded-xl border-2 border-ink bg-white py-3 text-sm font-black text-ink shadow-brutal box-hover"
+            >
+              Skip <X className="h-4 w-4" /> Next founder
+            </button>
+          </div>
+        )}
 
-        {connectFor && me && (
-          <ConnectModal founder={founders!.find((x) => x.id === connectFor)!} myFounderId={me.id} onClose={() => setConnectFor(null)} />
+        {(atEnd || (founders && founders.length === 0)) && (
+          <div className="rounded-2xl border-2 border-ink bg-cream p-12 text-center shadow-brutal">
+            <div className="text-lg font-black">You've seen everyone</div>
+            <div className="mt-1 text-sm text-muted-text">
+              {atEnd ? `Skipped ${skipped}. ` : ""}New founders join weekly.
+            </div>
+            {atEnd && (
+              <button
+                onClick={() => { setIndex(0); setSkipped(0); }}
+                className="mt-4 inline-flex items-center gap-2 rounded-lg border-2 border-ink bg-orange px-4 py-2 text-xs font-black text-white shadow-brutal-sm box-hover"
+              >
+                Start over
+              </button>
+            )}
+          </div>
+        )}
+
+        {connectFor && me && current && (
+          <ConnectModal founder={current} myFounderId={me.id} onClose={() => setConnectFor(null)} />
         )}
       </div>
     </AppShell>
