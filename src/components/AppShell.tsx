@@ -64,8 +64,8 @@ export function AppShell({ children }: { children: React.ReactNode }) {
       {/* Mobile top bar */}
       <div className="fixed inset-x-0 top-0 z-30 flex items-center justify-between border-b border-black/5 bg-navy px-4 py-3 md:hidden">
         <Link to="/" className="flex items-center gap-2">
-          <div className="grid h-7 w-7 place-items-center rounded-md bg-indigo text-white"><Sparkles className="h-3.5 w-3.5" /></div>
-          <span className="text-base font-black text-white">CoFound<span className="text-indigo-light">.ai</span></span>
+          <div className="grid h-7 w-7 place-items-center border-2 border-ink bg-cream"><VeyraMark size={16} /></div>
+          <span className="text-base font-black text-white">veyra</span>
         </Link>
         <button onClick={signOut} className="text-xs text-white/70">Sign out</button>
       </div>
