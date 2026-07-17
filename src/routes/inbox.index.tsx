@@ -127,6 +127,49 @@ function Inbox() {
           ))}
           {tab === "requests" && (requests?.length ?? 0) === 0 && <Empty label="No pending requests." />}
 
+          {tab === "sent" && sent?.map((r) => {
+            const statusStyle: Record<string, string> = {
+              pending: "bg-amber/20 text-ink border-ink",
+              accepted: "bg-sage text-ink border-ink",
+              declined: "bg-red/20 text-ink border-ink",
+            };
+            const badge = statusStyle[r.status ?? "pending"] ?? statusStyle.pending;
+            return (
+              <div key={r.id} className="rounded-2xl border-2 border-ink bg-cream p-5 shadow-brutal-sm">
+                <div className="flex items-start gap-4">
+                  <img src={founderAvatar({ seed_avatar: r.founder.seed_avatar, seed_name: r.founder.seed_name, profile: r.founder.profiles })}
+                    className="h-12 w-12 shrink-0 rounded-xl border-2 border-ink object-cover" alt="" />
+                  <div className="min-w-0 flex-1">
+                    <div className="flex items-center justify-between gap-2">
+                      <div className="min-w-0">
+                        <div className="truncate font-bold">To {r.founder.profiles?.full_name ?? r.founder.seed_name}</div>
+                        <div className="truncate text-xs text-muted-text">{r.founder.headline}</div>
+                      </div>
+                      <span className={`shrink-0 rounded-md border-2 px-2 py-0.5 text-[10px] font-black uppercase tracking-wider ${badge}`}>
+                        {r.status}
+                      </span>
+                    </div>
+                    {r.prompt_question && (
+                      <div className="mt-3 rounded-lg border-2 border-ink bg-white p-3">
+                        <div className="text-[10px] font-black uppercase tracking-wider text-orange">Reacting to</div>
+                        <div className="text-xs italic">"{r.prompt_question}"</div>
+                      </div>
+                    )}
+                    <p className="mt-3 text-sm">{r.message}</p>
+                    <div className="mt-2 text-[10px] text-muted-text">
+                      Sent {new Date(r.created_at!).toLocaleDateString()}
+                      {r.status === "accepted" && " · They accepted — check Talking"}
+                      {r.status === "declined" && " · They passed"}
+                      {r.status === "pending" && " · Waiting for reply"}
+                    </div>
+                  </div>
+                </div>
+              </div>
+            );
+          })}
+          {tab === "sent" && (sent?.length ?? 0) === 0 && <Empty label="No requests sent yet." />}
+
+
           {tab === "talking" && conversations?.map((c) => {
             const other = c.founder_a_id === me!.id ? c.b : c.a;
             const lastMsg = (c.messages ?? []).sort((a: any, b: any) => (b.created_at ?? "").localeCompare(a.created_at ?? ""))[0];
