@@ -308,21 +308,29 @@ function Inbox() {
             const other = c.founder_a_id === me!.id ? c.b : c.a;
             const lastMsg = (c.messages ?? []).sort((a: Record<string, unknown>, b: Record<string, unknown>) => String(b.created_at ?? "").localeCompare(String(a.created_at ?? "")))[0];
             const labels = labelsByConv.get(c.id) ?? [];
+            const pinned = pinnedSet.has(c.id);
             return (
-              <div key={c.id} className="rounded-2xl border-2 border-ink bg-white p-4 shadow-brutal-sm">
-                <Link to="/inbox/$conversationId" params={{ conversationId: c.id }}
-                  className="flex items-center gap-4">
-                  <img src={founderAvatar({ seed_avatar: other.seed_avatar, seed_name: other.seed_name, profile: other.profiles })}
-                    className="h-12 w-12 rounded-xl border-2 border-ink object-cover" alt="" />
-                  <div className="min-w-0 flex-1">
-                    <div className="flex items-center justify-between">
-                      <div className="font-black">{other.profiles?.full_name ?? other.seed_name}</div>
-                      <div className="text-[10px] font-black uppercase text-muted-text">{c.stage?.replace("_", " ")}</div>
+              <div key={c.id} className={`rounded-2xl border-2 border-ink p-4 shadow-brutal-sm ${pinned ? "bg-cream" : "bg-white"}`}>
+                <div className="flex items-center gap-4">
+                  <Link to="/inbox/$conversationId" params={{ conversationId: c.id }} className="flex flex-1 items-center gap-4 min-w-0">
+                    <img src={founderAvatar({ seed_avatar: other.seed_avatar, seed_name: other.seed_name, profile: other.profiles })}
+                      className="h-12 w-12 rounded-xl border-2 border-ink object-cover" alt="" />
+                    <div className="min-w-0 flex-1">
+                      <div className="flex items-center gap-2">
+                        {pinned && <Pin className="h-3 w-3 fill-orange text-orange" />}
+                        <div className="font-black truncate">{other.profiles?.full_name ?? other.seed_name}</div>
+                        <div className="ml-auto text-[10px] font-black uppercase text-muted-text">{c.stage?.replace("_", " ")}</div>
+                      </div>
+                      <div className="truncate text-xs text-muted-text">{lastMsg?.content ?? "Start the conversation →"}</div>
                     </div>
-                    <div className="truncate text-xs text-muted-text">{lastMsg?.content ?? "Start the conversation →"}</div>
-                  </div>
-                  <MessageSquare className="h-4 w-4 text-muted-text" />
-                </Link>
+                    <MessageSquare className="h-4 w-4 text-muted-text" />
+                  </Link>
+                  <button onClick={() => togglePin(c.id)}
+                    title={pinned ? "Unpin" : "Pin to top"}
+                    className={`shrink-0 rounded-md border-2 border-ink p-2 shadow-brutal-sm box-hover ${pinned ? "bg-orange text-white" : "bg-white text-ink"}`}>
+                    {pinned ? <PinOff className="h-3.5 w-3.5" /> : <Pin className="h-3.5 w-3.5" />}
+                  </button>
+                </div>
                 <div className="mt-3 flex flex-wrap items-center gap-1.5">
                   {labels.map((l) => (
                     <button key={l.id} onClick={() => removeLabel(l.id)}
