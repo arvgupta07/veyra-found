@@ -1,12 +1,14 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
+import { useEffect, useState } from "react";
+import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { useMyFounder, useMyProfile } from "@/hooks/useMyFounder";
 import { AppShell } from "@/components/AppShell";
 import { useRequireAuth } from "@/hooks/useRequireAuth";
 import { SkillTag, TierBadge, VerifiedBadges } from "@/components/FounderBits";
-import { founderAvatar } from "@/lib/founder-types";
-import { MapPin, Briefcase } from "lucide-react";
+import { founderAvatar, SKILLS_LIST } from "@/lib/founder-types";
+import { MapPin, Briefcase, Pencil, X, Loader2, Save } from "lucide-react";
 
 export const Route = createFileRoute("/profile/me")({
   component: MyProfile,
