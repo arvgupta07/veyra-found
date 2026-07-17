@@ -389,14 +389,17 @@ export type Database = {
         Row: {
           founder_id: string
           post_id: string
+          value: number
         }
         Insert: {
           founder_id: string
           post_id: string
+          value?: number
         }
         Update: {
           founder_id?: string
           post_id?: string
+          value?: number
         }
         Relationships: [
           {
