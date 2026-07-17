@@ -76,6 +76,24 @@ function MyProfile() {
     { label: "Vision", v: assessment?.vision_score },
   ];
 
+  // Profile completeness — 10 checks × 10pts
+  const checks = [
+    { key: "Name",        ok: !!(profile?.full_name && profile.full_name.length >= 2) },
+    { key: "Headline",    ok: !!(me.headline && me.headline.length >= 10) },
+    { key: "Bio (50+ chars)", ok: !!(me.bio && me.bio.length >= 50) },
+    { key: "Location",    ok: !!me.location },
+    { key: "Age",         ok: !!me.age },
+    { key: "Avatar",      ok: !!me.seed_avatar },
+    { key: "3+ skills",   ok: (me.skills ?? []).length >= 3 },
+    { key: "3 prompts",   ok: (prompts ?? []).length >= 3 },
+    { key: "Assessment",  ok: !!assessment },
+    { key: "Verified",    ok: !!(me.linkedin_verified || me.github_verified || me.aadhaar_verified) },
+  ];
+  const done = checks.filter((c) => c.ok).length;
+  const pct = Math.round((done / checks.length) * 100);
+  const missing = checks.filter((c) => !c.ok);
+  const barColor = pct >= 80 ? "bg-sage" : pct >= 50 ? "bg-orange" : "bg-red";
+
   return (
     <AppShell>
       <div className="mx-auto max-w-3xl px-4 py-6 md:py-10">
