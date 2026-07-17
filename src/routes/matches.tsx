@@ -163,10 +163,19 @@ function MatchRow({ f, score, rank }: { f: Record<string, unknown> & { id: strin
       </div>
       <div className="mt-4 flex gap-2">
         <Link
-          to="/discover"
+          to="/profile/$founderId"
+          params={{ founderId: founder.id }}
           className="flex-1 rounded-lg border-2 border-ink bg-white py-2 text-center text-xs font-black shadow-brutal-sm box-hover"
         >
-          View profile in Discover
+          View profile
+        </Link>
+        <Link
+          to="/profile/$founderId"
+          params={{ founderId: founder.id }}
+          hash="connect"
+          className="flex-1 rounded-lg border-2 border-ink bg-orange py-2 text-center text-xs font-black text-white shadow-brutal-sm box-hover"
+        >
+          Message
         </Link>
       </div>
     </article>
