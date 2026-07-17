@@ -18,6 +18,8 @@ function MyProfile() {
   const { ready } = useRequireAuth({ requireOnboarded: true });
   const { data: me } = useMyFounder();
   const { data: profile } = useMyProfile();
+  const qc = useQueryClient();
+  const [editing, setEditing] = useState(false);
   const { data: assessment } = useQuery({
     queryKey: ["assessment", me?.id],
     enabled: !!me?.id,
