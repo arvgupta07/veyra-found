@@ -18,6 +18,7 @@ function FounderProfile() {
   const { ready } = useRequireAuth({ requireOnboarded: true });
   const { founderId } = Route.useParams();
   const { data: me } = useMyFounder();
+  const qc = useQueryClient();
   const [connectOpen, setConnectOpen] = useState(false);
 
   useEffect(() => {
@@ -33,6 +34,37 @@ function FounderProfile() {
       return f;
     },
   });
+
+  const { data: block } = useQuery({
+    queryKey: ["block", me?.id, founderId],
+    enabled: !!me?.id && me?.id !== founderId,
+    queryFn: async () => {
+      const { data } = await supabase.from("blocks")
+        .select("id, blocker_id, blocked_id")
+        .or(`and(blocker_id.eq.${me!.id},blocked_id.eq.${founderId}),and(blocker_id.eq.${founderId},blocked_id.eq.${me!.id})`)
+        .maybeSingle();
+      return data;
+    },
+  });
+
+  async function toggleBlock() {
+    if (!me) return;
+    if (block?.blocker_id === me.id) {
+      const { error } = await supabase.from("blocks").delete().eq("id", block.id);
+      if (error) return toast.error(error.message);
+      toast.success("Unblocked");
+    } else if (block) {
+      return toast.error("This user has blocked you.");
+    } else {
+      const { error } = await supabase.from("blocks").insert({ blocker_id: me.id, blocked_id: founderId });
+      if (error) return toast.error(error.message);
+      toast.success("Blocked. They can no longer message you.");
+    }
+    qc.invalidateQueries({ queryKey: ["block", me.id, founderId] });
+    qc.invalidateQueries({ queryKey: ["discover-feed"] });
+    qc.invalidateQueries({ queryKey: ["inbox-convos"] });
+    qc.invalidateQueries({ queryKey: ["inbox-requests"] });
+  }
 
   if (!ready) return null;
   if (isLoading) return <AppShell><div className="grid place-items-center py-24"><Loader2 className="h-6 w-6 animate-spin" /></div></AppShell>;
