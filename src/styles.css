@@ -199,20 +199,24 @@
   }
 
   /* Marquee */
-  .animate-marquee { animation: marquee 22s linear infinite; }
+  .animate-marquee {
+    animation: marquee 22s linear infinite;
+    will-change: transform;
+    transform: translateZ(0);
+  }
   @keyframes marquee {
-    0% { transform: translateX(0); }
-    100% { transform: translateX(-50%); }
+    0% { transform: translate3d(0,0,0); }
+    100% { transform: translate3d(-50%,0,0); }
   }
 
   /* Floating blob */
-  .animate-float { animation: floaty 6s ease-in-out infinite; }
+  .animate-float { animation: floaty 6s ease-in-out infinite; will-change: transform; }
   @keyframes floaty {
     0%,100% { transform: translateY(0) rotate(-2deg); }
     50% { transform: translateY(-10px) rotate(2deg); }
   }
 
-  .animate-wiggle { animation: wiggle 2.4s ease-in-out infinite; }
+  .animate-wiggle { animation: wiggle 2.4s ease-in-out infinite; will-change: transform; }
   @keyframes wiggle {
     0%,100% { transform: rotate(-1.5deg); }
     50% { transform: rotate(1.5deg); }
@@ -234,6 +238,26 @@
     background-size: 32px 32px;
     background-position: -1px -1px;
     opacity: 0.06;
+  }
+
+  /* Defer offscreen paint work — big win on long landing pages */
+  .cv-auto {
+    content-visibility: auto;
+    contain-intrinsic-size: 800px;
+  }
+
+  /* Kill decorative animations on small screens where they cost the most */
+  @media (max-width: 640px) {
+    .animate-float, .animate-wiggle { animation: none !important; }
+    .bg-grid { display: none; }
+  }
+
+  /* Respect user preference */
+  @media (prefers-reduced-motion: reduce) {
+    .animate-marquee, .animate-float, .animate-wiggle, .animate-blink, .animate-pop-in {
+      animation: none !important;
+    }
+    .box-hover, .box-press { transition: none !important; }
   }
 
   .stripe-orange {

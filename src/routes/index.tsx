@@ -221,7 +221,7 @@ function Landing() {
       </section>
 
       {/* Features */}
-      <section id="founders" className="border-b-[3px] border-ink bg-cream">
+      <section id="founders" className="cv-auto border-b-[3px] border-ink bg-cream">
         <div className="mx-auto max-w-7xl px-4 py-16 sm:px-6 md:py-24">
           <div className="grid grid-cols-[minmax(0,1fr)_auto] items-end gap-4">
             <div className="min-w-0">
@@ -256,7 +256,7 @@ function Landing() {
       </section>
 
       {/* How it works */}
-      <section id="how" className="border-b-[3px] border-ink bg-sage">
+      <section id="how" className="cv-auto border-b-[3px] border-ink bg-sage">
         <div className="mx-auto max-w-7xl px-4 py-16 sm:px-6 md:py-24">
           <h2 className="text-4xl md:text-6xl">How it works</h2>
           <div className="mt-12 grid gap-6 md:grid-cols-4">
@@ -280,7 +280,7 @@ function Landing() {
       </section>
 
       {/* Testimonial strip */}
-      <section className="border-b-[3px] border-ink bg-orange">
+      <section className="cv-auto border-b-[3px] border-ink bg-orange">
         <div className="mx-auto grid max-w-7xl gap-6 px-4 py-16 sm:px-6 md:grid-cols-3 md:py-20">
           {[
             { q: "Found my technical co-founder in 11 days. Shipped MVP in 3 weeks.", who: "Rahul, Fintech" },
@@ -299,7 +299,7 @@ function Landing() {
       </section>
 
       {/* CTA */}
-      <section id="investors" className="border-b-[3px] border-ink bg-red text-cream">
+      <section id="investors" className="cv-auto border-b-[3px] border-ink bg-red text-cream">
         <div className="mx-auto max-w-7xl px-4 py-20 text-center sm:px-6 md:py-28">
           <h2 className="text-5xl md:text-7xl">Ready to find<br /><span className="bg-cream px-3 text-ink border-[3px] border-ink shadow-brutal inline-block">your co-founder?</span></h2>
           <p className="mt-6 text-lg font-bold text-cream/90">Free. No credit card. Real founders only.</p>
