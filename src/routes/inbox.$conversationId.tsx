@@ -7,12 +7,26 @@ import { AppShell } from "@/components/AppShell";
 import { useRequireAuth } from "@/hooks/useRequireAuth";
 import { founderAvatar } from "@/lib/founder-types";
 import { ScoreRing } from "@/components/FounderBits";
-import { Send, ArrowLeft, Sparkles, ChevronDown, Loader2, AlertTriangle, CheckCircle2, MessageCircle } from "lucide-react";
+import { Send, ArrowLeft, Sparkles, ChevronDown, Loader2, AlertTriangle, CheckCircle2, MessageCircle, Pencil, Trash2, Smile, Check, X } from "lucide-react";
 import { toast } from "sonner";
 
 export const Route = createFileRoute("/inbox/$conversationId")({
   component: ConversationView,
 });
+
+const REACTIONS = ["👍", "❤️", "😂", "🎉", "🔥", "🤔"];
+
+type MessageRow = {
+  id: string;
+  conversation_id: string;
+  sender_id: string | null;
+  seed_sender_founder_id: string | null;
+  content: string;
+  created_at: string;
+  edited_at: string | null;
+  deleted_at: string | null;
+  reactions: Record<string, string[]> | null;
+};
 
 function ConversationView() {
   const { conversationId } = useParams({ from: "/inbox/$conversationId" });
@@ -22,6 +36,9 @@ function ConversationView() {
   const bottomRef = useRef<HTMLDivElement>(null);
   const [reportOpen, setReportOpen] = useState(true);
   const [text, setText] = useState("");
+  const [activeMsg, setActiveMsg] = useState<string | null>(null);
+  const [editingId, setEditingId] = useState<string | null>(null);
+  const [editText, setEditText] = useState("");
 
   const { data: convo } = useQuery({
     queryKey: ["convo", conversationId],
@@ -38,7 +55,7 @@ function ConversationView() {
     queryFn: async () => {
       const { data } = await supabase.from("messages")
         .select("*").eq("conversation_id", conversationId).order("created_at", { ascending: true });
-      return data ?? [];
+      return (data ?? []) as unknown as MessageRow[];
     },
   });
 
@@ -52,7 +69,7 @@ function ConversationView() {
 
   useEffect(() => {
     const ch = supabase.channel(`msgs-${conversationId}`)
-      .on("postgres_changes", { event: "INSERT", schema: "public", table: "messages", filter: `conversation_id=eq.${conversationId}` },
+      .on("postgres_changes", { event: "*", schema: "public", table: "messages", filter: `conversation_id=eq.${conversationId}` },
         () => qc.invalidateQueries({ queryKey: ["messages", conversationId] }))
       .subscribe();
     return () => { supabase.removeChannel(ch); };
@@ -83,6 +100,36 @@ function ConversationView() {
     if (error) toast.error(error.message);
   }
 
+  async function saveEdit(id: string) {
+    const content = editText.trim();
+    if (!content) return;
+    const { error } = await supabase.from("messages")
+      .update({ content, edited_at: new Date().toISOString() }).eq("id", id);
+    if (error) return toast.error(error.message);
+    setEditingId(null); setEditText("");
+    qc.invalidateQueries({ queryKey: ["messages", conversationId] });
+  }
+
+  async function deleteMsg(id: string) {
+    const { error } = await supabase.from("messages")
+      .update({ deleted_at: new Date().toISOString(), content: "" }).eq("id", id);
+    if (error) return toast.error(error.message);
+    setActiveMsg(null);
+    qc.invalidateQueries({ queryKey: ["messages", conversationId] });
+  }
+
+  async function toggleReaction(m: MessageRow, emoji: string) {
+    if (!me?.user_id) return;
+    const current = (m.reactions as Record<string, string[]> | null) ?? {};
+    const list = current[emoji] ?? [];
+    const has = list.includes(me.user_id);
+    const next = { ...current, [emoji]: has ? list.filter((u) => u !== me.user_id) : [...list, me.user_id] };
+    if (next[emoji].length === 0) delete next[emoji];
+    const { error } = await supabase.from("messages").update({ reactions: next }).eq("id", m.id);
+    if (error) toast.error(error.message);
+    setActiveMsg(null);
+  }
+
   if (!ready || !convo || !me) return null;
   const other = convo.founder_a_id === me.id ? convo.b : convo.a;
   const otherName = other.profiles?.full_name ?? other.seed_name ?? "Founder";
@@ -91,24 +138,27 @@ function ConversationView() {
     <AppShell>
       <div className="mx-auto flex h-[calc(100vh-3.5rem)] max-w-5xl flex-col md:h-screen">
         {/* Header */}
-        <div className="flex items-center gap-3 border-b bg-white px-4 py-3">
-          <Link to="/inbox" className="text-muted-text hover:text-foreground"><ArrowLeft className="h-5 w-5" /></Link>
-          <img src={founderAvatar({ seed_avatar: other.seed_avatar, seed_name: other.seed_name, profile: other.profiles })} className="h-10 w-10 rounded-xl object-cover" alt="" />
-          <div className="min-w-0 flex-1">
-            <div className="truncate font-bold">{otherName}</div>
-            <div className="truncate text-xs text-muted-text">{other.headline}</div>
-          </div>
-          <span className="rounded-full bg-indigo/10 px-2.5 py-1 text-[10px] font-bold uppercase tracking-wider text-indigo">{convo.stage?.replace("_", " ")}</span>
+        <div className="flex items-center gap-3 border-b-2 border-ink bg-white px-4 py-3">
+          <Link to="/inbox" className="text-muted-text hover:text-ink"><ArrowLeft className="h-5 w-5" /></Link>
+          <Link to="/profile/$founderId" params={{ founderId: other.id }} className="flex items-center gap-3 flex-1 min-w-0">
+            <img src={founderAvatar({ seed_avatar: other.seed_avatar, seed_name: other.seed_name, profile: other.profiles })}
+              className="h-10 w-10 rounded-xl border-2 border-ink object-cover transition hover:-translate-y-0.5" alt="" />
+            <div className="min-w-0 flex-1">
+              <div className="truncate font-black hover:text-orange">{otherName}</div>
+              <div className="truncate text-xs text-muted-text">{other.headline}</div>
+            </div>
+          </Link>
+          <span className="rounded-md border-2 border-ink bg-cream px-2 py-1 text-[10px] font-black uppercase tracking-wider">{convo.stage?.replace("_", " ")}</span>
         </div>
 
         {/* AI Report drawer */}
-        <div className="border-b bg-gradient-to-r from-indigo/5 to-transparent">
+        <div className="border-b-2 border-ink bg-cream/40">
           <button onClick={() => setReportOpen((v) => !v)} className="flex w-full items-center justify-between px-4 py-3 text-left">
             <div className="flex items-center gap-2">
-              <Sparkles className="h-4 w-4 text-indigo" />
-              <span className="text-sm font-semibold">AI Compatibility Report</span>
+              <Sparkles className="h-4 w-4 text-orange" />
+              <span className="text-sm font-black">AI Compatibility Report</span>
               {report?.compatibility_score && (
-                <span className="rounded-full bg-indigo px-2 py-0.5 text-[11px] font-bold text-white">{report.compatibility_score}/100</span>
+                <span className="rounded-md border-2 border-ink bg-orange px-2 py-0.5 text-[11px] font-black text-white">{report.compatibility_score}/100</span>
               )}
             </div>
             <ChevronDown className={`h-4 w-4 transition ${reportOpen ? "rotate-180" : ""}`} />
@@ -138,14 +188,69 @@ function ConversationView() {
         </div>
 
         {/* Messages */}
-        <div className="flex-1 overflow-y-auto bg-surface px-4 py-6">
+        <div className="flex-1 overflow-y-auto bg-surface px-4 py-6" onClick={() => setActiveMsg(null)}>
           <div className="mx-auto max-w-2xl space-y-3">
             {(messages ?? []).map((m) => {
               const mine = m.sender_id === me.user_id || m.seed_sender_founder_id === me.id;
+              const deleted = !!m.deleted_at;
+              const editing = editingId === m.id;
+              const reactions = (m.reactions as Record<string, string[]> | null) ?? {};
+              const isActive = activeMsg === m.id;
               return (
                 <div key={m.id} className={`flex ${mine ? "justify-end" : "justify-start"}`}>
-                  <div className={`max-w-[75%] rounded-2xl px-4 py-2.5 text-sm ${mine ? "bg-indigo text-white" : "bg-white text-foreground shadow-card"}`}>
-                    {m.content}
+                  <div className="relative max-w-[80%]">
+                    <div
+                      onClick={(e) => { e.stopPropagation(); if (!deleted && !editing) setActiveMsg(isActive ? null : m.id); }}
+                      className={`cursor-pointer rounded-2xl border-2 border-ink px-4 py-2.5 text-sm shadow-brutal-sm ${
+                        deleted ? "bg-white text-muted-text italic" :
+                        mine ? "bg-orange text-white" : "bg-white text-ink"
+                      }`}
+                    >
+                      {deleted ? "message deleted" : editing ? (
+                        <div className="flex flex-col gap-2 min-w-[220px]">
+                          <textarea value={editText} onChange={(e) => setEditText(e.target.value)} rows={2}
+                            className="w-full rounded-md border-2 border-ink bg-white p-1.5 text-sm text-ink" />
+                          <div className="flex justify-end gap-1">
+                            <button onClick={() => { setEditingId(null); setEditText(""); }} className="rounded border-2 border-ink bg-white px-2 py-0.5 text-xs font-black text-ink"><X className="h-3 w-3" /></button>
+                            <button onClick={() => saveEdit(m.id)} className="rounded border-2 border-ink bg-sage px-2 py-0.5 text-xs font-black text-ink"><Check className="h-3 w-3" /></button>
+                          </div>
+                        </div>
+                      ) : (
+                        <>
+                          <div>{m.content}</div>
+                          {m.edited_at && <div className="mt-0.5 text-[9px] font-bold opacity-70">edited</div>}
+                        </>
+                      )}
+                    </div>
+
+                    {/* Reactions summary */}
+                    {!deleted && Object.keys(reactions).length > 0 && (
+                      <div className={`mt-1 flex flex-wrap gap-1 ${mine ? "justify-end" : "justify-start"}`}>
+                        {Object.entries(reactions).map(([em, users]) => (
+                          <button key={em} onClick={(e) => { e.stopPropagation(); toggleReaction(m, em); }}
+                            className={`inline-flex items-center gap-1 rounded-full border-2 border-ink bg-white px-1.5 py-0.5 text-[11px] font-black ${users.includes(me.user_id ?? "") ? "bg-cream" : ""}`}>
+                            {em} <span>{users.length}</span>
+                          </button>
+                        ))}
+                      </div>
+                    )}
+
+                    {/* Action bar */}
+                    {isActive && !deleted && !editing && (
+                      <div className={`absolute -top-9 z-10 flex items-center gap-1 rounded-xl border-2 border-ink bg-white p-1 shadow-brutal-sm ${mine ? "right-0" : "left-0"}`}
+                        onClick={(e) => e.stopPropagation()}>
+                        {REACTIONS.map((em) => (
+                          <button key={em} onClick={() => toggleReaction(m, em)} className="rounded px-1 text-base hover:bg-cream">{em}</button>
+                        ))}
+                        {mine && (
+                          <>
+                            <div className="mx-1 h-4 w-px bg-ink/20" />
+                            <button onClick={() => { setEditingId(m.id); setEditText(m.content); setActiveMsg(null); }} className="grid h-6 w-6 place-items-center rounded hover:bg-cream" title="Edit"><Pencil className="h-3 w-3" /></button>
+                            <button onClick={() => deleteMsg(m.id)} className="grid h-6 w-6 place-items-center rounded text-red hover:bg-red/10" title="Delete"><Trash2 className="h-3 w-3" /></button>
+                          </>
+                        )}
+                      </div>
+                    )}
                   </div>
                 </div>
               );
@@ -169,11 +274,8 @@ function ConversationView() {
               ) : (report.conversation_starters as string[] | null)?.length ? (
                 <div className="flex flex-wrap gap-2">
                   {(report.conversation_starters as string[]).map((s, i) => (
-                    <button
-                      key={i}
-                      onClick={() => setText(s)}
-                      className="rounded-lg border-2 border-ink bg-white px-3 py-2 text-left text-xs font-semibold shadow-[3px_3px_0_0_hsl(var(--ink))] transition hover:-translate-x-0.5 hover:-translate-y-0.5 hover:shadow-[5px_5px_0_0_hsl(var(--ink))]"
-                    >
+                    <button key={i} onClick={() => setText(s)}
+                      className="rounded-lg border-2 border-ink bg-white px-3 py-2 text-left text-xs font-semibold shadow-brutal-sm box-hover">
                       {s}
                     </button>
                   ))}
@@ -186,15 +288,19 @@ function ConversationView() {
         )}
 
         {/* Composer */}
-        <div className="border-t bg-white p-3">
+        <div className="border-t-2 border-ink bg-white p-3">
           <div className="mx-auto flex max-w-2xl items-center gap-2">
             <input value={text} onChange={(e) => setText(e.target.value)}
               onKeyDown={(e) => { if (e.key === "Enter" && !e.shiftKey) { e.preventDefault(); send(); } }}
               placeholder="Send a message…"
-              className="flex-1 rounded-full border bg-surface px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-indigo" />
-            <button onClick={send} disabled={!text.trim()} className="grid h-10 w-10 place-items-center rounded-full bg-indigo text-white disabled:opacity-50">
+              className="flex-1 rounded-lg border-2 border-ink bg-white px-4 py-2.5 text-sm outline-none" />
+            <button onClick={send} disabled={!text.trim()}
+              className="grid h-10 w-10 place-items-center rounded-lg border-2 border-ink bg-orange text-white shadow-brutal-sm disabled:opacity-50">
               <Send className="h-4 w-4" />
             </button>
+          </div>
+          <div className="mx-auto mt-1 max-w-2xl text-[10px] text-muted-text">
+            <Smile className="mr-1 inline h-3 w-3" /> Tap any message to react, edit, or delete.
           </div>
         </div>
 
@@ -203,7 +309,7 @@ function ConversationView() {
   );
 }
 
-function ReportList({ title, items, color, icon: Icon }: { title: string; items: string[] | null; color: string; icon: any }) {
+function ReportList({ title, items, color, icon: Icon }: { title: string; items: string[] | null; color: string; icon: React.ComponentType<{ className?: string }> }) {
   if (!items?.length) return null;
   const colorMap: Record<string, string> = { emerald: "text-emerald", amber: "text-amber", destructive: "text-destructive", indigo: "text-indigo" };
   return (
