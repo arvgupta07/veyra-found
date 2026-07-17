@@ -37,7 +37,7 @@ function Onboarding() {
 
   // Form state
   const [f, setF] = useState({
-    full_name: "", headline: "", bio: "", location: "",
+    full_name: "", age: 25, headline: "", bio: "", location: "",
     linkedin_url: "", github_url: "", years_experience: 3,
     background: "technical" as "technical"|"business"|"design"|"other",
     skills: [] as string[], custom_skill: "",
