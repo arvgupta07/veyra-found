@@ -46,6 +46,8 @@ function Onboarding() {
     idea_stage: "idea" as "idea"|"mvp"|"revenue"|"funded",
     has_idea: false, idea_industry: "", idea_description: "",
     equity_offer: 40, exit_vision: "ipo" as "lifestyle"|"acquisition"|"ipo",
+    remote_pref: "hybrid" as "onsite"|"hybrid"|"remote",
+    looking_for: [] as string[],
   });
   useEffect(() => { if (profile?.full_name) setF((x) => ({ ...x, full_name: profile.full_name ?? "" })); }, [profile]);
 
@@ -91,6 +93,8 @@ function Onboarding() {
       idea_description: f.has_idea ? f.idea_description : null,
       equity_offer: `${f.equity_offer}%`,
       exit_vision: f.exit_vision,
+      remote_pref: f.remote_pref,
+      looking_for: f.looking_for,
     }).eq("id", founder.id);
     setSaving(false);
     if (error) return toast.error(error.message);
@@ -253,6 +257,17 @@ function Onboarding() {
                 <input type="range" min={10} max={60} step={5} value={f.equity_offer} onChange={(e) => setF({ ...f, equity_offer: +e.target.value })} className="mt-2 w-full accent-indigo" />
               </div>
               <CardChoice label="Exit vision" value={f.exit_vision} onChange={(v) => setF({ ...f, exit_vision: v as typeof f.exit_vision })} options={[["lifestyle","Lifestyle"],["acquisition","Get acquired"],["ipo","Go public"]]} />
+              <CardChoice label="Work location preference" value={f.remote_pref} onChange={(v) => setF({ ...f, remote_pref: v as typeof f.remote_pref })} options={[["onsite","On-site"],["hybrid","Hybrid"],["remote","Remote"]]} />
+              <div>
+                <label className="text-xs font-semibold text-muted-text">What I'm looking for in a co-founder</label>
+                <p className="text-[11px] text-muted-text">Skills or backgrounds that complement yours.</p>
+                <div className="mt-2 flex flex-wrap gap-1.5">
+                  {SKILLS_LIST.map((s) => {
+                    const on = f.looking_for.includes(s);
+                    return <button key={s} type="button" onClick={() => setF({ ...f, looking_for: on ? f.looking_for.filter((x) => x !== s) : [...f.looking_for, s] })} className={`rounded-md px-2.5 py-1 text-xs font-medium ${on ? "bg-orange text-white" : "bg-surface-2 text-muted-text hover:bg-orange/10"}`}>{s}</button>;
+                  })}
+                </div>
+              </div>
             </div>
             <div className="flex justify-between">
               <button onClick={() => setStep(1)} className="rounded-lg border px-4 py-2 text-sm">Back</button>
