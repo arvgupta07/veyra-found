@@ -65,6 +65,7 @@ function MyProfile() {
                 <div className="mt-1 text-sm text-white/70">{me.headline}</div>
                 <div className="mt-2 flex items-center gap-3 text-xs text-white/60">
                   <span className="inline-flex items-center gap-1"><MapPin className="h-3 w-3" /> {me.location}</span>
+                  {me.age && <span className="inline-flex items-center gap-1">🎂 {me.age}</span>}
                   <span className="inline-flex items-center gap-1"><Briefcase className="h-3 w-3" /> {me.years_experience}y</span>
                 </div>
               </div>
