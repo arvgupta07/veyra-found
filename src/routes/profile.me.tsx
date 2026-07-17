@@ -79,7 +79,7 @@ function MyProfile() {
           </div>
 
           {editing && <EditPanel
-            initial={{ full_name: profile?.full_name ?? "", headline: me.headline ?? "", bio: me.bio ?? "", location: me.location ?? "", skills: me.skills ?? [] }}
+            initial={{ full_name: profile?.full_name ?? "", headline: me.headline ?? "", bio: me.bio ?? "", location: me.location ?? "", age: me.age ?? 0, skills: me.skills ?? [] }}
             founderId={me.id}
             userId={me.user_id ?? ""}
             onClose={() => setEditing(false)}
