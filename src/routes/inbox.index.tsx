@@ -236,34 +236,32 @@ function Inbox() {
                       </div>
                     )}
                     <p className="mt-3 text-sm">{r.message}</p>
-                    <div className="mt-2 flex items-center justify-between gap-2">
-                      <div className="text-[10px] text-muted-text">
-                        Sent {new Date(r.created_at!).toLocaleDateString()}
-                        {r.status === "accepted" && " · They accepted — check Talking"}
-                        {r.status === "declined" && " · They passed"}
-                        {r.status === "pending" && " · Waiting for reply"}
-                      </div>
-                      {r.status === "pending" && (
-                        <button
-                          onClick={async () => {
-                            const { data: deleted, error } = await supabase
-                              .from("connection_requests")
-                              .delete()
-                              .eq("id", r.id)
-                              .select("id");
-                            if (error) return toast.error(error.message);
-                            if (!deleted || deleted.length === 0) {
-                              return toast.error("Couldn't retract — permission denied.");
-                            }
-                            toast.success("Request retracted");
-                            await qc.invalidateQueries({ queryKey: ["inbox-sent", me?.id] });
-                            await qc.invalidateQueries({ queryKey: ["inbox-requests"] });
-                          }}
-                          className="rounded-md border-2 border-ink bg-red px-2 py-1 text-[10px] font-black uppercase text-white shadow-brutal-sm hover:-translate-y-0.5 transition">
-                          Retract
-                        </button>
-                      )}
+                    <div className="mt-3 text-[10px] text-muted-text">
+                      Sent {new Date(r.created_at!).toLocaleDateString()}
+                      {r.status === "accepted" && " · They accepted — check Talking"}
+                      {r.status === "declined" && " · They passed"}
+                      {r.status === "pending" && " · Waiting for reply"}
                     </div>
+                    {r.status === "pending" && (
+                      <button
+                        onClick={async () => {
+                          const { data: deleted, error } = await supabase
+                            .from("connection_requests")
+                            .delete()
+                            .eq("id", r.id)
+                            .select("id");
+                          if (error) return toast.error(error.message);
+                          if (!deleted || deleted.length === 0) {
+                            return toast.error("Couldn't retract — permission denied.");
+                          }
+                          toast.success("Request retracted");
+                          await qc.invalidateQueries({ queryKey: ["inbox-sent", me?.id] });
+                          await qc.invalidateQueries({ queryKey: ["inbox-requests"] });
+                        }}
+                        className="mt-3 flex w-full items-center justify-center gap-1.5 rounded-lg border-2 border-ink bg-red px-4 py-2 text-xs font-black uppercase tracking-wider text-white shadow-brutal-sm hover:-translate-y-0.5 transition">
+                        <X className="h-3.5 w-3.5" /> Retract request
+                      </button>
+                    )}
                   </div>
                 </div>
               </div>
