@@ -154,6 +154,37 @@ function ConversationView() {
           </div>
         </div>
 
+        {/* AI conversation starters — shown when chat is empty */}
+        {(messages?.length ?? 0) === 0 && (
+          <div className="border-t-2 border-ink bg-cream px-4 py-3">
+            <div className="mx-auto max-w-2xl">
+              <div className="mb-2 flex items-center gap-2">
+                <Sparkles className="h-4 w-4 text-orange" />
+                <span className="text-[11px] font-black uppercase tracking-wider">AI starters — tuned to your compatibility</span>
+              </div>
+              {!report ? (
+                <div className="flex items-center gap-2 text-xs text-muted-text">
+                  <Loader2 className="h-3 w-3 animate-spin" /> Crafting personalized openers…
+                </div>
+              ) : (report.conversation_starters as string[] | null)?.length ? (
+                <div className="flex flex-wrap gap-2">
+                  {(report.conversation_starters as string[]).map((s, i) => (
+                    <button
+                      key={i}
+                      onClick={() => setText(s)}
+                      className="rounded-lg border-2 border-ink bg-white px-3 py-2 text-left text-xs font-semibold shadow-[3px_3px_0_0_hsl(var(--ink))] transition hover:-translate-x-0.5 hover:-translate-y-0.5 hover:shadow-[5px_5px_0_0_hsl(var(--ink))]"
+                    >
+                      {s}
+                    </button>
+                  ))}
+                </div>
+              ) : (
+                <div className="text-xs text-muted-text">No starters available yet — say hi!</div>
+              )}
+            </div>
+          </div>
+        )}
+
         {/* Composer */}
         <div className="border-t bg-white p-3">
           <div className="mx-auto flex max-w-2xl items-center gap-2">
@@ -166,6 +197,7 @@ function ConversationView() {
             </button>
           </div>
         </div>
+
       </div>
     </AppShell>
   );
