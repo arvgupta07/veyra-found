@@ -116,7 +116,7 @@ function Forum() {
   );
 }
 
-function ComposeModal({ onClose, founderId }: { onClose: () => void; founderId: string }) {
+function ComposeModal({ onClose, founderId }: { onClose: (postedCategory?: string) => void; founderId: string }) {
   const [title, setTitle] = useState("");
   const [content, setContent] = useState("");
   const [category, setCategory] = useState<string>("idea_validation");
@@ -133,7 +133,7 @@ function ComposeModal({ onClose, founderId }: { onClose: () => void; founderId: 
     setSaving(false);
     if (error) return toast.error(error.message);
     toast.success("Posted!");
-    onClose();
+    onClose(category);
   }
 
   return (
