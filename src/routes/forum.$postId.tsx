@@ -55,6 +55,30 @@ function PostView() {
     },
   });
 
+  const { data: myVote } = useQuery({
+    queryKey: ["myvote", postId, me?.id],
+    enabled: !!me?.id,
+    queryFn: async () => {
+      const { data } = await supabase.from("forum_upvotes").select("value")
+        .eq("founder_id", me!.id).eq("post_id", postId).maybeSingle();
+      return (data?.value ?? 0) as number;
+    },
+  });
+
+  async function vote(next: 1 | -1) {
+    if (!me) return;
+    const current = myVote ?? 0;
+    if (current === next) {
+      await supabase.from("forum_upvotes").delete().eq("post_id", postId).eq("founder_id", me.id);
+    } else if (current === 0) {
+      await supabase.from("forum_upvotes").insert({ post_id: postId, founder_id: me.id, value: next });
+    } else {
+      await supabase.from("forum_upvotes").update({ value: next }).eq("post_id", postId).eq("founder_id", me.id);
+    }
+    qc.invalidateQueries({ queryKey: ["myvote", postId, me.id] });
+    qc.invalidateQueries({ queryKey: ["post", postId] });
+  }
+
   async function toggleSave() {
     if (!me) return;
     if (saved) {
