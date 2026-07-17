@@ -175,10 +175,12 @@ function Inbox() {
           {tab === "requests" && requests?.map((r) => (
             <div key={r.id} className="rounded-2xl border-2 border-ink bg-white p-5 shadow-brutal-sm">
               <div className="flex items-start gap-4">
-                <img src={founderAvatar({ seed_avatar: r.founder.seed_avatar, seed_name: r.founder.seed_name, profile: r.founder.profiles })}
-                  className="h-12 w-12 rounded-xl border-2 border-ink object-cover" alt="" />
+                <Link to="/profile/$founderId" params={{ founderId: r.from_founder_id }}>
+                  <img src={founderAvatar({ seed_avatar: r.founder.seed_avatar, seed_name: r.founder.seed_name, profile: r.founder.profiles })}
+                    className="h-12 w-12 rounded-xl border-2 border-ink object-cover transition hover:scale-105" alt="" />
+                </Link>
                 <div className="flex-1">
-                  <div className="font-black">{r.founder.profiles?.full_name ?? r.founder.seed_name}</div>
+                  <Link to="/profile/$founderId" params={{ founderId: r.from_founder_id }} className="font-black hover:text-orange">{r.founder.profiles?.full_name ?? r.founder.seed_name}</Link>
                   <div className="text-xs text-muted-text">{r.founder.headline}</div>
                   {r.prompt_question && (
                     <div className="mt-3 rounded-lg border-2 border-ink bg-cream p-3">
