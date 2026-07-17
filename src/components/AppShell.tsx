@@ -34,10 +34,10 @@ export function AppShell({ children }: { children: React.ReactNode }) {
       {/* Sidebar (desktop) */}
       <aside className="fixed inset-y-0 left-0 hidden w-60 flex-col border-r border-white/5 bg-navy px-4 py-6 md:flex">
         <Link to="/" className="flex items-center gap-2 px-2">
-          <div className="grid h-8 w-8 place-items-center rounded-lg bg-indigo text-white shadow-md">
-            <Sparkles className="h-4 w-4" />
+          <div className="grid h-9 w-9 shrink-0 place-items-center border-[3px] border-ink bg-cream shadow-brutal-sm">
+            <VeyraMark size={20} />
           </div>
-          <span className="text-lg font-black tracking-tight text-white">CoFound<span className="text-indigo-light">.ai</span></span>
+          <span className="text-lg font-black tracking-tight text-white">veyra</span>
         </Link>
         <nav className="mt-8 space-y-1">
           {nav.map((n) => {
