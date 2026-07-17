@@ -151,41 +151,7 @@ function ConversationView() {
           <span className="rounded-md border-2 border-ink bg-cream px-2 py-1 text-[10px] font-black uppercase tracking-wider">{convo.stage?.replace("_", " ")}</span>
         </div>
 
-        {/* AI Report drawer */}
-        <div className="border-b-2 border-ink bg-cream/40">
-          <button onClick={() => setReportOpen((v) => !v)} className="flex w-full items-center justify-between px-4 py-3 text-left">
-            <div className="flex items-center gap-2">
-              <Sparkles className="h-4 w-4 text-orange" />
-              <span className="text-sm font-black">AI Compatibility Report</span>
-              {report?.compatibility_score && (
-                <span className="rounded-md border-2 border-ink bg-orange px-2 py-0.5 text-[11px] font-black text-white">{report.compatibility_score}/100</span>
-              )}
-            </div>
-            <ChevronDown className={`h-4 w-4 transition ${reportOpen ? "rotate-180" : ""}`} />
-          </button>
-          {reportOpen && (
-            <div className="px-4 pb-5">
-              {!report ? (
-                <div className="flex items-center gap-2 text-sm text-muted-text">
-                  <Loader2 className="h-4 w-4 animate-spin" /> Generating your compatibility report…
-                </div>
-              ) : report.compatibility_score == null ? (
-                <div className="text-sm text-muted-text">{report.rationale_summary}</div>
-              ) : (
-                <div className="grid gap-4 md:grid-cols-[auto_1fr]">
-                  <ScoreRing score={report.compatibility_score} size={110} />
-                  <div className="space-y-3">
-                    <p className="text-sm">{report.rationale_summary}</p>
-                    <ReportList title="Alignment" items={report.alignment_points as string[] | null} color="emerald" icon={CheckCircle2} />
-                    <ReportList title="Divergence" items={report.divergence_points as string[] | null} color="amber" icon={AlertTriangle} />
-                    <ReportList title="Risk flags" items={report.risk_flags as string[] | null} color="destructive" icon={AlertTriangle} />
-                    <ReportList title="Conversation starters" items={report.conversation_starters as string[] | null} color="indigo" icon={MessageCircle} />
-                  </div>
-                </div>
-              )}
-            </div>
-          )}
-        </div>
+        {/* AI report intentionally removed */}
 
         {/* Messages */}
         <div className="flex-1 overflow-y-auto bg-surface px-4 py-6" onClick={() => setActiveMsg(null)}>
