@@ -46,11 +46,11 @@ function Login() {
 
     const { data: userData } = await supabase.auth.getUser();
     if (userData.user) {
-      const { data: existing } = await supabase.from("founders").select("id").eq("user_id", userData.user.id).maybeSingle();
-      if (!existing) {
-        await supabase.from("founders").update({ user_id: userData.user.id }).eq("id", cfg.founderId).is("user_id", null);
-      }
-      await supabase.from("profiles").update({ is_pro: cfg.isPro }).eq("id", userData.user.id);
+      // Claim the seeded demo founder via a security-definer RPC so the demo
+      // account owns the seeded conversations, requests and matches.
+      const { error: claimErr } = await supabase.rpc("claim_demo_founder", { target: cfg.founderId });
+      if (claimErr) { setLoading(false); return toast.error(claimErr.message); }
+      await supabase.from("profiles").update({ is_pro: cfg.isPro, full_name: cfg.name }).eq("id", userData.user.id);
     }
     setLoading(false);
     toast.success(`Signed in as ${cfg.name} (${tier === "pro" ? "Pro" : "Free"} demo)`);

@@ -866,6 +866,7 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      claim_demo_founder: { Args: { target: string }; Returns: string }
       current_founder_id: { Args: never; Returns: string }
     }
     Enums: {
