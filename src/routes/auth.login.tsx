@@ -25,34 +25,37 @@ function Login() {
     router.navigate({ to: "/discover" });
   }
 
-  async function demoSignIn() {
+  async function demoSignIn(tier: "free" | "pro") {
     setLoading(true);
-    // try login first
-    let { error } = await supabase.auth.signInWithPassword({ email: "demo@cofound.ai", password: "demo1234" });
+    const cfg = tier === "pro"
+      ? { email: "demo-pro@cofound.ai", password: "demo1234", name: "Priya Nair", founderId: "22222222-2222-2222-2222-222222222222", isPro: true }
+      : { email: "demo@cofound.ai",     password: "demo1234", name: "Arjun Sharma", founderId: "11111111-1111-1111-1111-111111111111", isPro: false };
+
+    let { error } = await supabase.auth.signInWithPassword({ email: cfg.email, password: cfg.password });
     if (error) {
-      // signup
       const { error: sErr } = await supabase.auth.signUp({
-        email: "demo@cofound.ai", password: "demo1234",
-        options: { data: { full_name: "Arjun Sharma", role: "founder" } },
+        email: cfg.email, password: cfg.password,
+        options: { data: { full_name: cfg.name, role: "founder" } },
       });
       if (sErr && !sErr.message.includes("registered")) { setLoading(false); return toast.error(sErr.message); }
-      const login2 = await supabase.auth.signInWithPassword({ email: "demo@cofound.ai", password: "demo1234" });
+      const login2 = await supabase.auth.signInWithPassword({ email: cfg.email, password: cfg.password });
       error = login2.error;
     }
     if (error) { setLoading(false); return toast.error(error.message); }
-    // Claim Arjun founder
+
     const { data: userData } = await supabase.auth.getUser();
     if (userData.user) {
-      // Move Arjun's founder record to this user (if not already claimed)
       const { data: existing } = await supabase.from("founders").select("id").eq("user_id", userData.user.id).maybeSingle();
       if (!existing) {
-        await supabase.from("founders").update({ user_id: userData.user.id }).eq("id", "11111111-1111-1111-1111-111111111111").is("user_id", null);
+        await supabase.from("founders").update({ user_id: userData.user.id }).eq("id", cfg.founderId).is("user_id", null);
       }
+      await supabase.from("profiles").update({ is_pro: cfg.isPro }).eq("id", userData.user.id);
     }
     setLoading(false);
-    toast.success("Signed in as Arjun (demo)");
+    toast.success(`Signed in as ${cfg.name} (${tier === "pro" ? "Pro" : "Free"} demo)`);
     router.navigate({ to: "/discover" });
   }
+
 
   return (
     <div className="min-h-screen bg-surface">
