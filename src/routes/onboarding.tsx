@@ -66,7 +66,7 @@ function Onboarding() {
     const { data: existing } = await supabase.from("founders").select("id").eq("user_id", session.user.id).maybeSingle();
     const payload = {
       user_id: session.user.id,
-      headline: f.headline, bio: f.bio, location: f.location,
+      headline: f.headline, bio: f.bio, location: f.location, age: f.age,
       linkedin_url: f.linkedin_url, github_url: f.github_url,
       years_experience: f.years_experience, background: f.background,
     };
