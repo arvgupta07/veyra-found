@@ -1,5 +1,5 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { useMyFounder } from "@/hooks/useMyFounder";
@@ -7,7 +7,7 @@ import { AppShell } from "@/components/AppShell";
 import { useRequireAuth } from "@/hooks/useRequireAuth";
 import { SkillTag, TierBadge, VerifiedBadges } from "@/components/FounderBits";
 import { founderAvatar } from "@/lib/founder-types";
-import { ArrowLeft, MapPin, Briefcase, Loader2, Send, X } from "lucide-react";
+import { ArrowLeft, MapPin, Briefcase, Loader2, Send, X, Ban, ShieldCheck } from "lucide-react";
 import { toast } from "sonner";
 
 export const Route = createFileRoute("/profile/$founderId")({
@@ -18,6 +18,7 @@ function FounderProfile() {
   const { ready } = useRequireAuth({ requireOnboarded: true });
   const { founderId } = Route.useParams();
   const { data: me } = useMyFounder();
+  const qc = useQueryClient();
   const [connectOpen, setConnectOpen] = useState(false);
 
   useEffect(() => {
@@ -33,6 +34,37 @@ function FounderProfile() {
       return f;
     },
   });
+
+  const { data: block } = useQuery({
+    queryKey: ["block", me?.id, founderId],
+    enabled: !!me?.id && me?.id !== founderId,
+    queryFn: async () => {
+      const { data } = await supabase.from("blocks")
+        .select("id, blocker_id, blocked_id")
+        .or(`and(blocker_id.eq.${me!.id},blocked_id.eq.${founderId}),and(blocker_id.eq.${founderId},blocked_id.eq.${me!.id})`)
+        .maybeSingle();
+      return data;
+    },
+  });
+
+  async function toggleBlock() {
+    if (!me) return;
+    if (block?.blocker_id === me.id) {
+      const { error } = await supabase.from("blocks").delete().eq("id", block.id);
+      if (error) return toast.error(error.message);
+      toast.success("Unblocked");
+    } else if (block) {
+      return toast.error("This user has blocked you.");
+    } else {
+      const { error } = await supabase.from("blocks").insert({ blocker_id: me.id, blocked_id: founderId });
+      if (error) return toast.error(error.message);
+      toast.success("Blocked. They can no longer message you.");
+    }
+    qc.invalidateQueries({ queryKey: ["block", me.id, founderId] });
+    qc.invalidateQueries({ queryKey: ["discover-feed"] });
+    qc.invalidateQueries({ queryKey: ["inbox-convos"] });
+    qc.invalidateQueries({ queryKey: ["inbox-requests"] });
+  }
 
   if (!ready) return null;
   if (isLoading) return <AppShell><div className="grid place-items-center py-24"><Loader2 className="h-6 w-6 animate-spin" /></div></AppShell>;
@@ -75,10 +107,31 @@ function FounderProfile() {
               <TierBadge tier={data.trust_tier ?? "Builder"} />
             </div>
             {!isMe && me && (
-              <button onClick={() => setConnectOpen(true)}
-                className="mt-4 inline-flex items-center gap-2 rounded-lg border-2 border-ink bg-orange px-4 py-2 text-xs font-black text-white shadow-brutal-sm box-hover">
-                <Send className="h-3 w-3" /> Send message
-              </button>
+              <div className="mt-4 flex flex-wrap items-center gap-2">
+                {!block && (
+                  <button onClick={() => setConnectOpen(true)}
+                    className="inline-flex items-center gap-2 rounded-lg border-2 border-ink bg-orange px-4 py-2 text-xs font-black text-white shadow-brutal-sm box-hover">
+                    <Send className="h-3 w-3" /> Send message
+                  </button>
+                )}
+                {block?.blocker_id === me.id && (
+                  <button onClick={toggleBlock}
+                    className="inline-flex items-center gap-2 rounded-lg border-2 border-ink bg-sage px-4 py-2 text-xs font-black text-ink shadow-brutal-sm box-hover">
+                    <ShieldCheck className="h-3 w-3" /> Unblock
+                  </button>
+                )}
+                {block?.blocked_id === me.id && block.blocker_id !== me.id && (
+                  <span className="inline-flex items-center gap-2 rounded-lg border-2 border-ink bg-cream px-4 py-2 text-xs font-black text-ink">
+                    <Ban className="h-3 w-3" /> This user has blocked you
+                  </span>
+                )}
+                {!block && (
+                  <button onClick={toggleBlock}
+                    className="inline-flex items-center gap-2 rounded-lg border-2 border-ink bg-white px-4 py-2 text-xs font-black text-ink shadow-brutal-sm box-hover">
+                    <Ban className="h-3 w-3" /> Block
+                  </button>
+                )}
+              </div>
             )}
           </div>
 

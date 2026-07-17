@@ -126,6 +126,11 @@ function ConversationView() {
             </div>
           </Link>
           <span className="rounded-md border-2 border-ink bg-cream px-2 py-1 text-[10px] font-black uppercase tracking-wider">{convo.stage?.replace("_", " ")}</span>
+          <Link to="/profile/$founderId" params={{ founderId: other.id }}
+            className="rounded-md border-2 border-ink bg-white px-2 py-1 text-[10px] font-black uppercase tracking-wider text-ink shadow-brutal-sm hover:bg-cream"
+            title="Open profile to block">
+            Block
+          </Link>
         </div>
 
         {/* AI report intentionally removed */}
