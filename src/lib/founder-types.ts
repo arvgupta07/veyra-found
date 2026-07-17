@@ -43,11 +43,27 @@ export function founderDisplayName(f: { seed_name: string | null; user_id: strin
   return f.profile?.full_name ?? f.seed_name ?? "Founder";
 }
 
-export function founderAvatar(f: { seed_avatar: string | null; profile?: { full_name?: string | null } | null; seed_name?: string | null }): string {
+export function founderAvatar(f: { seed_avatar: string | null; profile?: { full_name?: string | null; avatar_url?: string | null } | null; seed_name?: string | null }): string {
+  if (f.profile?.avatar_url) return f.profile.avatar_url;
   if (f.seed_avatar) return f.seed_avatar;
   const name = f.profile?.full_name ?? f.seed_name ?? "F";
   return `https://api.dicebear.com/7.x/initials/svg?seed=${encodeURIComponent(name)}&backgroundColor=6366F1`;
 }
+
+export const AVATAR_PRESETS: string[] = [
+  "https://api.dicebear.com/7.x/adventurer/svg?seed=Rocket&backgroundColor=FF7F11",
+  "https://api.dicebear.com/7.x/adventurer/svg?seed=Neon&backgroundColor=ACBFA4",
+  "https://api.dicebear.com/7.x/adventurer/svg?seed=Storm&backgroundColor=E2E8CE",
+  "https://api.dicebear.com/7.x/adventurer/svg?seed=Aster&backgroundColor=FF1B1C",
+  "https://api.dicebear.com/7.x/adventurer/svg?seed=Vega&backgroundColor=262626",
+  "https://api.dicebear.com/7.x/adventurer/svg?seed=Zephyr&backgroundColor=FF7F11",
+  "https://api.dicebear.com/7.x/bottts/svg?seed=Byte&backgroundColor=ACBFA4",
+  "https://api.dicebear.com/7.x/bottts/svg?seed=Circuit&backgroundColor=FF7F11",
+  "https://api.dicebear.com/7.x/bottts/svg?seed=Pixel&backgroundColor=E2E8CE",
+  "https://api.dicebear.com/7.x/notionists/svg?seed=Ada&backgroundColor=ACBFA4",
+  "https://api.dicebear.com/7.x/notionists/svg?seed=Grace&backgroundColor=FF7F11",
+  "https://api.dicebear.com/7.x/notionists/svg?seed=Turing&backgroundColor=E2E8CE",
+];
 
 export const PROMPTS = [
   "The thing I'd bring to a founding team that doesn't show on a resume...",

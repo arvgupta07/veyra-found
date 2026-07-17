@@ -30,7 +30,7 @@ function PostView() {
     queryKey: ["post", postId],
     queryFn: async () => {
       const { data } = await supabase.from("forum_posts")
-        .select("*, author:founders(*, profiles(full_name))").eq("id", postId).maybeSingle();
+        .select("*, author:founders!forum_posts_author_id_fkey(*, profiles(full_name))").eq("id", postId).maybeSingle();
       return data;
     },
   });
@@ -39,7 +39,7 @@ function PostView() {
     queryKey: ["comments", postId],
     queryFn: async () => {
       const { data } = await supabase.from("forum_comments")
-        .select("*, author:founders(*, profiles(full_name))")
+        .select("*, author:founders!forum_comments_author_id_fkey(*, profiles(full_name))")
         .eq("post_id", postId).order("created_at", { ascending: true });
       return data ?? [];
     },

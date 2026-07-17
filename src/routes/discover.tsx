@@ -4,7 +4,7 @@ import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { useMyFounder } from "@/hooks/useMyFounder";
 import { AppShell } from "@/components/AppShell";
-import { SkillTag, TierBadge, VerifiedBadges } from "@/components/FounderBits";
+import { SkillTag, VerifiedBadges } from "@/components/FounderBits";
 import { MapPin, Sparkles, Send, X, Loader2, Keyboard } from "lucide-react";
 import { toast } from "sonner";
 import { founderAvatar } from "@/lib/founder-types";
@@ -162,39 +162,46 @@ function FounderCard({
 
   return (
     <article className="overflow-hidden rounded-3xl border-2 border-ink bg-white shadow-brutal">
-      {/* Flat brutal header */}
-      <div className="border-b-2 border-ink bg-cream p-5">
-        <div className="flex items-start gap-4">
-          <Link to="/profile/$founderId" params={{ founderId: founder.id }}>
-            <img src={avatar} alt={name}
-              className="h-16 w-16 rounded-2xl border-2 border-ink object-cover shadow-brutal-sm transition hover:-translate-x-0.5 hover:-translate-y-0.5" />
-          </Link>
-          <div className="min-w-0 flex-1">
-            <Link to="/profile/$founderId" params={{ founderId: founder.id }}
-              className="block truncate text-xl font-black text-ink hover:text-orange">{name}</Link>
-            <div className="mt-1 truncate text-sm font-semibold text-ink/80">{founder.headline}</div>
-            <div className="mt-1.5 flex flex-wrap items-center gap-x-3 gap-y-1 text-[11px] font-bold text-ink/70">
-              <span className="inline-flex items-center gap-1"><MapPin className="h-3 w-3" /> {founder.location}</span>
-              {founder.age && <span>🎂 {founder.age}</span>}
-              <span>· {founder.years_experience}y exp</span>
-            </div>
+      {/* Hero band */}
+      <div className="relative bg-ink px-5 pt-5 pb-14 text-cream">
+        <div className="flex items-start justify-between gap-3">
+          <div className="text-[10px] font-black uppercase tracking-[0.2em] text-cream/70">Founder · {founder.trust_tier ?? "Builder"}</div>
+          <div className="rounded-md border-2 border-cream bg-orange px-2 py-0.5 text-[10px] font-black uppercase tracking-wider text-white">
+            {commitmentLabel}
           </div>
-          <TierBadge tier={founder.trust_tier ?? "Builder"} />
+        </div>
+        <div className="mt-3 text-3xl font-black leading-tight tracking-tight">
+          <Link to="/profile/$founderId" params={{ founderId: founder.id }} className="hover:text-orange">{name}</Link>
+        </div>
+        {founder.headline && <div className="mt-1 text-sm font-semibold text-cream/85">{founder.headline}</div>}
+        <div className="mt-3 flex flex-wrap items-center gap-1.5 text-[11px] font-bold">
+          {founder.location && (
+            <span className="inline-flex items-center gap-1 rounded-md border-2 border-cream bg-ink/40 px-2 py-0.5">
+              <MapPin className="h-3 w-3" /> {founder.location}
+            </span>
+          )}
+          {founder.age && <span className="rounded-md border-2 border-cream bg-ink/40 px-2 py-0.5">🎂 {founder.age}</span>}
+          <span className="rounded-md border-2 border-cream bg-ink/40 px-2 py-0.5">{founder.years_experience}y exp</span>
+          {stageLabel && <span className="rounded-md border-2 border-cream bg-sage px-2 py-0.5 text-ink">{stageLabel}</span>}
         </div>
       </div>
 
-      <div className="space-y-5 p-6">
-        <p className="text-sm text-ink/80">{founder.bio}</p>
+      {/* Avatar tab straddling hero */}
+      <div className="relative -mt-10 px-5">
+        <Link to="/profile/$founderId" params={{ founderId: founder.id }} className="inline-block">
+          <img src={avatar} alt={name}
+            className="h-20 w-20 rounded-2xl border-2 border-ink bg-white object-cover shadow-brutal transition hover:-translate-x-0.5 hover:-translate-y-0.5" />
+        </Link>
+      </div>
+
+      <div className="space-y-5 p-5 pt-4">
+        {founder.bio && <p className="text-sm leading-relaxed text-ink/85">{founder.bio}</p>}
         <VerifiedBadges f={founder} />
-        <div className="flex flex-wrap gap-1.5">
-          {(founder.skills ?? []).slice(0, 8).map((s: string) => <SkillTag key={s}>{s}</SkillTag>)}
-        </div>
-        <div className="grid grid-cols-2 gap-3 rounded-xl border-2 border-ink bg-white p-4 text-xs sm:grid-cols-4">
-          <Fact label="Commitment" value={commitmentLabel} />
-          <Fact label="Stage" value={stageLabel} />
-          <Fact label="Equity offer" value={founder.equity_offer ?? "—"} />
-          <Fact label="Exit" value={{ lifestyle: "Lifestyle", acquisition: "Acquisition", ipo: "IPO" }[founder.exit_vision as string] ?? "—"} />
-        </div>
+        {(founder.skills ?? []).length > 0 && (
+          <div className="flex flex-wrap gap-1.5">
+            {(founder.skills ?? []).slice(0, 10).map((s: string) => <SkillTag key={s}>{s}</SkillTag>)}
+          </div>
+        )}
 
         {founder.has_idea && founder.idea_description && (
           <div className="rounded-xl border-2 border-ink bg-sage p-4">
@@ -203,6 +210,12 @@ function FounderCard({
             {founder.idea_industry && <div className="mt-1 text-xs text-ink/70">{founder.idea_industry}</div>}
           </div>
         )}
+
+        <div className="grid grid-cols-3 gap-2 text-xs">
+          <Fact label="Equity" value={founder.equity_offer ?? "—"} />
+          <Fact label="Exit" value={{ lifestyle: "Lifestyle", acquisition: "Acquisition", ipo: "IPO" }[founder.exit_vision as string] ?? "—"} />
+          <Fact label="Tier" value={founder.trust_tier ?? "Builder"} />
+        </div>
 
         <div className="space-y-3">
           {prompts.map((p: any) => (

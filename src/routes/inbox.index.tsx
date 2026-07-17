@@ -246,12 +246,20 @@ function Inbox() {
                       {r.status === "pending" && (
                         <button
                           onClick={async () => {
-                            const { error } = await supabase.from("connection_requests").delete().eq("id", r.id);
+                            const { data: deleted, error } = await supabase
+                              .from("connection_requests")
+                              .delete()
+                              .eq("id", r.id)
+                              .select("id");
                             if (error) return toast.error(error.message);
+                            if (!deleted || deleted.length === 0) {
+                              return toast.error("Couldn't retract — permission denied.");
+                            }
                             toast.success("Request retracted");
-                            qc.invalidateQueries({ queryKey: ["inbox-sent", me?.id] });
+                            await qc.invalidateQueries({ queryKey: ["inbox-sent", me?.id] });
+                            await qc.invalidateQueries({ queryKey: ["inbox-requests"] });
                           }}
-                          className="rounded-md border-2 border-ink bg-red px-2 py-1 text-[10px] font-black uppercase text-white shadow-brutal-sm">
+                          className="rounded-md border-2 border-ink bg-red px-2 py-1 text-[10px] font-black uppercase text-white shadow-brutal-sm hover:-translate-y-0.5 transition">
                           Retract
                         </button>
                       )}
