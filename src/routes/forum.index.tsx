@@ -111,7 +111,7 @@ function Forum() {
         </div>
       </div>
 
-      {composeOpen && me && <ComposeModal onClose={() => { setComposeOpen(false); refetch(); }} founderId={me.id} />}
+      {composeOpen && me && <ComposeModal onClose={(postedCategory) => { setComposeOpen(false); if (postedCategory) setCat(postedCategory); refetch(); }} founderId={me.id} />}
     </AppShell>
   );
 }
