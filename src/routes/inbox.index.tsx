@@ -81,11 +81,14 @@ function Inbox() {
       <div className="mx-auto max-w-3xl px-4 py-6 md:py-10">
         <h1 className="text-3xl font-black tracking-tight">Inbox</h1>
         <div className="mt-6 flex gap-6 border-b">
-          {(["requests", "talking"] as const).map((t) => (
+          {(["requests", "sent", "talking"] as const).map((t) => (
             <button key={t} onClick={() => setTab(t)}
               className={`relative pb-3 text-sm font-semibold capitalize transition ${tab === t ? "text-indigo" : "text-muted-text hover:text-foreground"}`}>
               {t} {t === "requests" && (requests?.length ?? 0) > 0 && (
                 <span className="ml-1 rounded-full bg-indigo px-1.5 py-0.5 text-[10px] text-white">{requests!.length}</span>
+              )}
+              {t === "sent" && (sent?.length ?? 0) > 0 && (
+                <span className="ml-1 rounded-full bg-ink px-1.5 py-0.5 text-[10px] text-white">{sent!.length}</span>
               )}
               {tab === t && <span className="absolute inset-x-0 -bottom-px h-0.5 bg-indigo" />}
             </button>
