@@ -57,14 +57,6 @@ function ConversationView() {
     },
   });
 
-  const { data: report, refetch: refetchReport } = useQuery({
-    queryKey: ["report", conversationId],
-    queryFn: async () => {
-      const { data } = await supabase.from("compatibility_reports").select("*").eq("conversation_id", conversationId).maybeSingle();
-      return data;
-    },
-  });
-
   useEffect(() => {
     const ch = supabase.channel(`msgs-${conversationId}`)
       .on("postgres_changes", { event: "*", schema: "public", table: "messages", filter: `conversation_id=eq.${conversationId}` },
@@ -74,19 +66,6 @@ function ConversationView() {
   }, [conversationId, qc]);
 
   useEffect(() => { bottomRef.current?.scrollIntoView({ behavior: "smooth" }); }, [messages]);
-
-  useEffect(() => {
-    if (!report && convo) {
-      const t = setTimeout(async () => {
-        try {
-          const mod = await import("@/lib/compat.functions");
-          await mod.generateCompatibilityReport({ data: { conversationId } });
-          refetchReport();
-        } catch (e) { console.error(e); }
-      }, 500);
-      return () => clearTimeout(t);
-    }
-  }, [convo, report, conversationId, refetchReport]);
 
   async function send() {
     if (!text.trim() || !me) return;
