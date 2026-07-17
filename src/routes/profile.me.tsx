@@ -68,9 +68,22 @@ function MyProfile() {
                   <span className="inline-flex items-center gap-1"><Briefcase className="h-3 w-3" /> {me.years_experience}y</span>
                 </div>
               </div>
-              <TierBadge tier={me.trust_tier ?? "Builder"} />
+              <div className="flex flex-col items-end gap-2">
+                <TierBadge tier={me.trust_tier ?? "Builder"} />
+                <button onClick={() => setEditing(true)} className="inline-flex items-center gap-1 rounded-md border-2 border-ink bg-orange px-2 py-1 text-[11px] font-black text-white shadow-brutal-sm">
+                  <Pencil className="h-3 w-3" /> Customize
+                </button>
+              </div>
             </div>
           </div>
+
+          {editing && <EditPanel
+            initial={{ full_name: profile?.full_name ?? "", headline: me.headline ?? "", bio: me.bio ?? "", location: me.location ?? "", skills: me.skills ?? [] }}
+            founderId={me.id}
+            userId={me.user_id ?? ""}
+            onClose={() => setEditing(false)}
+            onSaved={() => { qc.invalidateQueries(); setEditing(false); }}
+          />}
 
           <div className="-mt-8 space-y-6 p-6">
             <div className="rounded-2xl bg-white p-5 shadow-card">
