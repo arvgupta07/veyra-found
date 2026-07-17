@@ -70,6 +70,45 @@ export type Database = {
           },
         ]
       }
+      blocks: {
+        Row: {
+          blocked_id: string
+          blocker_id: string
+          created_at: string
+          id: string
+          reason: string | null
+        }
+        Insert: {
+          blocked_id: string
+          blocker_id: string
+          created_at?: string
+          id?: string
+          reason?: string | null
+        }
+        Update: {
+          blocked_id?: string
+          blocker_id?: string
+          created_at?: string
+          id?: string
+          reason?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "blocks_blocked_id_fkey"
+            columns: ["blocked_id"]
+            isOneToOne: false
+            referencedRelation: "founders"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "blocks_blocker_id_fkey"
+            columns: ["blocker_id"]
+            isOneToOne: false
+            referencedRelation: "founders"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       compatibility_reports: {
         Row: {
           alignment_points: Json | null
@@ -880,6 +919,7 @@ export type Database = {
     Functions: {
       claim_demo_founder: { Args: { target: string }; Returns: string }
       current_founder_id: { Args: never; Returns: string }
+      is_blocked_between: { Args: { a: string; b: string }; Returns: boolean }
     }
     Enums: {
       convo_stage: "talking" | "intro_call" | "trial_project" | "confirmed"
