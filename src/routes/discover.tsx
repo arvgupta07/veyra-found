@@ -220,7 +220,7 @@ function FounderCard({
           ))}
         </div>
 
-        <button onClick={onConnect} className="flex w-full items-center justify-center gap-2 rounded-xl bg-navy py-3 text-sm font-semibold text-white hover:bg-navy-light">
+        <button onClick={onConnect} className="flex w-full items-center justify-center gap-2 rounded-xl border-2 border-ink bg-ink py-3 text-sm font-black text-white shadow-brutal-sm box-hover">
           <Send className="h-4 w-4" /> Send a general intro instead
         </button>
       </div>
