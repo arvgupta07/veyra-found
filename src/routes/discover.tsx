@@ -20,6 +20,7 @@ function Discover() {
   const [connectFor, setConnectFor] = useState<string | null>(null);
   const [index, setIndex] = useState(0);
   const [skipped, setSkipped] = useState(0);
+  const [openPrompt, setOpenPrompt] = useState<{ founderId: string; question: string } | null>(null);
 
   const { data: founders, isLoading } = useQuery({
     queryKey: ["discover", me?.id],
@@ -32,10 +33,37 @@ function Discover() {
     },
   });
 
-  if (!ready) return null;
-
   const current = founders?.[index];
   const atEnd = !!founders && founders.length > 0 && index >= founders.length;
+
+  useEffect(() => {
+    function onKeyDown(e: KeyboardEvent) {
+      if (e.target instanceof HTMLInputElement || e.target instanceof HTMLTextAreaElement) return;
+      if (e.key === "s" || e.key === "S") {
+        e.preventDefault();
+        if (!atEnd && current) {
+          setSkipped((s) => s + 1);
+          setIndex((i) => i + 1);
+          setOpenPrompt(null);
+        }
+      }
+      if (e.key === "Enter") {
+        e.preventDefault();
+        if (!atEnd && current) {
+          const first = current.founder_prompts?.[0];
+          if (first) setOpenPrompt({ founderId: current.id, question: first.prompt_question });
+        }
+      }
+    }
+    window.addEventListener("keydown", onKeyDown);
+    return () => window.removeEventListener("keydown", onKeyDown);
+  }, [current, atEnd]);
+
+  useEffect(() => {
+    setOpenPrompt(null);
+  }, [index]);
+
+  if (!ready) return null;
 
   return (
     <AppShell>
@@ -58,13 +86,27 @@ function Discover() {
 
         {current && (
           <div className="space-y-4">
-            <FounderCard key={current.id} founder={{ ...current, __me: me?.id }} onConnect={() => setConnectFor(current.id)} />
+            <FounderCard
+              key={current.id}
+              founder={{ ...current, __me: me?.id }}
+              onConnect={() => setConnectFor(current.id)}
+              openPrompt={openPrompt}
+              onOpenPrompt={(q) => setOpenPrompt({ founderId: current.id, question: q })}
+              onClosePrompt={() => setOpenPrompt(null)}
+            />
             <button
               onClick={() => { setSkipped((s) => s + 1); setIndex((i) => i + 1); }}
               className="flex w-full items-center justify-center gap-2 rounded-xl border-2 border-ink bg-white py-3 text-sm font-black text-ink shadow-brutal box-hover"
             >
               Skip <X className="h-4 w-4" /> Next founder
             </button>
+            <div className="flex items-center justify-center gap-3 text-[10px] font-black uppercase tracking-wider text-muted-text">
+              <span className="inline-flex items-center gap-1 rounded-md border border-ink bg-cream px-2 py-1"><Keyboard className="h-3 w-3" /> S</span>
+              <span>Skip</span>
+              <span className="text-muted-text/50">·</span>
+              <span className="inline-flex items-center gap-1 rounded-md border border-ink bg-cream px-2 py-1">Enter</span>
+              <span>Open reply</span>
+            </div>
           </div>
         )}
 
