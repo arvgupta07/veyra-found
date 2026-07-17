@@ -22,6 +22,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
   const router = useRouter();
   const pathname = useRouterState({ select: (s) => s.location.pathname });
   const { data: profile } = useMyProfile();
+  const { dark, toggle } = useDarkMode();
   const nav = profile?.role === "investor" ? investorNav : founderNav;
 
   async function signOut() {
