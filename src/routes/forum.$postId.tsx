@@ -30,7 +30,7 @@ function PostView() {
     queryKey: ["post", postId],
     queryFn: async () => {
       const { data } = await supabase.from("forum_posts")
-        .select("*, author:founders(*, profiles(full_name))").eq("id", postId).maybeSingle();
+        .select("*, author:founders!forum_posts_author_id_fkey(*, profiles(full_name))").eq("id", postId).maybeSingle();
       return data;
     },
   });
