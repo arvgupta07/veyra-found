@@ -4,7 +4,7 @@ import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { useMyFounder } from "@/hooks/useMyFounder";
 import { AppShell } from "@/components/AppShell";
-import { SkillTag, TierBadge, VerifiedBadges } from "@/components/FounderBits";
+import { SkillTag, VerifiedBadges } from "@/components/FounderBits";
 import { MapPin, Sparkles, Send, X, Loader2, Keyboard } from "lucide-react";
 import { toast } from "sonner";
 import { founderAvatar } from "@/lib/founder-types";
