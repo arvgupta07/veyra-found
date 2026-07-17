@@ -6,7 +6,7 @@ import { useMyFounder } from "@/hooks/useMyFounder";
 import { AppShell } from "@/components/AppShell";
 import { useRequireAuth } from "@/hooks/useRequireAuth";
 import { founderAvatar } from "@/lib/founder-types";
-import { ArrowUp, ArrowLeft, Loader2, Bookmark, MessageSquareText, Send } from "lucide-react";
+import { ArrowBigUp, ArrowBigDown, ArrowLeft, Loader2, Bookmark, MessageSquareText, Send } from "lucide-react";
 import { toast } from "sonner";
 
 export const Route = createFileRoute("/forum/$postId")({
