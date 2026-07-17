@@ -243,6 +243,42 @@ export type Database = {
           },
         ]
       }
+      conversation_pins: {
+        Row: {
+          conversation_id: string
+          created_at: string
+          founder_id: string
+          id: string
+        }
+        Insert: {
+          conversation_id: string
+          created_at?: string
+          founder_id: string
+          id?: string
+        }
+        Update: {
+          conversation_id?: string
+          created_at?: string
+          founder_id?: string
+          id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "conversation_pins_conversation_id_fkey"
+            columns: ["conversation_id"]
+            isOneToOne: false
+            referencedRelation: "conversations"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "conversation_pins_founder_id_fkey"
+            columns: ["founder_id"]
+            isOneToOne: false
+            referencedRelation: "founders"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       conversations: {
         Row: {
           created_at: string
