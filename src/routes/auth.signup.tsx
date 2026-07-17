@@ -42,7 +42,7 @@ function Signup() {
   return (
     <div className="min-h-screen bg-cream">
       <header className="mx-auto flex max-w-7xl items-center justify-between px-6 py-5">
-        <Link to="/" className="flex items-center gap-2"><VeyraMark /><VeyraWordmark /></Link>
+        <Link to="/" className="flex items-center gap-2"><VeyraWordmark /></Link>
       </header>
       <div className="mx-auto flex max-w-xl flex-col gap-6 px-6 py-8">
         <div>
