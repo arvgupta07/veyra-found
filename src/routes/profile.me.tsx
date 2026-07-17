@@ -155,7 +155,39 @@ function MyProfile() {
             )}
           </div>
         </div>
+
+        {/* Account actions */}
+        <div className="mt-6 rounded-2xl border-2 border-ink bg-white p-5 shadow-brutal-sm">
+          <div className="text-xs font-black uppercase tracking-wider text-muted-text">Account</div>
+          <div className="mt-3 flex flex-wrap gap-2">
+            <button onClick={signOut}
+              className="inline-flex items-center gap-2 rounded-lg border-2 border-ink bg-white px-4 py-2 text-xs font-black shadow-brutal-sm box-hover">
+              <LogOut className="h-4 w-4" /> Sign out
+            </button>
+            <button onClick={() => setConfirmDelete(true)}
+              className="inline-flex items-center gap-2 rounded-lg border-2 border-ink bg-red px-4 py-2 text-xs font-black text-white shadow-brutal-sm box-hover">
+              <Trash2 className="h-4 w-4" /> Delete account
+            </button>
+          </div>
+        </div>
       </div>
+
+      {confirmDelete && (
+        <div className="fixed inset-0 z-50 grid place-items-center bg-ink/60 p-4" onClick={() => !deleting && setConfirmDelete(false)}>
+          <div onClick={(e) => e.stopPropagation()} className="w-full max-w-md rounded-2xl border-2 border-ink bg-cream p-6 shadow-brutal">
+            <div className="text-xl font-black">Delete your account?</div>
+            <p className="mt-2 text-sm text-ink/80">This wipes your profile, prompts, requests, and conversations. Cannot be undone.</p>
+            <div className="mt-5 flex gap-2">
+              <button onClick={() => setConfirmDelete(false)} disabled={deleting}
+                className="flex-1 rounded-lg border-2 border-ink bg-white py-2 text-sm font-black">Cancel</button>
+              <button onClick={deleteAccount} disabled={deleting}
+                className="flex-1 inline-flex items-center justify-center gap-2 rounded-lg border-2 border-ink bg-red py-2 text-sm font-black text-white disabled:opacity-50">
+                {deleting ? <Loader2 className="h-4 w-4 animate-spin" /> : <Trash2 className="h-4 w-4" />} Delete
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </AppShell>
   );
 }
