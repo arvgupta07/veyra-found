@@ -31,7 +31,7 @@ function Forum() {
     queryKey: ["forum", cat],
     queryFn: async () => {
       let q = supabase.from("forum_posts")
-        .select("*, author:founders(*, profiles(full_name))")
+        .select("*, author:founders!forum_posts_author_id_fkey(*, profiles(full_name))")
         .order("created_at", { ascending: false }).limit(50);
       if (cat !== "all") q = q.eq("category", cat as never);
       const { data } = await q;
