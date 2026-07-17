@@ -129,6 +129,33 @@ function MyProfile() {
           />}
 
           <div className="-mt-8 space-y-6 p-6">
+            <div className="rounded-2xl border-2 border-ink bg-white p-5 shadow-brutal-sm">
+              <div className="flex items-center justify-between">
+                <div>
+                  <div className="text-[10px] font-black uppercase tracking-wider text-muted-text">Profile completeness</div>
+                  <div className="mt-0.5 text-xl font-black">{pct}% <span className="text-xs font-bold text-muted-text">· {done}/{checks.length} done</span></div>
+                </div>
+                <div className={`rounded-md border-2 border-ink px-2 py-1 text-[10px] font-black uppercase ${pct >= 80 ? "bg-sage text-ink" : pct >= 50 ? "bg-orange text-white" : "bg-red text-white"}`}>
+                  {pct >= 80 ? "Strong" : pct >= 50 ? "Getting there" : "Add more"}
+                </div>
+              </div>
+              <div className="mt-3 h-2 overflow-hidden rounded-full border-2 border-ink bg-cream">
+                <div className={`h-full ${barColor} transition-all`} style={{ width: `${pct}%` }} />
+              </div>
+              {missing.length > 0 && (
+                <div className="mt-3">
+                  <div className="text-[10px] font-black uppercase text-muted-text">Missing</div>
+                  <div className="mt-1.5 flex flex-wrap gap-1.5">
+                    {missing.map((m) => (
+                      <span key={m.key} className="inline-flex items-center gap-1 rounded-md border-2 border-ink bg-white px-2 py-0.5 text-[10px] font-black text-ink">
+                        <X className="h-2.5 w-2.5" /> {m.key}
+                      </span>
+                    ))}
+                  </div>
+                </div>
+              )}
+            </div>
+
             <div className="rounded-2xl bg-white p-5 shadow-card">
               <div className="text-sm">{me.bio}</div>
               <div className="mt-3"><VerifiedBadges f={me} /></div>
