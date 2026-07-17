@@ -36,16 +36,19 @@ function Discover() {
   const current = founders?.[index];
   const atEnd = !!founders && founders.length > 0 && index >= founders.length;
 
+  function advance() {
+    setSkipped((s) => s + 1);
+    setIndex((i) => i + 1);
+    setOpenPrompt(null);
+    if (typeof window !== "undefined") window.scrollTo({ top: 0, behavior: "smooth" });
+  }
+
   useEffect(() => {
     function onKeyDown(e: KeyboardEvent) {
       if (e.target instanceof HTMLInputElement || e.target instanceof HTMLTextAreaElement) return;
       if (e.key === "s" || e.key === "S") {
         e.preventDefault();
-        if (!atEnd && current) {
-          setSkipped((s) => s + 1);
-          setIndex((i) => i + 1);
-          setOpenPrompt(null);
-        }
+        if (!atEnd && current) advance();
       }
       if (e.key === "Enter") {
         e.preventDefault();
@@ -57,6 +60,7 @@ function Discover() {
     }
     window.addEventListener("keydown", onKeyDown);
     return () => window.removeEventListener("keydown", onKeyDown);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [current, atEnd]);
 
   useEffect(() => {
