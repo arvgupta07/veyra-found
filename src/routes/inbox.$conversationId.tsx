@@ -6,8 +6,7 @@ import { useMyFounder } from "@/hooks/useMyFounder";
 import { AppShell } from "@/components/AppShell";
 import { useRequireAuth } from "@/hooks/useRequireAuth";
 import { founderAvatar } from "@/lib/founder-types";
-import { ScoreRing } from "@/components/FounderBits";
-import { Send, ArrowLeft, Sparkles, ChevronDown, Loader2, AlertTriangle, CheckCircle2, MessageCircle, Pencil, Trash2, Smile, Check, X } from "lucide-react";
+import { Send, ArrowLeft, Pencil, Trash2, Smile, Check, X } from "lucide-react";
 import { toast } from "sonner";
 
 export const Route = createFileRoute("/inbox/$conversationId")({
@@ -34,7 +33,6 @@ function ConversationView() {
   const { data: me } = useMyFounder();
   const qc = useQueryClient();
   const bottomRef = useRef<HTMLDivElement>(null);
-  const [reportOpen, setReportOpen] = useState(true);
   const [text, setText] = useState("");
   const [activeMsg, setActiveMsg] = useState<string | null>(null);
   const [editingId, setEditingId] = useState<string | null>(null);
@@ -59,14 +57,6 @@ function ConversationView() {
     },
   });
 
-  const { data: report, refetch: refetchReport } = useQuery({
-    queryKey: ["report", conversationId],
-    queryFn: async () => {
-      const { data } = await supabase.from("compatibility_reports").select("*").eq("conversation_id", conversationId).maybeSingle();
-      return data;
-    },
-  });
-
   useEffect(() => {
     const ch = supabase.channel(`msgs-${conversationId}`)
       .on("postgres_changes", { event: "*", schema: "public", table: "messages", filter: `conversation_id=eq.${conversationId}` },
@@ -76,19 +66,6 @@ function ConversationView() {
   }, [conversationId, qc]);
 
   useEffect(() => { bottomRef.current?.scrollIntoView({ behavior: "smooth" }); }, [messages]);
-
-  useEffect(() => {
-    if (!report && convo) {
-      const t = setTimeout(async () => {
-        try {
-          const mod = await import("@/lib/compat.functions");
-          await mod.generateCompatibilityReport({ data: { conversationId } });
-          refetchReport();
-        } catch (e) { console.error(e); }
-      }, 500);
-      return () => clearTimeout(t);
-    }
-  }, [convo, report, conversationId, refetchReport]);
 
   async function send() {
     if (!text.trim() || !me) return;
@@ -151,41 +128,7 @@ function ConversationView() {
           <span className="rounded-md border-2 border-ink bg-cream px-2 py-1 text-[10px] font-black uppercase tracking-wider">{convo.stage?.replace("_", " ")}</span>
         </div>
 
-        {/* AI Report drawer */}
-        <div className="border-b-2 border-ink bg-cream/40">
-          <button onClick={() => setReportOpen((v) => !v)} className="flex w-full items-center justify-between px-4 py-3 text-left">
-            <div className="flex items-center gap-2">
-              <Sparkles className="h-4 w-4 text-orange" />
-              <span className="text-sm font-black">AI Compatibility Report</span>
-              {report?.compatibility_score && (
-                <span className="rounded-md border-2 border-ink bg-orange px-2 py-0.5 text-[11px] font-black text-white">{report.compatibility_score}/100</span>
-              )}
-            </div>
-            <ChevronDown className={`h-4 w-4 transition ${reportOpen ? "rotate-180" : ""}`} />
-          </button>
-          {reportOpen && (
-            <div className="px-4 pb-5">
-              {!report ? (
-                <div className="flex items-center gap-2 text-sm text-muted-text">
-                  <Loader2 className="h-4 w-4 animate-spin" /> Generating your compatibility report…
-                </div>
-              ) : report.compatibility_score == null ? (
-                <div className="text-sm text-muted-text">{report.rationale_summary}</div>
-              ) : (
-                <div className="grid gap-4 md:grid-cols-[auto_1fr]">
-                  <ScoreRing score={report.compatibility_score} size={110} />
-                  <div className="space-y-3">
-                    <p className="text-sm">{report.rationale_summary}</p>
-                    <ReportList title="Alignment" items={report.alignment_points as string[] | null} color="emerald" icon={CheckCircle2} />
-                    <ReportList title="Divergence" items={report.divergence_points as string[] | null} color="amber" icon={AlertTriangle} />
-                    <ReportList title="Risk flags" items={report.risk_flags as string[] | null} color="destructive" icon={AlertTriangle} />
-                    <ReportList title="Conversation starters" items={report.conversation_starters as string[] | null} color="indigo" icon={MessageCircle} />
-                  </div>
-                </div>
-              )}
-            </div>
-          )}
-        </div>
+        {/* AI report intentionally removed */}
 
         {/* Messages */}
         <div className="flex-1 overflow-y-auto bg-surface px-4 py-6" onClick={() => setActiveMsg(null)}>
@@ -259,33 +202,7 @@ function ConversationView() {
           </div>
         </div>
 
-        {/* AI conversation starters — shown when chat is empty */}
-        {(messages?.length ?? 0) === 0 && (
-          <div className="border-t-2 border-ink bg-cream px-4 py-3">
-            <div className="mx-auto max-w-2xl">
-              <div className="mb-2 flex items-center gap-2">
-                <Sparkles className="h-4 w-4 text-orange" />
-                <span className="text-[11px] font-black uppercase tracking-wider">AI starters — tuned to your compatibility</span>
-              </div>
-              {!report ? (
-                <div className="flex items-center gap-2 text-xs text-muted-text">
-                  <Loader2 className="h-3 w-3 animate-spin" /> Crafting personalized openers…
-                </div>
-              ) : (report.conversation_starters as string[] | null)?.length ? (
-                <div className="flex flex-wrap gap-2">
-                  {(report.conversation_starters as string[]).map((s, i) => (
-                    <button key={i} onClick={() => setText(s)}
-                      className="rounded-lg border-2 border-ink bg-white px-3 py-2 text-left text-xs font-semibold shadow-brutal-sm box-hover">
-                      {s}
-                    </button>
-                  ))}
-                </div>
-              ) : (
-                <div className="text-xs text-muted-text">No starters available yet — say hi!</div>
-              )}
-            </div>
-          </div>
-        )}
+        {/* AI starters intentionally removed */}
 
         {/* Composer */}
         <div className="border-t-2 border-ink bg-white p-3">
@@ -306,23 +223,5 @@ function ConversationView() {
 
       </div>
     </AppShell>
-  );
-}
-
-function ReportList({ title, items, color, icon: Icon }: { title: string; items: string[] | null; color: string; icon: React.ComponentType<{ className?: string }> }) {
-  if (!items?.length) return null;
-  const colorMap: Record<string, string> = { emerald: "text-emerald", amber: "text-amber", destructive: "text-destructive", indigo: "text-indigo" };
-  return (
-    <div>
-      <div className={`text-[10px] font-bold uppercase tracking-wider ${colorMap[color]}`}>{title}</div>
-      <ul className="mt-1 space-y-1">
-        {items.map((it, i) => (
-          <li key={i} className="flex items-start gap-2 text-xs">
-            <Icon className={`mt-0.5 h-3 w-3 flex-none ${colorMap[color]}`} />
-            <span>{it}</span>
-          </li>
-        ))}
-      </ul>
-    </div>
   );
 }
