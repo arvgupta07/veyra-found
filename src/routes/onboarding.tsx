@@ -179,8 +179,14 @@ function Onboarding() {
                 <textarea maxLength={280} rows={3} value={f.bio} onChange={(e) => setF({ ...f, bio: e.target.value })} className="mt-1 w-full rounded-lg border px-3 py-2 text-sm focus:ring-2 focus:ring-indigo focus:outline-none" />
                 <div className="mt-1 text-right text-[10px] text-muted-text">{f.bio.length}/280</div>
               </div>
-              <div className="grid grid-cols-2 gap-3">
+              <div className="grid grid-cols-3 gap-3">
                 <Input label="Location" placeholder="Mumbai" value={f.location} onChange={(v) => setF({ ...f, location: v })} />
+                <div>
+                  <label className="text-xs font-semibold text-muted-text">Age</label>
+                  <input type="number" min={16} max={100} value={f.age}
+                    onChange={(e) => setF({ ...f, age: +e.target.value || 0 })}
+                    className="mt-1 w-full rounded-lg border-2 border-ink bg-white px-3 py-2 text-sm" />
+                </div>
                 <div>
                   <label className="text-xs font-semibold text-muted-text">Years of experience</label>
                   <select value={f.years_experience} onChange={(e) => setF({ ...f, years_experience: +e.target.value })} className="mt-1 w-full rounded-lg border px-3 py-2 text-sm">
