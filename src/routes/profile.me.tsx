@@ -182,7 +182,15 @@ function EditPanel({ initial, founderId, userId, onClose, onSaved }: {
             <textarea rows={3} maxLength={280} value={form.bio} onChange={(e) => setForm({ ...form, bio: e.target.value })}
               className="mt-1 w-full rounded-lg border-2 border-ink bg-white px-3 py-2 text-sm" />
           </div>
-          <Field label="Location" v={form.location} onChange={(v) => setForm({ ...form, location: v })} />
+          <div className="grid grid-cols-2 gap-3">
+            <Field label="Location" v={form.location} onChange={(v) => setForm({ ...form, location: v })} />
+            <div>
+              <label className="text-[11px] font-black uppercase text-muted-text">Age</label>
+              <input type="number" min={16} max={100} value={form.age || ""}
+                onChange={(e) => setForm({ ...form, age: +e.target.value || 0 })}
+                className="mt-1 w-full rounded-lg border-2 border-ink bg-white px-3 py-2 text-sm" />
+            </div>
+          </div>
           <div>
             <label className="text-[11px] font-black uppercase text-muted-text">Skills</label>
             <div className="mt-2 flex flex-wrap gap-1.5">
