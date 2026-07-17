@@ -1,14 +1,14 @@
 import { Link, useRouter, useRouterState } from "@tanstack/react-router";
-import { Compass, Inbox, MessagesSquare, User, Sparkles, LogOut, TrendingUp } from "lucide-react";
+import { Compass, Inbox, MessagesSquare, User, Sparkles, LogOut, TrendingUp, Heart } from "lucide-react";
 import { useMyProfile } from "@/hooks/useMyFounder";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 
 const founderNav = [
   { to: "/discover", label: "Discover", icon: Compass },
+  { to: "/matches", label: "Matches", icon: Heart },
   { to: "/inbox", label: "Inbox", icon: Inbox },
   { to: "/forum", label: "Forum", icon: MessagesSquare },
-  { to: "/investor-feed", label: "Investors", icon: TrendingUp },
   { to: "/profile/me", label: "Profile", icon: User },
 ];
 const investorNav = [
