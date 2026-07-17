@@ -4,6 +4,7 @@ import {
   Sparkles, ShieldCheck, ArrowRight, CheckCircle2, BarChart3, MessagesSquare,
   Zap, Users, Rocket, Star, MoveUpRight,
 } from "lucide-react";
+import { VeyraMark } from "@/components/VeyraLogo";
 
 export const Route = createFileRoute("/")({
   component: Landing,
