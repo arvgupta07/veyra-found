@@ -224,16 +224,33 @@ function PromptCard({
   myFounderId,
   toFounderId,
   toName,
+  isOpen,
+  onOpen,
+  onClose,
 }: {
   question: string;
   answer: string;
   myFounderId?: string;
   toFounderId: string;
   toName: string;
+  isOpen: boolean;
+  onOpen: () => void;
+  onClose: () => void;
 }) {
-  const [open, setOpen] = useState(false);
+  const [open, setOpen] = useState(isOpen);
   const [reply, setReply] = useState("");
   const [sending, setSending] = useState(false);
+  const textareaRef = useRef<HTMLTextAreaElement>(null);
+
+  useEffect(() => {
+    setOpen(isOpen);
+  }, [isOpen]);
+
+  useEffect(() => {
+    if (open && textareaRef.current) {
+      textareaRef.current.focus();
+    }
+  }, [open]);
 
   async function send() {
     if (!myFounderId) return toast.error("Loading your profile…");
@@ -251,6 +268,7 @@ function PromptCard({
     toast.success(`Request sent to ${toName}!`);
     setReply("");
     setOpen(false);
+    onClose();
   }
 
   return (
@@ -260,7 +278,7 @@ function PromptCard({
 
       {!open ? (
         <button
-          onClick={() => setOpen(true)}
+          onClick={() => { setOpen(true); onOpen(); }}
           className="mt-3 inline-flex items-center gap-1.5 rounded-lg border-2 border-ink bg-white px-3 py-1.5 text-xs font-bold text-ink shadow-brutal-sm box-hover"
         >
           <Sparkles className="h-3 w-3" /> Reply to this prompt
@@ -268,6 +286,7 @@ function PromptCard({
       ) : (
         <div className="mt-3 space-y-2">
           <textarea
+            ref={textareaRef}
             rows={3}
             maxLength={400}
             value={reply}
@@ -279,7 +298,7 @@ function PromptCard({
           <div className="flex items-center justify-between">
             <div className="text-[10px] font-semibold text-muted-text">{reply.length}/400</div>
             <div className="flex gap-2">
-              <button onClick={() => { setOpen(false); setReply(""); }} className="rounded-lg border-2 border-ink bg-white px-3 py-1.5 text-xs font-bold">Cancel</button>
+              <button onClick={() => { setOpen(false); setReply(""); onClose(); }} className="rounded-lg border-2 border-ink bg-white px-3 py-1.5 text-xs font-bold">Cancel</button>
               <button
                 onClick={send}
                 disabled={sending}
