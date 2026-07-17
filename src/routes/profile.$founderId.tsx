@@ -107,10 +107,31 @@ function FounderProfile() {
               <TierBadge tier={data.trust_tier ?? "Builder"} />
             </div>
             {!isMe && me && (
-              <button onClick={() => setConnectOpen(true)}
-                className="mt-4 inline-flex items-center gap-2 rounded-lg border-2 border-ink bg-orange px-4 py-2 text-xs font-black text-white shadow-brutal-sm box-hover">
-                <Send className="h-3 w-3" /> Send message
-              </button>
+              <div className="mt-4 flex flex-wrap items-center gap-2">
+                {!block && (
+                  <button onClick={() => setConnectOpen(true)}
+                    className="inline-flex items-center gap-2 rounded-lg border-2 border-ink bg-orange px-4 py-2 text-xs font-black text-white shadow-brutal-sm box-hover">
+                    <Send className="h-3 w-3" /> Send message
+                  </button>
+                )}
+                {block?.blocker_id === me.id && (
+                  <button onClick={toggleBlock}
+                    className="inline-flex items-center gap-2 rounded-lg border-2 border-ink bg-sage px-4 py-2 text-xs font-black text-ink shadow-brutal-sm box-hover">
+                    <ShieldCheck className="h-3 w-3" /> Unblock
+                  </button>
+                )}
+                {block?.blocked_id === me.id && block.blocker_id !== me.id && (
+                  <span className="inline-flex items-center gap-2 rounded-lg border-2 border-ink bg-cream px-4 py-2 text-xs font-black text-ink">
+                    <Ban className="h-3 w-3" /> This user has blocked you
+                  </span>
+                )}
+                {!block && (
+                  <button onClick={toggleBlock}
+                    className="inline-flex items-center gap-2 rounded-lg border-2 border-ink bg-white px-4 py-2 text-xs font-black text-ink shadow-brutal-sm box-hover">
+                    <Ban className="h-3 w-3" /> Block
+                  </button>
+                )}
+              </div>
             )}
           </div>
 
