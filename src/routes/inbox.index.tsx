@@ -16,7 +16,7 @@ export const Route = createFileRoute("/inbox/")({
 function Inbox() {
   const { ready } = useRequireAuth({ requireOnboarded: true });
   const { data: me } = useMyFounder();
-  const [tab, setTab] = useState<"requests" | "talking">("requests");
+  const [tab, setTab] = useState<"requests" | "sent" | "talking">("requests");
 
   const { data: requests, refetch: refetchReq } = useQuery({
     queryKey: ["inbox-requests", me?.id],
@@ -25,6 +25,17 @@ function Inbox() {
       const { data } = await supabase.from("connection_requests")
         .select("*, founder:founders!connection_requests_from_founder_id_fkey(*, profiles(full_name))")
         .eq("to_founder_id", me!.id).eq("status", "pending").order("created_at", { ascending: false });
+      return data ?? [];
+    },
+  });
+
+  const { data: sent } = useQuery({
+    queryKey: ["inbox-sent", me?.id],
+    enabled: !!me?.id,
+    queryFn: async () => {
+      const { data } = await supabase.from("connection_requests")
+        .select("*, founder:founders!connection_requests_to_founder_id_fkey(*, profiles(full_name))")
+        .eq("from_founder_id", me!.id).order("created_at", { ascending: false });
       return data ?? [];
     },
   });
