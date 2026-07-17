@@ -39,7 +39,7 @@ function PostView() {
     queryKey: ["comments", postId],
     queryFn: async () => {
       const { data } = await supabase.from("forum_comments")
-        .select("*, author:founders(*, profiles(full_name))")
+        .select("*, author:founders!forum_comments_author_id_fkey(*, profiles(full_name))")
         .eq("post_id", postId).order("created_at", { ascending: true });
       return data ?? [];
     },
