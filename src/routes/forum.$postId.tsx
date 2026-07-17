@@ -143,8 +143,16 @@ function PostView() {
           <h1 className="mt-3 text-2xl font-black tracking-tight">{post.title}</h1>
           <p className="mt-4 whitespace-pre-wrap text-sm leading-relaxed">{post.content}</p>
           <div className="mt-5 flex flex-wrap items-center gap-2">
-            <div className="inline-flex items-center gap-1 rounded-md border-2 border-ink bg-cream px-2 py-1 text-xs font-black">
-              <ArrowUp className="h-3 w-3" /> {post.upvotes ?? 0}
+            <div className="inline-flex items-stretch overflow-hidden rounded-lg border-2 border-ink bg-white shadow-brutal-sm">
+              <button onClick={() => vote(1)} aria-label="Upvote"
+                className={`grid w-9 place-items-center transition ${myVote === 1 ? "bg-sage" : "hover:bg-cream"}`}>
+                <ArrowBigUp className={`h-4 w-4 ${myVote === 1 ? "fill-ink" : ""}`} />
+              </button>
+              <div className="grid min-w-[2.5rem] place-items-center border-x-2 border-ink px-2 text-sm font-black">{post.upvotes ?? 0}</div>
+              <button onClick={() => vote(-1)} aria-label="Downvote"
+                className={`grid w-9 place-items-center transition ${myVote === -1 ? "bg-red text-white" : "hover:bg-cream"}`}>
+                <ArrowBigDown className={`h-4 w-4 ${myVote === -1 ? "fill-white" : ""}`} />
+              </button>
             </div>
             <button onClick={toggleSave} className={`inline-flex items-center gap-1 rounded-md border-2 border-ink px-2 py-1 text-xs font-black box-hover ${saved ? "bg-orange text-white" : "bg-white"}`}>
               <Bookmark className="h-3 w-3" /> {saved ? "Saved" : "Save"}
