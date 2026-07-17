@@ -1,4 +1,4 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, useRouter } from "@tanstack/react-router";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
@@ -8,7 +8,7 @@ import { AppShell } from "@/components/AppShell";
 import { useRequireAuth } from "@/hooks/useRequireAuth";
 import { SkillTag, TierBadge, VerifiedBadges } from "@/components/FounderBits";
 import { founderAvatar, SKILLS_LIST } from "@/lib/founder-types";
-import { MapPin, Briefcase, Pencil, X, Loader2, Save } from "lucide-react";
+import { MapPin, Briefcase, Pencil, X, Loader2, Save, LogOut, Trash2 } from "lucide-react";
 
 export const Route = createFileRoute("/profile/me")({
   component: MyProfile,
