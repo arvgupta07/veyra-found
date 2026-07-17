@@ -236,11 +236,25 @@ function Inbox() {
                       </div>
                     )}
                     <p className="mt-3 text-sm">{r.message}</p>
-                    <div className="mt-2 text-[10px] text-muted-text">
-                      Sent {new Date(r.created_at!).toLocaleDateString()}
-                      {r.status === "accepted" && " · They accepted — check Talking"}
-                      {r.status === "declined" && " · They passed"}
-                      {r.status === "pending" && " · Waiting for reply"}
+                    <div className="mt-2 flex items-center justify-between gap-2">
+                      <div className="text-[10px] text-muted-text">
+                        Sent {new Date(r.created_at!).toLocaleDateString()}
+                        {r.status === "accepted" && " · They accepted — check Talking"}
+                        {r.status === "declined" && " · They passed"}
+                        {r.status === "pending" && " · Waiting for reply"}
+                      </div>
+                      {r.status === "pending" && (
+                        <button
+                          onClick={async () => {
+                            const { error } = await supabase.from("connection_requests").delete().eq("id", r.id);
+                            if (error) return toast.error(error.message);
+                            toast.success("Request retracted");
+                            qc.invalidateQueries({ queryKey: ["inbox-sent", me?.id] });
+                          }}
+                          className="rounded-md border-2 border-ink bg-red px-2 py-1 text-[10px] font-black uppercase text-white shadow-brutal-sm">
+                          Retract
+                        </button>
+                      )}
                     </div>
                   </div>
                 </div>
