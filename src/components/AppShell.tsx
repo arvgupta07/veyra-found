@@ -72,7 +72,12 @@ export function AppShell({ children }: { children: React.ReactNode }) {
           <div className="grid h-7 w-7 place-items-center border-2 border-ink bg-cream"><VeyraMark size={16} /></div>
           <span className="text-base font-black text-white">veyra</span>
         </Link>
-        <button onClick={signOut} className="text-xs text-white/70">Sign out</button>
+        <div className="flex items-center gap-3">
+          <button onClick={toggle} aria-label="Toggle dark mode" className="text-white/80">
+            {dark ? <Sun className="h-4 w-4" /> : <Moon className="h-4 w-4" />}
+          </button>
+          <button onClick={signOut} className="text-xs text-white/70">Sign out</button>
+        </div>
       </div>
 
       {/* Mobile bottom nav */}
