@@ -17,7 +17,7 @@ function NotFoundComponent() {
         <h1 className="text-7xl font-black text-foreground">404</h1>
         <h2 className="mt-4 text-xl font-semibold">Page not found</h2>
         <p className="mt-2 text-sm text-muted-foreground">
-          This route doesn't exist on CoFound AI.
+          This route doesn't exist on Veyra.
         </p>
         <div className="mt-6">
           <Link to="/" className="inline-flex items-center rounded-lg bg-primary px-4 py-2 text-sm font-medium text-primary-foreground hover:opacity-90">Go home</Link>
@@ -49,10 +49,10 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
     meta: [
       { charSet: "utf-8" },
       { name: "viewport", content: "width=device-width, initial-scale=1" },
-      { title: "CoFound AI — India's co-founder matching platform" },
-      { name: "description", content: "The right co-founder changes everything. Verified profiles, compatibility science, and a structured process from first message to confirmed co-founder." },
-      { property: "og:title", content: "CoFound AI — India's co-founder matching platform" },
-      { property: "og:description", content: "Verified founder profiles, compatibility science, and a structured process to your next co-founder." },
+      { title: "Veyra — Connect. Build. Beyond." },
+      { name: "description", content: "Veyra is India's co-founder matching platform. Verified founders, compatibility science, and a structured path from first message to confirmed co-founder." },
+      { property: "og:title", content: "Veyra — Connect. Build. Beyond." },
+      { property: "og:description", content: "Verified founders, compatibility science, and a structured path to your next co-founder." },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
     ],

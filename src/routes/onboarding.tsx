@@ -224,7 +224,19 @@ function Onboarding() {
                     return <button key={s} type="button" onClick={() => setF({ ...f, skills: on ? f.skills.filter((x) => x !== s) : [...f.skills, s] })} className={`rounded-md px-2.5 py-1 text-xs font-medium ${on ? "bg-indigo text-white" : "bg-surface-2 text-muted-text hover:bg-indigo/10"}`}>{s}</button>;
                   })}
                 </div>
-                <input placeholder="Add a custom skill" value={f.custom_skill} onChange={(e) => setF({ ...f, custom_skill: e.target.value })} className="mt-2 w-full rounded-lg border px-3 py-2 text-sm" />
+                <div className="mt-2 flex gap-2">
+                  <input placeholder="Add a custom skill" value={f.custom_skill}
+                    onChange={(e) => setF({ ...f, custom_skill: e.target.value })}
+                    onKeyDown={(e) => { if (e.key === "Enter") { e.preventDefault();
+                      const s = f.custom_skill.trim(); if (!s) return;
+                      setF({ ...f, skills: [...new Set([...f.skills, s])], custom_skill: "" });
+                    } }}
+                    className="flex-1 rounded-lg border-2 border-ink bg-white px-3 py-2 text-sm" />
+                  <button type="button" onClick={() => {
+                    const s = f.custom_skill.trim(); if (!s) return;
+                    setF({ ...f, skills: [...new Set([...f.skills, s])], custom_skill: "" });
+                  }} className="rounded-lg border-2 border-ink bg-orange px-4 py-2 text-sm font-black text-white shadow-brutal-sm">Add</button>
+                </div>
               </div>
               <div>
                 <label className="text-xs font-semibold text-muted-text">Industry focus</label>

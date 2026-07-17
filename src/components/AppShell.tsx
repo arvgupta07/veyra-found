@@ -1,8 +1,9 @@
 import { Link, useRouter, useRouterState } from "@tanstack/react-router";
-import { Compass, Inbox, MessagesSquare, User, Sparkles, LogOut, TrendingUp, Heart } from "lucide-react";
+import { Compass, Inbox, MessagesSquare, User, LogOut, TrendingUp, Heart } from "lucide-react";
 import { useMyProfile } from "@/hooks/useMyFounder";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
+import { VeyraMark } from "@/components/VeyraLogo";
 
 const founderNav = [
   { to: "/discover", label: "Discover", icon: Compass },
@@ -33,10 +34,10 @@ export function AppShell({ children }: { children: React.ReactNode }) {
       {/* Sidebar (desktop) */}
       <aside className="fixed inset-y-0 left-0 hidden w-60 flex-col border-r border-white/5 bg-navy px-4 py-6 md:flex">
         <Link to="/" className="flex items-center gap-2 px-2">
-          <div className="grid h-8 w-8 place-items-center rounded-lg bg-indigo text-white shadow-md">
-            <Sparkles className="h-4 w-4" />
+          <div className="grid h-9 w-9 shrink-0 place-items-center border-[3px] border-ink bg-cream shadow-brutal-sm">
+            <VeyraMark size={20} />
           </div>
-          <span className="text-lg font-black tracking-tight text-white">CoFound<span className="text-indigo-light">.ai</span></span>
+          <span className="text-lg font-black tracking-tight text-white">veyra</span>
         </Link>
         <nav className="mt-8 space-y-1">
           {nav.map((n) => {
@@ -63,8 +64,8 @@ export function AppShell({ children }: { children: React.ReactNode }) {
       {/* Mobile top bar */}
       <div className="fixed inset-x-0 top-0 z-30 flex items-center justify-between border-b border-black/5 bg-navy px-4 py-3 md:hidden">
         <Link to="/" className="flex items-center gap-2">
-          <div className="grid h-7 w-7 place-items-center rounded-md bg-indigo text-white"><Sparkles className="h-3.5 w-3.5" /></div>
-          <span className="text-base font-black text-white">CoFound<span className="text-indigo-light">.ai</span></span>
+          <div className="grid h-7 w-7 place-items-center border-2 border-ink bg-cream"><VeyraMark size={16} /></div>
+          <span className="text-base font-black text-white">veyra</span>
         </Link>
         <button onClick={signOut} className="text-xs text-white/70">Sign out</button>
       </div>

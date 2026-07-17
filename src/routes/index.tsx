@@ -4,6 +4,7 @@ import {
   Sparkles, ShieldCheck, ArrowRight, CheckCircle2, BarChart3, MessagesSquare,
   Zap, Users, Rocket, Star, MoveUpRight,
 } from "lucide-react";
+import { VeyraMark } from "@/components/VeyraLogo";
 
 export const Route = createFileRoute("/")({
   component: Landing,
@@ -66,12 +67,13 @@ function Landing() {
       <header className="border-b-[3px] border-ink bg-cream">
         <div className="mx-auto flex max-w-7xl items-center justify-between gap-3 px-4 py-4 sm:px-6">
           <Link to="/" className="group flex items-center gap-2">
-            <div className="grid h-10 w-10 shrink-0 place-items-center border-[3px] border-ink bg-orange shadow-brutal-sm transition-transform group-hover:-rotate-6">
-              <Sparkles className="h-5 w-5 text-ink" strokeWidth={3} />
+            <div className="grid h-10 w-10 shrink-0 place-items-center border-[3px] border-ink bg-cream shadow-brutal-sm transition-transform group-hover:-rotate-6">
+              <VeyraMark size={22} />
             </div>
-            <span className="text-xl font-black tracking-tight">
-              COFOUND<span className="text-red">.AI</span>
-            </span>
+            <div className="flex flex-col leading-none">
+              <span className="text-xl font-black tracking-tight">veyra</span>
+              <span className="mt-0.5 text-[9px] font-black uppercase tracking-widest text-orange">Connect · Build · Beyond</span>
+            </div>
           </Link>
           <nav className="hidden gap-1 md:flex">
             {[

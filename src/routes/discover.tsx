@@ -1,4 +1,4 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, Link } from "@tanstack/react-router";
 import { useEffect, useRef, useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
@@ -36,16 +36,19 @@ function Discover() {
   const current = founders?.[index];
   const atEnd = !!founders && founders.length > 0 && index >= founders.length;
 
+  function advance() {
+    setSkipped((s) => s + 1);
+    setIndex((i) => i + 1);
+    setOpenPrompt(null);
+    if (typeof window !== "undefined") window.scrollTo({ top: 0, behavior: "smooth" });
+  }
+
   useEffect(() => {
     function onKeyDown(e: KeyboardEvent) {
       if (e.target instanceof HTMLInputElement || e.target instanceof HTMLTextAreaElement) return;
       if (e.key === "s" || e.key === "S") {
         e.preventDefault();
-        if (!atEnd && current) {
-          setSkipped((s) => s + 1);
-          setIndex((i) => i + 1);
-          setOpenPrompt(null);
-        }
+        if (!atEnd && current) advance();
       }
       if (e.key === "Enter") {
         e.preventDefault();
@@ -57,6 +60,7 @@ function Discover() {
     }
     window.addEventListener("keydown", onKeyDown);
     return () => window.removeEventListener("keydown", onKeyDown);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [current, atEnd]);
 
   useEffect(() => {
@@ -95,7 +99,7 @@ function Discover() {
               onClosePrompt={() => setOpenPrompt(null)}
             />
             <button
-              onClick={() => { setSkipped((s) => s + 1); setIndex((i) => i + 1); }}
+              onClick={advance}
               className="flex w-full items-center justify-center gap-2 rounded-xl border-2 border-ink bg-white py-3 text-sm font-black text-ink shadow-brutal box-hover"
             >
               Skip <X className="h-4 w-4" /> Next founder
@@ -160,9 +164,11 @@ function FounderCard({
     <article className="overflow-hidden rounded-3xl border bg-white shadow-card">
       <div className="relative h-40 bg-hero-radial">
         <div className="absolute left-6 top-6 flex items-center gap-3">
-          <img src={avatar} alt={name} className="h-16 w-16 rounded-2xl border-2 border-white/20 object-cover" />
+          <Link to="/profile/$founderId" params={{ founderId: founder.id }}>
+            <img src={avatar} alt={name} className="h-16 w-16 rounded-2xl border-2 border-white/20 object-cover transition hover:scale-105" />
+          </Link>
           <div>
-            <div className="text-lg font-bold text-white">{name}</div>
+            <Link to="/profile/$founderId" params={{ founderId: founder.id }} className="text-lg font-bold text-white hover:text-orange">{name}</Link>
             <div className="mt-0.5 flex items-center gap-2 text-xs text-white/70">
               <MapPin className="h-3 w-3" /> {founder.location} · {founder.years_experience}y
             </div>

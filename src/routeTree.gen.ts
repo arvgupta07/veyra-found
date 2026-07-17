@@ -18,6 +18,7 @@ import { Route as IndexRouteImport } from './routes/index'
 import { Route as InboxIndexRouteImport } from './routes/inbox.index'
 import { Route as ForumIndexRouteImport } from './routes/forum.index'
 import { Route as ProfileMeRouteImport } from './routes/profile.me'
+import { Route as ProfileFounderIdRouteImport } from './routes/profile.$founderId'
 import { Route as InboxConversationIdRouteImport } from './routes/inbox.$conversationId'
 import { Route as ForumPostIdRouteImport } from './routes/forum.$postId'
 import { Route as AuthSignupRouteImport } from './routes/auth.signup'
@@ -68,6 +69,11 @@ const ProfileMeRoute = ProfileMeRouteImport.update({
   path: '/profile/me',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ProfileFounderIdRoute = ProfileFounderIdRouteImport.update({
+  id: '/profile/$founderId',
+  path: '/profile/$founderId',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const InboxConversationIdRoute = InboxConversationIdRouteImport.update({
   id: '/inbox/$conversationId',
   path: '/inbox/$conversationId',
@@ -100,6 +106,7 @@ export interface FileRoutesByFullPath {
   '/auth/signup': typeof AuthSignupRoute
   '/forum/$postId': typeof ForumPostIdRoute
   '/inbox/$conversationId': typeof InboxConversationIdRoute
+  '/profile/$founderId': typeof ProfileFounderIdRoute
   '/profile/me': typeof ProfileMeRoute
   '/forum/': typeof ForumIndexRoute
   '/inbox/': typeof InboxIndexRoute
@@ -115,6 +122,7 @@ export interface FileRoutesByTo {
   '/auth/signup': typeof AuthSignupRoute
   '/forum/$postId': typeof ForumPostIdRoute
   '/inbox/$conversationId': typeof InboxConversationIdRoute
+  '/profile/$founderId': typeof ProfileFounderIdRoute
   '/profile/me': typeof ProfileMeRoute
   '/forum': typeof ForumIndexRoute
   '/inbox': typeof InboxIndexRoute
@@ -131,6 +139,7 @@ export interface FileRoutesById {
   '/auth/signup': typeof AuthSignupRoute
   '/forum/$postId': typeof ForumPostIdRoute
   '/inbox/$conversationId': typeof InboxConversationIdRoute
+  '/profile/$founderId': typeof ProfileFounderIdRoute
   '/profile/me': typeof ProfileMeRoute
   '/forum/': typeof ForumIndexRoute
   '/inbox/': typeof InboxIndexRoute
@@ -148,6 +157,7 @@ export interface FileRouteTypes {
     | '/auth/signup'
     | '/forum/$postId'
     | '/inbox/$conversationId'
+    | '/profile/$founderId'
     | '/profile/me'
     | '/forum/'
     | '/inbox/'
@@ -163,6 +173,7 @@ export interface FileRouteTypes {
     | '/auth/signup'
     | '/forum/$postId'
     | '/inbox/$conversationId'
+    | '/profile/$founderId'
     | '/profile/me'
     | '/forum'
     | '/inbox'
@@ -178,6 +189,7 @@ export interface FileRouteTypes {
     | '/auth/signup'
     | '/forum/$postId'
     | '/inbox/$conversationId'
+    | '/profile/$founderId'
     | '/profile/me'
     | '/forum/'
     | '/inbox/'
@@ -194,6 +206,7 @@ export interface RootRouteChildren {
   AuthSignupRoute: typeof AuthSignupRoute
   ForumPostIdRoute: typeof ForumPostIdRoute
   InboxConversationIdRoute: typeof InboxConversationIdRoute
+  ProfileFounderIdRoute: typeof ProfileFounderIdRoute
   ProfileMeRoute: typeof ProfileMeRoute
   ForumIndexRoute: typeof ForumIndexRoute
   InboxIndexRoute: typeof InboxIndexRoute
@@ -264,6 +277,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ProfileMeRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/profile/$founderId': {
+      id: '/profile/$founderId'
+      path: '/profile/$founderId'
+      fullPath: '/profile/$founderId'
+      preLoaderRoute: typeof ProfileFounderIdRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/inbox/$conversationId': {
       id: '/inbox/$conversationId'
       path: '/inbox/$conversationId'
@@ -306,6 +326,7 @@ const rootRouteChildren: RootRouteChildren = {
   AuthSignupRoute: AuthSignupRoute,
   ForumPostIdRoute: ForumPostIdRoute,
   InboxConversationIdRoute: InboxConversationIdRoute,
+  ProfileFounderIdRoute: ProfileFounderIdRoute,
   ProfileMeRoute: ProfileMeRoute,
   ForumIndexRoute: ForumIndexRoute,
   InboxIndexRoute: InboxIndexRoute,

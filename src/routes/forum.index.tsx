@@ -111,12 +111,12 @@ function Forum() {
         </div>
       </div>
 
-      {composeOpen && me && <ComposeModal onClose={() => { setComposeOpen(false); refetch(); }} founderId={me.id} />}
+      {composeOpen && me && <ComposeModal onClose={(postedCategory) => { setComposeOpen(false); if (postedCategory) setCat(postedCategory); refetch(); }} founderId={me.id} />}
     </AppShell>
   );
 }
 
-function ComposeModal({ onClose, founderId }: { onClose: () => void; founderId: string }) {
+function ComposeModal({ onClose, founderId }: { onClose: (postedCategory?: string) => void; founderId: string }) {
   const [title, setTitle] = useState("");
   const [content, setContent] = useState("");
   const [category, setCategory] = useState<string>("idea_validation");
@@ -133,15 +133,15 @@ function ComposeModal({ onClose, founderId }: { onClose: () => void; founderId: 
     setSaving(false);
     if (error) return toast.error(error.message);
     toast.success("Posted!");
-    onClose();
+    onClose(category);
   }
 
   return (
-    <div className="fixed inset-0 z-40 grid place-items-center bg-ink/60 p-4" onClick={onClose}>
+    <div className="fixed inset-0 z-40 grid place-items-center bg-ink/60 p-4" onClick={() => onClose()}>
       <div onClick={(e) => e.stopPropagation()} className="w-full max-w-lg rounded-2xl border-2 border-ink bg-cream p-6 shadow-brutal">
         <div className="flex items-start justify-between">
           <div className="text-xl font-black">New post</div>
-          <button onClick={onClose}><X className="h-5 w-5" /></button>
+          <button onClick={() => onClose()}><X className="h-5 w-5" /></button>
         </div>
         <div className="mt-4 space-y-3">
           <select value={category} onChange={(e) => setCategory(e.target.value)} className="w-full rounded-lg border-2 border-ink bg-white px-3 py-2 text-sm font-semibold">
