@@ -1,11 +1,11 @@
-import { createFileRoute, Link, useRouter } from "@tanstack/react-router";
-import { useEffect, useMemo, useState } from "react";
+import { createFileRoute } from "@tanstack/react-router";
+import { useEffect, useRef, useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { useMyFounder } from "@/hooks/useMyFounder";
 import { AppShell } from "@/components/AppShell";
 import { SkillTag, TierBadge, VerifiedBadges } from "@/components/FounderBits";
-import { MapPin, Briefcase, Sparkles, Send, X, Loader2 } from "lucide-react";
+import { MapPin, Sparkles, Send, X, Loader2, Keyboard } from "lucide-react";
 import { toast } from "sonner";
 import { founderAvatar } from "@/lib/founder-types";
 import { useRequireAuth } from "@/hooks/useRequireAuth";
