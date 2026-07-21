@@ -24,8 +24,18 @@ export function AppShell({ children }: { children: React.ReactNode }) {
   const router = useRouter();
   const pathname = useRouterState({ select: (s) => s.location.pathname });
   const { data: profile } = useMyProfile();
+  const { user } = useSession();
+  const { data: isAdmin } = useQuery({
+    queryKey: ["is-admin-nav", user?.id], enabled: !!user,
+    queryFn: async () => {
+      const { data } = await supabase.from("user_roles").select("role")
+        .eq("user_id", user!.id).eq("role", "admin").maybeSingle();
+      return !!data;
+    },
+  });
   const { dark, toggle } = useDarkMode();
-  const nav = profile?.role === "investor" ? investorNav : founderNav;
+  const baseNav = profile?.role === "investor" ? investorNav : founderNav;
+  const nav = isAdmin ? [...baseNav, { to: "/admin", label: "Admin", icon: ShieldCheck }] : baseNav;
 
   async function signOut() {
     await supabase.auth.signOut();
