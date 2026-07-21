@@ -106,9 +106,11 @@ function Onboarding() {
     const { data: founder } = await supabase.from("founders").select("id").eq("user_id", session!.user.id).maybeSingle();
     if (!founder) return;
     await supabase.from("founder_prompts").delete().eq("founder_id", founder.id);
-    await supabase.from("founder_prompts").insert(selectedPrompts.map((p, i) => ({
-      founder_id: founder.id, prompt_question: p.q, prompt_answer: p.a, display_order: i,
-    })));
+    if (selectedPrompts.length > 0) {
+      await supabase.from("founder_prompts").insert(selectedPrompts.map((p, i) => ({
+        founder_id: founder.id, prompt_question: p.q, prompt_answer: p.a, display_order: i,
+      })));
+    }
     setSaving(false);
     setStep(4);
   }
