@@ -7,7 +7,7 @@ import { useMyFounder, useMyProfile } from "@/hooks/useMyFounder";
 import { AppShell } from "@/components/AppShell";
 import { useRequireAuth } from "@/hooks/useRequireAuth";
 import { SkillTag, TierBadge, VerifiedBadges } from "@/components/FounderBits";
-import { founderAvatar, SKILLS_LIST } from "@/lib/founder-types";
+import { founderAvatar, SKILLS_LIST, AVATAR_PRESETS } from "@/lib/founder-types";
 import { MapPin, Briefcase, Pencil, X, Loader2, Save, LogOut, Trash2 } from "lucide-react";
 
 export const Route = createFileRoute("/profile/me")({
@@ -121,7 +121,7 @@ function MyProfile() {
           </div>
 
           {editing && <EditPanel
-            initial={{ full_name: profile?.full_name ?? "", headline: me.headline ?? "", bio: me.bio ?? "", location: me.location ?? "", age: me.age ?? 0, skills: me.skills ?? [] }}
+            initial={{ full_name: profile?.full_name ?? "", headline: me.headline ?? "", bio: me.bio ?? "", location: me.location ?? "", age: me.age ?? 0, skills: me.skills ?? [], seed_avatar: me.seed_avatar ?? AVATAR_PRESETS[0] }}
             founderId={me.id}
             userId={me.user_id ?? ""}
             onClose={() => setEditing(false)}
@@ -238,7 +238,7 @@ function MyProfile() {
 }
 
 function EditPanel({ initial, founderId, userId, onClose, onSaved }: {
-  initial: { full_name: string; headline: string; bio: string; location: string; age: number; skills: string[] };
+  initial: { full_name: string; headline: string; bio: string; location: string; age: number; skills: string[]; seed_avatar: string };
   founderId: string;
   userId: string;
   onClose: () => void;
@@ -255,8 +255,9 @@ function EditPanel({ initial, founderId, userId, onClose, onSaved }: {
       supabase.from("founders").update({
         headline: form.headline, bio: form.bio, location: form.location, skills: form.skills,
         age: form.age > 0 ? form.age : null,
+        seed_avatar: form.seed_avatar,
       }).eq("id", founderId),
-      userId ? supabase.from("profiles").update({ full_name: form.full_name }).eq("id", userId) : Promise.resolve({ error: null }),
+      userId ? supabase.from("profiles").update({ full_name: form.full_name, avatar_url: form.seed_avatar }).eq("id", userId) : Promise.resolve({ error: null }),
     ]);
     setSaving(false);
     if (e1 || e2) return toast.error(e1?.message ?? e2?.message ?? "Save failed");
@@ -276,6 +277,21 @@ function EditPanel({ initial, founderId, userId, onClose, onSaved }: {
           <button onClick={onClose}><X className="h-5 w-5" /></button>
         </div>
         <div className="mt-4 space-y-3">
+          <div>
+            <label className="text-[11px] font-black uppercase text-muted-text">Avatar</label>
+            <div className="mt-2 grid grid-cols-6 gap-2">
+              {AVATAR_PRESETS.map((url) => {
+                const on = form.seed_avatar === url;
+                return (
+                  <button key={url} type="button" onClick={() => setForm({ ...form, seed_avatar: url })}
+                    className={`relative aspect-square overflow-hidden rounded-xl border-2 border-ink transition ${on ? "shadow-brutal -translate-x-0.5 -translate-y-0.5" : "shadow-brutal-sm hover:-translate-y-0.5"}`}>
+                    <img src={url} alt="" className="h-full w-full object-cover" />
+                    {on && <div className="absolute inset-0 bg-orange/60" />}
+                  </button>
+                );
+              })}
+            </div>
+          </div>
           <Field label="Full name" v={form.full_name} onChange={(v) => setForm({ ...form, full_name: v })} />
           <Field label="Headline" v={form.headline} onChange={(v) => setForm({ ...form, headline: v })} />
           <div>
@@ -303,6 +319,10 @@ function EditPanel({ initial, founderId, userId, onClose, onSaved }: {
             </div>
             <div className="mt-2 flex gap-2">
               <input value={custom} onChange={(e) => setCustom(e.target.value)} placeholder="Add a custom skill"
+                onKeyDown={(e) => { if (e.key === "Enter") { e.preventDefault();
+                  const s = custom.trim(); if (!s) return;
+                  setForm((f) => ({ ...f, skills: [...new Set([...f.skills, s])] })); setCustom("");
+                } }}
                 className="flex-1 rounded-lg border-2 border-ink bg-white px-3 py-2 text-sm" />
               <button type="button" onClick={() => {
                 const s = custom.trim(); if (!s) return;

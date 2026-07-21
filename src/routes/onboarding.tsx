@@ -5,7 +5,7 @@ import { Loader2, ChevronRight, Rocket, Briefcase, Palette, Wrench } from "lucid
 import { supabase } from "@/integrations/supabase/client";
 import { useSession } from "@/hooks/useSession";
 import { useMyFounder, useMyProfile } from "@/hooks/useMyFounder";
-import { PROMPTS, SKILLS_LIST, INDUSTRIES, ASSESSMENT_QUESTIONS } from "@/lib/founder-types";
+import { PROMPTS, SKILLS_LIST, INDUSTRIES, ASSESSMENT_QUESTIONS, LOOKING_FOR_OPTIONS } from "@/lib/founder-types";
 
 export const Route = createFileRoute("/onboarding")({
   component: Onboarding,
@@ -106,9 +106,11 @@ function Onboarding() {
     const { data: founder } = await supabase.from("founders").select("id").eq("user_id", session!.user.id).maybeSingle();
     if (!founder) return;
     await supabase.from("founder_prompts").delete().eq("founder_id", founder.id);
-    await supabase.from("founder_prompts").insert(selectedPrompts.map((p, i) => ({
-      founder_id: founder.id, prompt_question: p.q, prompt_answer: p.a, display_order: i,
-    })));
+    if (selectedPrompts.length > 0) {
+      await supabase.from("founder_prompts").insert(selectedPrompts.map((p, i) => ({
+        founder_id: founder.id, prompt_question: p.q, prompt_answer: p.a, display_order: i,
+      })));
+    }
     setSaving(false);
     setStep(4);
   }
@@ -225,9 +227,10 @@ function Onboarding() {
               <div>
                 <label className="text-xs font-semibold text-muted-text">Skills</label>
                 <div className="mt-2 flex flex-wrap gap-1.5">
-                  {SKILLS_LIST.map((s) => {
+                  {[...new Set([...SKILLS_LIST, ...f.skills])].map((s) => {
                     const on = f.skills.includes(s);
-                    return <button key={s} type="button" onClick={() => setF({ ...f, skills: on ? f.skills.filter((x) => x !== s) : [...f.skills, s] })} className={`rounded-md px-2.5 py-1 text-xs font-medium ${on ? "bg-indigo text-white" : "bg-surface-2 text-muted-text hover:bg-indigo/10"}`}>{s}</button>;
+                    const custom = !SKILLS_LIST.includes(s);
+                    return <button key={s} type="button" onClick={() => setF({ ...f, skills: on ? f.skills.filter((x) => x !== s) : [...f.skills, s] })} className={`rounded-md px-2.5 py-1 text-xs font-medium ${on ? (custom ? "bg-orange text-white" : "bg-indigo text-white") : "bg-surface-2 text-muted-text hover:bg-indigo/10"}`}>{s}{custom && on ? " ✕" : ""}</button>;
                   })}
                 </div>
                 <div className="mt-2 flex gap-2">
@@ -244,6 +247,7 @@ function Onboarding() {
                   }} className="rounded-lg border-2 border-ink bg-orange px-4 py-2 text-sm font-black text-white shadow-brutal-sm">Add</button>
                 </div>
               </div>
+
               <div>
                 <label className="text-xs font-semibold text-muted-text">Industry focus</label>
                 <div className="mt-2 flex flex-wrap gap-1.5">
@@ -256,10 +260,26 @@ function Onboarding() {
               <CardChoice label="Commitment" value={f.commitment} onChange={(v) => setF({ ...f, commitment: v as typeof f.commitment })} options={[["full_time","Full-time"],["part_time","Part-time"],["exploring","Exploring"]]} />
               <CardChoice label="Stage" value={f.idea_stage} onChange={(v) => setF({ ...f, idea_stage: v as typeof f.idea_stage })} options={[["idea","Just an idea"],["mvp","Building MVP"],["revenue","Have revenue"],["funded","Already funded"]]} />
               <div>
-                <label className="flex items-center gap-2 text-sm font-medium">
-                  <input type="checkbox" checked={f.has_idea} onChange={(e) => setF({ ...f, has_idea: e.target.checked })} className="h-4 w-4 rounded" />
-                  I have an idea I'm exploring
-                </label>
+                <label className="text-xs font-semibold text-muted-text">Where are you at?</label>
+                <div className="mt-2 grid gap-2 md:grid-cols-3">
+                  {([
+                    ["has_idea", "I have an idea", "Exploring or building a specific idea"],
+                    ["has_skills", "No idea, but I have skills", "I want to build — need a problem to work on"],
+                    ["exploring", "Just exploring", "Open to see what clicks"],
+                  ] as const).map(([v, title, sub]) => {
+                    const on = (v === "has_idea" && f.has_idea) || (v === "has_skills" && !f.has_idea && f.looking_for.includes("Someone with an idea")) || (v === "exploring" && !f.has_idea && !f.looking_for.includes("Someone with an idea"));
+                    return (
+                      <button key={v} type="button" onClick={() => {
+                        if (v === "has_idea") setF({ ...f, has_idea: true, looking_for: f.looking_for.filter(x => x !== "Someone with an idea") });
+                        else if (v === "has_skills") setF({ ...f, has_idea: false, looking_for: [...new Set([...f.looking_for, "Someone with an idea"])] });
+                        else setF({ ...f, has_idea: false, looking_for: f.looking_for.filter(x => x !== "Someone with an idea") });
+                      }} className={`rounded-lg border-2 p-3 text-left ${on ? "border-indigo bg-indigo/5" : "border-border"}`}>
+                        <div className="text-sm font-black">{title}</div>
+                        <div className="mt-0.5 text-[11px] text-muted-text">{sub}</div>
+                      </button>
+                    );
+                  })}
+                </div>
                 {f.has_idea && (
                   <div className="mt-3 space-y-3 rounded-lg bg-surface p-4">
                     <select value={f.idea_industry} onChange={(e) => setF({ ...f, idea_industry: e.target.value })} className="w-full rounded-lg border px-3 py-2 text-sm">
@@ -278,14 +298,15 @@ function Onboarding() {
               <CardChoice label="Work location preference" value={f.remote_pref} onChange={(v) => setF({ ...f, remote_pref: v as typeof f.remote_pref })} options={[["onsite","On-site"],["hybrid","Hybrid"],["remote","Remote"]]} />
               <div>
                 <label className="text-xs font-semibold text-muted-text">What I'm looking for in a co-founder</label>
-                <p className="text-[11px] text-muted-text">Skills or backgrounds that complement yours.</p>
+                <p className="text-[11px] text-muted-text">Pick everything that feels true — skills, style, and stage.</p>
                 <div className="mt-2 flex flex-wrap gap-1.5">
-                  {SKILLS_LIST.map((s) => {
+                  {LOOKING_FOR_OPTIONS.map((s) => {
                     const on = f.looking_for.includes(s);
                     return <button key={s} type="button" onClick={() => setF({ ...f, looking_for: on ? f.looking_for.filter((x) => x !== s) : [...f.looking_for, s] })} className={`rounded-md px-2.5 py-1 text-xs font-medium ${on ? "bg-orange text-white" : "bg-surface-2 text-muted-text hover:bg-orange/10"}`}>{s}</button>;
                   })}
                 </div>
               </div>
+
             </div>
             <div className="flex justify-between">
               <button onClick={() => setStep(1)} className="rounded-lg border px-4 py-2 text-sm">Back</button>
@@ -299,8 +320,8 @@ function Onboarding() {
         {step === 3 && (
           <div className="space-y-6">
             <div>
-              <h1 className="text-3xl font-black tracking-tight">Pick 4 prompts</h1>
-              <p className="mt-1 text-sm text-muted-text">These are the moments a co-founder will connect with. Selected {selectedPrompts.length}/4.</p>
+              <h1 className="text-3xl font-black tracking-tight">Pick up to 4 prompts</h1>
+              <p className="mt-1 text-sm text-muted-text">Optional — but strong profiles pick 3-4. Selected {selectedPrompts.length}/4.</p>
             </div>
             <div className="grid gap-3">
               {PROMPTS.map((q) => {
@@ -322,12 +343,18 @@ function Onboarding() {
                 );
               })}
             </div>
-            <div className="flex justify-between">
+            <div className="flex flex-wrap items-center justify-between gap-2">
               <button onClick={() => setStep(2)} className="rounded-lg border px-4 py-2 text-sm">Back</button>
-              <button onClick={saveStep3} disabled={saving || !canNextP} className="inline-flex items-center gap-2 rounded-lg bg-indigo px-5 py-2.5 text-sm font-semibold text-white disabled:opacity-50">
-                {saving && <Loader2 className="h-4 w-4 animate-spin" />} Continue <ChevronRight className="h-4 w-4" />
-              </button>
+              <div className="flex gap-2">
+                <button onClick={() => { setSelectedPrompts([]); setStep(4); }} className="rounded-lg border-2 border-ink bg-white px-4 py-2 text-sm font-black shadow-brutal-sm">
+                  Skip prompts
+                </button>
+                <button onClick={saveStep3} disabled={saving || (selectedPrompts.length > 0 && !canNextP)} className="inline-flex items-center gap-2 rounded-lg bg-indigo px-5 py-2.5 text-sm font-semibold text-white disabled:opacity-50">
+                  {saving && <Loader2 className="h-4 w-4 animate-spin" />} Continue <ChevronRight className="h-4 w-4" />
+                </button>
+              </div>
             </div>
+
           </div>
         )}
 
