@@ -7,7 +7,7 @@ import { useMyFounder, useMyProfile } from "@/hooks/useMyFounder";
 import { AppShell } from "@/components/AppShell";
 import { useRequireAuth } from "@/hooks/useRequireAuth";
 import { SkillTag, TierBadge, VerifiedBadges } from "@/components/FounderBits";
-import { founderAvatar, SKILLS_LIST } from "@/lib/founder-types";
+import { founderAvatar, SKILLS_LIST, AVATAR_PRESETS } from "@/lib/founder-types";
 import { MapPin, Briefcase, Pencil, X, Loader2, Save, LogOut, Trash2 } from "lucide-react";
 
 export const Route = createFileRoute("/profile/me")({
