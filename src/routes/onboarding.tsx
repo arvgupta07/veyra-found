@@ -258,10 +258,26 @@ function Onboarding() {
               <CardChoice label="Commitment" value={f.commitment} onChange={(v) => setF({ ...f, commitment: v as typeof f.commitment })} options={[["full_time","Full-time"],["part_time","Part-time"],["exploring","Exploring"]]} />
               <CardChoice label="Stage" value={f.idea_stage} onChange={(v) => setF({ ...f, idea_stage: v as typeof f.idea_stage })} options={[["idea","Just an idea"],["mvp","Building MVP"],["revenue","Have revenue"],["funded","Already funded"]]} />
               <div>
-                <label className="flex items-center gap-2 text-sm font-medium">
-                  <input type="checkbox" checked={f.has_idea} onChange={(e) => setF({ ...f, has_idea: e.target.checked })} className="h-4 w-4 rounded" />
-                  I have an idea I'm exploring
-                </label>
+                <label className="text-xs font-semibold text-muted-text">Where are you at?</label>
+                <div className="mt-2 grid gap-2 md:grid-cols-3">
+                  {([
+                    ["has_idea", "I have an idea", "Exploring or building a specific idea"],
+                    ["has_skills", "No idea, but I have skills", "I want to build — need a problem to work on"],
+                    ["exploring", "Just exploring", "Open to see what clicks"],
+                  ] as const).map(([v, title, sub]) => {
+                    const on = (v === "has_idea" && f.has_idea) || (v === "has_skills" && !f.has_idea && f.looking_for.includes("Someone with an idea")) || (v === "exploring" && !f.has_idea && !f.looking_for.includes("Someone with an idea"));
+                    return (
+                      <button key={v} type="button" onClick={() => {
+                        if (v === "has_idea") setF({ ...f, has_idea: true, looking_for: f.looking_for.filter(x => x !== "Someone with an idea") });
+                        else if (v === "has_skills") setF({ ...f, has_idea: false, looking_for: [...new Set([...f.looking_for, "Someone with an idea"])] });
+                        else setF({ ...f, has_idea: false, looking_for: f.looking_for.filter(x => x !== "Someone with an idea") });
+                      }} className={`rounded-lg border-2 p-3 text-left ${on ? "border-indigo bg-indigo/5" : "border-border"}`}>
+                        <div className="text-sm font-black">{title}</div>
+                        <div className="mt-0.5 text-[11px] text-muted-text">{sub}</div>
+                      </button>
+                    );
+                  })}
+                </div>
                 {f.has_idea && (
                   <div className="mt-3 space-y-3 rounded-lg bg-surface p-4">
                     <select value={f.idea_industry} onChange={(e) => setF({ ...f, idea_industry: e.target.value })} className="w-full rounded-lg border px-3 py-2 text-sm">
@@ -280,14 +296,15 @@ function Onboarding() {
               <CardChoice label="Work location preference" value={f.remote_pref} onChange={(v) => setF({ ...f, remote_pref: v as typeof f.remote_pref })} options={[["onsite","On-site"],["hybrid","Hybrid"],["remote","Remote"]]} />
               <div>
                 <label className="text-xs font-semibold text-muted-text">What I'm looking for in a co-founder</label>
-                <p className="text-[11px] text-muted-text">Skills or backgrounds that complement yours.</p>
+                <p className="text-[11px] text-muted-text">Pick everything that feels true — skills, style, and stage.</p>
                 <div className="mt-2 flex flex-wrap gap-1.5">
-                  {SKILLS_LIST.map((s) => {
+                  {LOOKING_FOR_OPTIONS.map((s) => {
                     const on = f.looking_for.includes(s);
                     return <button key={s} type="button" onClick={() => setF({ ...f, looking_for: on ? f.looking_for.filter((x) => x !== s) : [...f.looking_for, s] })} className={`rounded-md px-2.5 py-1 text-xs font-medium ${on ? "bg-orange text-white" : "bg-surface-2 text-muted-text hover:bg-orange/10"}`}>{s}</button>;
                   })}
                 </div>
               </div>
+
             </div>
             <div className="flex justify-between">
               <button onClick={() => setStep(1)} className="rounded-lg border px-4 py-2 text-sm">Back</button>
