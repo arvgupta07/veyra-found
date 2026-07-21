@@ -5,7 +5,7 @@ import { Loader2, ChevronRight, Rocket, Briefcase, Palette, Wrench } from "lucid
 import { supabase } from "@/integrations/supabase/client";
 import { useSession } from "@/hooks/useSession";
 import { useMyFounder, useMyProfile } from "@/hooks/useMyFounder";
-import { PROMPTS, SKILLS_LIST, INDUSTRIES, ASSESSMENT_QUESTIONS, LOOKING_FOR_OPTIONS } from "@/lib/founder-types";
+import { PROMPT_GROUPS, SKILLS_LIST, INDUSTRIES, ASSESSMENT_QUESTIONS, LOOKING_FOR_OPTIONS } from "@/lib/founder-types";
 
 export const Route = createFileRoute("/onboarding")({
   component: Onboarding,
@@ -323,26 +323,38 @@ function Onboarding() {
               <h1 className="text-3xl font-black tracking-tight">Pick up to 4 prompts</h1>
               <p className="mt-1 text-sm text-muted-text">Optional — but strong profiles pick 3-4. Selected {selectedPrompts.length}/4.</p>
             </div>
-            <div className="grid gap-3">
-              {PROMPTS.map((q) => {
-                const idx = selectedPrompts.findIndex((p) => p.q === q);
-                const selected = idx !== -1;
-                return (
-                  <div key={q} className={`rounded-2xl border-2 bg-white p-4 shadow-card transition ${selected ? "border-indigo" : "border-transparent"}`}>
-                    <button type="button" onClick={() => {
-                      if (selected) setSelectedPrompts(selectedPrompts.filter((_, i) => i !== idx));
-                      else if (selectedPrompts.length < 4) setSelectedPrompts([...selectedPrompts, { q, a: "" }]);
-                    }} className="flex w-full items-center justify-between text-left">
-                      <span className="text-sm font-semibold">{q}</span>
-                      <span className={`grid h-5 w-5 place-items-center rounded-full text-[10px] font-bold ${selected ? "bg-indigo text-white" : "bg-surface-2 text-muted-text"}`}>{selected ? idx + 1 : "+"}</span>
-                    </button>
-                    {selected && (
-                      <textarea maxLength={150} rows={2} value={selectedPrompts[idx].a} onChange={(e) => setSelectedPrompts(selectedPrompts.map((p, i) => i === idx ? { ...p, a: e.target.value } : p))} placeholder="Your answer..." className="mt-3 w-full rounded-lg border bg-surface px-3 py-2 text-sm" />
-                    )}
+            <div className="space-y-6">
+              {PROMPT_GROUPS.map((group) => (
+                <div key={group.label} className="space-y-2">
+                  <div className="flex items-center gap-2">
+                    <div className="h-3 w-3 border-2 border-ink bg-orange" />
+                    <h2 className="text-xs font-black uppercase tracking-widest">{group.label}</h2>
+                    <div className="h-[2px] flex-1 bg-ink/20" />
                   </div>
-                );
-              })}
+                  <div className="grid gap-3">
+                    {group.prompts.map((q) => {
+                      const idx = selectedPrompts.findIndex((p) => p.q === q);
+                      const selected = idx !== -1;
+                      return (
+                        <div key={q} className={`rounded-2xl border-2 bg-white p-4 shadow-card transition ${selected ? "border-indigo" : "border-transparent"}`}>
+                          <button type="button" onClick={() => {
+                            if (selected) setSelectedPrompts(selectedPrompts.filter((_, i) => i !== idx));
+                            else if (selectedPrompts.length < 4) setSelectedPrompts([...selectedPrompts, { q, a: "" }]);
+                          }} className="flex w-full items-center justify-between text-left">
+                            <span className="text-sm font-semibold">{q}</span>
+                            <span className={`grid h-5 w-5 place-items-center rounded-full text-[10px] font-bold ${selected ? "bg-indigo text-white" : "bg-surface-2 text-muted-text"}`}>{selected ? idx + 1 : "+"}</span>
+                          </button>
+                          {selected && (
+                            <textarea maxLength={150} rows={2} value={selectedPrompts[idx].a} onChange={(e) => setSelectedPrompts(selectedPrompts.map((p, i) => i === idx ? { ...p, a: e.target.value } : p))} placeholder="Your answer..." className="mt-3 w-full rounded-lg border bg-surface px-3 py-2 text-sm" />
+                          )}
+                        </div>
+                      );
+                    })}
+                  </div>
+                </div>
+              ))}
             </div>
+
             <div className="flex flex-wrap items-center justify-between gap-2">
               <button onClick={() => setStep(2)} className="rounded-lg border px-4 py-2 text-sm">Back</button>
               <div className="flex gap-2">
