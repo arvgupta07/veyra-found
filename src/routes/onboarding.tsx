@@ -318,8 +318,8 @@ function Onboarding() {
         {step === 3 && (
           <div className="space-y-6">
             <div>
-              <h1 className="text-3xl font-black tracking-tight">Pick 4 prompts</h1>
-              <p className="mt-1 text-sm text-muted-text">These are the moments a co-founder will connect with. Selected {selectedPrompts.length}/4.</p>
+              <h1 className="text-3xl font-black tracking-tight">Pick up to 4 prompts</h1>
+              <p className="mt-1 text-sm text-muted-text">Optional — but strong profiles pick 3-4. Selected {selectedPrompts.length}/4.</p>
             </div>
             <div className="grid gap-3">
               {PROMPTS.map((q) => {
@@ -341,12 +341,18 @@ function Onboarding() {
                 );
               })}
             </div>
-            <div className="flex justify-between">
+            <div className="flex flex-wrap items-center justify-between gap-2">
               <button onClick={() => setStep(2)} className="rounded-lg border px-4 py-2 text-sm">Back</button>
-              <button onClick={saveStep3} disabled={saving || !canNextP} className="inline-flex items-center gap-2 rounded-lg bg-indigo px-5 py-2.5 text-sm font-semibold text-white disabled:opacity-50">
-                {saving && <Loader2 className="h-4 w-4 animate-spin" />} Continue <ChevronRight className="h-4 w-4" />
-              </button>
+              <div className="flex gap-2">
+                <button onClick={() => { setSelectedPrompts([]); setStep(4); }} className="rounded-lg border-2 border-ink bg-white px-4 py-2 text-sm font-black shadow-brutal-sm">
+                  Skip prompts
+                </button>
+                <button onClick={saveStep3} disabled={saving || (selectedPrompts.length > 0 && !canNextP)} className="inline-flex items-center gap-2 rounded-lg bg-indigo px-5 py-2.5 text-sm font-semibold text-white disabled:opacity-50">
+                  {saving && <Loader2 className="h-4 w-4 animate-spin" />} Continue <ChevronRight className="h-4 w-4" />
+                </button>
+              </div>
             </div>
+
           </div>
         )}
 
