@@ -1,6 +1,8 @@
 import { Link, useRouter, useRouterState } from "@tanstack/react-router";
-import { Compass, Inbox, MessagesSquare, User, LogOut, TrendingUp, Heart, Moon, Sun } from "lucide-react";
+import { Compass, Inbox, MessagesSquare, User, LogOut, TrendingUp, Heart, Moon, Sun, ShieldCheck } from "lucide-react";
+import { useQuery } from "@tanstack/react-query";
 import { useMyProfile } from "@/hooks/useMyFounder";
+import { useSession } from "@/hooks/useSession";
 import { useDarkMode } from "@/hooks/useDarkMode";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
