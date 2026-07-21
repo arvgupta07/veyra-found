@@ -14,6 +14,7 @@ import { Route as MatchesRouteImport } from './routes/matches'
 import { Route as InvestorFeedRouteImport } from './routes/investor-feed'
 import { Route as DiscoverRouteImport } from './routes/discover'
 import { Route as DashboardRouteImport } from './routes/dashboard'
+import { Route as AdminRouteImport } from './routes/admin'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as InboxIndexRouteImport } from './routes/inbox.index'
 import { Route as ForumIndexRouteImport } from './routes/forum.index'
@@ -23,6 +24,7 @@ import { Route as InboxConversationIdRouteImport } from './routes/inbox.$convers
 import { Route as ForumPostIdRouteImport } from './routes/forum.$postId'
 import { Route as AuthSignupRouteImport } from './routes/auth.signup'
 import { Route as AuthLoginRouteImport } from './routes/auth.login'
+import { Route as ApiPublicBootstrapAdminRouteImport } from './routes/api.public.bootstrap-admin'
 
 const OnboardingRoute = OnboardingRouteImport.update({
   id: '/onboarding',
@@ -47,6 +49,11 @@ const DiscoverRoute = DiscoverRouteImport.update({
 const DashboardRoute = DashboardRouteImport.update({
   id: '/dashboard',
   path: '/dashboard',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AdminRoute = AdminRouteImport.update({
+  id: '/admin',
+  path: '/admin',
   getParentRoute: () => rootRouteImport,
 } as any)
 const IndexRoute = IndexRouteImport.update({
@@ -94,9 +101,15 @@ const AuthLoginRoute = AuthLoginRouteImport.update({
   path: '/auth/login',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ApiPublicBootstrapAdminRoute = ApiPublicBootstrapAdminRouteImport.update({
+  id: '/api/public/bootstrap-admin',
+  path: '/api/public/bootstrap-admin',
+  getParentRoute: () => rootRouteImport,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/admin': typeof AdminRoute
   '/dashboard': typeof DashboardRoute
   '/discover': typeof DiscoverRoute
   '/investor-feed': typeof InvestorFeedRoute
@@ -110,9 +123,11 @@ export interface FileRoutesByFullPath {
   '/profile/me': typeof ProfileMeRoute
   '/forum/': typeof ForumIndexRoute
   '/inbox/': typeof InboxIndexRoute
+  '/api/public/bootstrap-admin': typeof ApiPublicBootstrapAdminRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/admin': typeof AdminRoute
   '/dashboard': typeof DashboardRoute
   '/discover': typeof DiscoverRoute
   '/investor-feed': typeof InvestorFeedRoute
@@ -126,10 +141,12 @@ export interface FileRoutesByTo {
   '/profile/me': typeof ProfileMeRoute
   '/forum': typeof ForumIndexRoute
   '/inbox': typeof InboxIndexRoute
+  '/api/public/bootstrap-admin': typeof ApiPublicBootstrapAdminRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/admin': typeof AdminRoute
   '/dashboard': typeof DashboardRoute
   '/discover': typeof DiscoverRoute
   '/investor-feed': typeof InvestorFeedRoute
@@ -143,11 +160,13 @@ export interface FileRoutesById {
   '/profile/me': typeof ProfileMeRoute
   '/forum/': typeof ForumIndexRoute
   '/inbox/': typeof InboxIndexRoute
+  '/api/public/bootstrap-admin': typeof ApiPublicBootstrapAdminRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
     | '/'
+    | '/admin'
     | '/dashboard'
     | '/discover'
     | '/investor-feed'
@@ -161,9 +180,11 @@ export interface FileRouteTypes {
     | '/profile/me'
     | '/forum/'
     | '/inbox/'
+    | '/api/public/bootstrap-admin'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
+    | '/admin'
     | '/dashboard'
     | '/discover'
     | '/investor-feed'
@@ -177,9 +198,11 @@ export interface FileRouteTypes {
     | '/profile/me'
     | '/forum'
     | '/inbox'
+    | '/api/public/bootstrap-admin'
   id:
     | '__root__'
     | '/'
+    | '/admin'
     | '/dashboard'
     | '/discover'
     | '/investor-feed'
@@ -193,10 +216,12 @@ export interface FileRouteTypes {
     | '/profile/me'
     | '/forum/'
     | '/inbox/'
+    | '/api/public/bootstrap-admin'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  AdminRoute: typeof AdminRoute
   DashboardRoute: typeof DashboardRoute
   DiscoverRoute: typeof DiscoverRoute
   InvestorFeedRoute: typeof InvestorFeedRoute
@@ -210,6 +235,7 @@ export interface RootRouteChildren {
   ProfileMeRoute: typeof ProfileMeRoute
   ForumIndexRoute: typeof ForumIndexRoute
   InboxIndexRoute: typeof InboxIndexRoute
+  ApiPublicBootstrapAdminRoute: typeof ApiPublicBootstrapAdminRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -247,6 +273,13 @@ declare module '@tanstack/react-router' {
       path: '/dashboard'
       fullPath: '/dashboard'
       preLoaderRoute: typeof DashboardRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/admin': {
+      id: '/admin'
+      path: '/admin'
+      fullPath: '/admin'
+      preLoaderRoute: typeof AdminRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/': {
@@ -312,11 +345,19 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthLoginRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/api/public/bootstrap-admin': {
+      id: '/api/public/bootstrap-admin'
+      path: '/api/public/bootstrap-admin'
+      fullPath: '/api/public/bootstrap-admin'
+      preLoaderRoute: typeof ApiPublicBootstrapAdminRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  AdminRoute: AdminRoute,
   DashboardRoute: DashboardRoute,
   DiscoverRoute: DiscoverRoute,
   InvestorFeedRoute: InvestorFeedRoute,
@@ -330,6 +371,7 @@ const rootRouteChildren: RootRouteChildren = {
   ProfileMeRoute: ProfileMeRoute,
   ForumIndexRoute: ForumIndexRoute,
   InboxIndexRoute: InboxIndexRoute,
+  ApiPublicBootstrapAdminRoute: ApiPublicBootstrapAdminRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

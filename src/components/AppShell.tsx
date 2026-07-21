@@ -1,6 +1,8 @@
 import { Link, useRouter, useRouterState } from "@tanstack/react-router";
-import { Compass, Inbox, MessagesSquare, User, LogOut, TrendingUp, Heart, Moon, Sun } from "lucide-react";
+import { Compass, Inbox, MessagesSquare, User, LogOut, TrendingUp, Heart, Moon, Sun, ShieldCheck } from "lucide-react";
+import { useQuery } from "@tanstack/react-query";
 import { useMyProfile } from "@/hooks/useMyFounder";
+import { useSession } from "@/hooks/useSession";
 import { useDarkMode } from "@/hooks/useDarkMode";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
@@ -22,8 +24,18 @@ export function AppShell({ children }: { children: React.ReactNode }) {
   const router = useRouter();
   const pathname = useRouterState({ select: (s) => s.location.pathname });
   const { data: profile } = useMyProfile();
+  const { user } = useSession();
+  const { data: isAdmin } = useQuery({
+    queryKey: ["is-admin-nav", user?.id], enabled: !!user,
+    queryFn: async () => {
+      const { data } = await supabase.from("user_roles").select("role")
+        .eq("user_id", user!.id).eq("role", "admin").maybeSingle();
+      return !!data;
+    },
+  });
   const { dark, toggle } = useDarkMode();
-  const nav = profile?.role === "investor" ? investorNav : founderNav;
+  const baseNav = profile?.role === "investor" ? investorNav : founderNav;
+  const nav = isAdmin ? [...baseNav, { to: "/admin", label: "Admin", icon: ShieldCheck }] : baseNav;
 
   async function signOut() {
     await supabase.auth.signOut();
