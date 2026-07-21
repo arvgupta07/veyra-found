@@ -38,8 +38,15 @@ export const adminDeleteUser = createServerFn({ method: "POST" })
   .handler(async ({ data, context }) => {
     await assertAdmin(context);
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
-    const { error } = await supabaseAdmin.auth.admin.deleteUser(data.userId);
-    if (error) throw new Error(error.message);
+    // Explicitly wipe app-side rows first so nothing survives if the account
+    // had been detached from a claimed founder (claim_demo_founder nulls user_id).
+    await supabaseAdmin.from("founders").delete().eq("user_id", data.userId);
+    await supabaseAdmin.from("profiles").delete().eq("id", data.userId);
+    // Hard-delete auth user (cascades to any remaining refs).
+    const { error } = await supabaseAdmin.auth.admin.deleteUser(data.userId, false);
+    if (error && !/not.*found/i.test(error.message)) throw new Error(error.message);
+    // Sweep orphan founder rows with no owner and no seed persona.
+    await supabaseAdmin.from("founders").delete().is("user_id", null).is("seed_name", null);
     return { ok: true };
   });
 
