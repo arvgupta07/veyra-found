@@ -66,23 +66,97 @@ export const AVATAR_PRESETS: string[] = [
 ];
 
 export const PROMPTS = [
-  "The thing I'd bring to a founding team that doesn't show on a resume...",
-  "My biggest startup failure taught me...",
-  "I work best with someone who...",
-  "The problem I'm obsessed with solving...",
-  "My co-founder deal-breakers are...",
-  "The last thing I built from scratch...",
-  "I know I'm not great at...",
-  "What I'm really looking for in a co-founding relationship...",
-  "The startup I wish existed in India...",
-  "My honest superpower is...",
-  "A hill I'll die on as a founder...",
-  "In 5 years, I want my startup to...",
+  // Building & work style
+  "I do my best thinking when...",
+  "My work style in three words, and why all three are true...",
+  "The way I'd describe how I handle pressure...",
+  "I know a product is ready to ship when...",
+  "The part of building a startup nobody talks about that I actually enjoy...",
+  "My relationship with deadlines is...",
+  "When I disagree with someone I respect, I...",
+  "The last time I changed my mind completely about something...",
+  "I'm the kind of founder who...",
+  "My process when something isn't working is...",
+  "The thing I optimise for that most people don't...",
+  "I get unreasonably excited about...",
+  // Past experience & lessons
+  "The startup lesson that cost me the most to learn...",
+  "Something I built that failed, and what I'd do differently...",
+  "The best professional feedback I ever received was...",
+  "A decision I made that looked wrong at first but wasn't...",
+  "The thing my last company got completely right...",
+  "What I wish someone had told me before I started...",
+  "The moment I realised I wanted to be a founder...",
+  "The worst advice I ever followed...",
+  "A project I'm genuinely proud of and why...",
+  "The thing I've unlearned in the last two years...",
+  // Co-founder relationship
+  "The co-founder dynamic I want looks like...",
+  "My honest non-negotiables in a working partnership...",
+  "I know a working relationship is healthy when...",
+  "The thing I need my co-founder to be better at than me...",
+  "How I like to celebrate wins (big and small)...",
+  "When things get hard, I...",
+  "My communication style is...and I need my co-founder's to be...",
+  "The green flag I look for in someone I'm building with...",
+  "What I think makes two founders actually compatible (not just complementary)...",
+  "I'll know we're a good team when...",
+  "The version of me my co-founder will see most is...",
+  "What loyalty means to me in a business context...",
+  // Vision & ambition
+  "The problem I keep coming back to no matter what...",
+  "In ten years I want to be able to say I...",
+  "The change I want to make that feels too big to say out loud...",
+  "I'm building in this space because...",
+  "The company I'd most want to compete with (and why)...",
+  "The India-specific problem I think is wildly underestimated...",
+  "My exit fantasy is...and my realistic goal is...",
+  "The market everyone ignores that I can't stop thinking about...",
+  "I'd rather build something that does X than Y...",
+  // Honest & personal
+  "The thing I'm working on getting better at as a founder...",
+  "Where I'm genuinely not strong and I know it...",
+  "My biggest self-doubt and how I manage it...",
+  "I burn out when...and recover by...",
+  "The type of feedback I find hardest to hear...",
+  "I'm at my worst when...",
+  "What motivates me that I don't usually admit...",
+  "The assumption about me that's usually wrong...",
+  "The thing I care about that doesn't show up on a pitch deck...",
+  // Lighter & revealing
+  "The weird thing I do that actually makes me more productive...",
+  "My idea of a perfect working day...",
+  "The app I'd build just for myself if nothing else mattered...",
+  "Two truths and a lie about my startup journey...",
+  "The book, podcast, or essay that changed how I think about building...",
+  "I'm insufferable about...",
+  "The founder I'd most want to have a long call with (and what I'd ask)...",
+  "Startups aside, the other thing I'm quietly obsessed with...",
+  "The dumbest reason I've stayed up past 2am working...",
+  "My hot take on the Indian startup ecosystem is...",
 ];
 
 export const SKILLS_LIST = [
-  "React","Python","Node.js","iOS","Android","Machine Learning","Product Management",
-  "Growth Marketing","Sales","Finance","Operations","UI/UX Design","Data Science","Blockchain","Hardware",
+  // Technical
+  "React","Python","Node.js","iOS","Android","Machine Learning","Data Science","Blockchain","Hardware","DevOps","Backend","Frontend",
+  // Product & design
+  "Product Management","UI/UX Design","Product Design","User Research","Brand Design",
+  // Go-to-market
+  "Growth Marketing","Performance Marketing","Content","SEO","Community","Social Media","PR","Partnerships",
+  // Sales & ops
+  "Sales","B2B Sales","Enterprise Sales","Business Development","Operations","Supply Chain","Customer Success",
+  // Business
+  "Finance","Fundraising","Legal","HR & Hiring","Strategy",
+  // Domain
+  "Healthcare","Education","Real Estate","D2C","Manufacturing","Media","Gaming",
+];
+
+export const LOOKING_FOR_OPTIONS = [
+  "Technical co-founder","Business/GTM co-founder","Design co-founder","Product co-founder",
+  "Domain expert","Sales lead","Growth lead","Operations lead","Finance/Fundraising lead",
+  "Someone with an idea","Someone who can execute","Someone with a network","Someone in my city",
+  "Full-time commitment","Part-time / exploring","Complementary skills","Shared values",
+  "First-time founder","Experienced founder","Ex-operator","Ex-engineer",
 ];
 
 export const INDUSTRIES = ["Fintech","Healthtech","Edtech","SaaS","E-commerce","Deep Tech","Climate","Consumer","B2B","Other"];
