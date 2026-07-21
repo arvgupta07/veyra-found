@@ -5,7 +5,7 @@ import { Loader2, ChevronRight, Rocket, Briefcase, Palette, Wrench } from "lucid
 import { supabase } from "@/integrations/supabase/client";
 import { useSession } from "@/hooks/useSession";
 import { useMyFounder, useMyProfile } from "@/hooks/useMyFounder";
-import { PROMPTS, SKILLS_LIST, INDUSTRIES, ASSESSMENT_QUESTIONS } from "@/lib/founder-types";
+import { PROMPTS, SKILLS_LIST, INDUSTRIES, ASSESSMENT_QUESTIONS, LOOKING_FOR_OPTIONS } from "@/lib/founder-types";
 
 export const Route = createFileRoute("/onboarding")({
   component: Onboarding,
