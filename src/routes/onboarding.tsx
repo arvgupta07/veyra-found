@@ -225,9 +225,10 @@ function Onboarding() {
               <div>
                 <label className="text-xs font-semibold text-muted-text">Skills</label>
                 <div className="mt-2 flex flex-wrap gap-1.5">
-                  {SKILLS_LIST.map((s) => {
+                  {[...new Set([...SKILLS_LIST, ...f.skills])].map((s) => {
                     const on = f.skills.includes(s);
-                    return <button key={s} type="button" onClick={() => setF({ ...f, skills: on ? f.skills.filter((x) => x !== s) : [...f.skills, s] })} className={`rounded-md px-2.5 py-1 text-xs font-medium ${on ? "bg-indigo text-white" : "bg-surface-2 text-muted-text hover:bg-indigo/10"}`}>{s}</button>;
+                    const custom = !SKILLS_LIST.includes(s);
+                    return <button key={s} type="button" onClick={() => setF({ ...f, skills: on ? f.skills.filter((x) => x !== s) : [...f.skills, s] })} className={`rounded-md px-2.5 py-1 text-xs font-medium ${on ? (custom ? "bg-orange text-white" : "bg-indigo text-white") : "bg-surface-2 text-muted-text hover:bg-indigo/10"}`}>{s}{custom && on ? " ✕" : ""}</button>;
                   })}
                 </div>
                 <div className="mt-2 flex gap-2">
@@ -244,6 +245,7 @@ function Onboarding() {
                   }} className="rounded-lg border-2 border-ink bg-orange px-4 py-2 text-sm font-black text-white shadow-brutal-sm">Add</button>
                 </div>
               </div>
+
               <div>
                 <label className="text-xs font-semibold text-muted-text">Industry focus</label>
                 <div className="mt-2 flex flex-wrap gap-1.5">
