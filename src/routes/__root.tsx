@@ -9,6 +9,8 @@ import { Toaster } from "sonner";
 import appCss from "../styles.css?url";
 import { reportLovableError } from "../lib/lovable-error-reporting";
 import { supabase } from "@/integrations/supabase/client";
+import { CustomCursor } from "@/components/CustomCursor";
+import { useRouterState } from "@tanstack/react-router";
 
 function NotFoundComponent() {
   return (
@@ -95,9 +97,13 @@ function RootComponent() {
     return () => sub.subscription.unsubscribe();
   }, [router, queryClient]);
 
+  const pathname = useRouterState({ select: (s) => s.location.pathname });
   return (
     <QueryClientProvider client={queryClient}>
-      <Outlet />
+      <CustomCursor />
+      <div key={pathname} className="animate-page-in">
+        <Outlet />
+      </div>
       <Toaster richColors position="top-right" />
     </QueryClientProvider>
   );

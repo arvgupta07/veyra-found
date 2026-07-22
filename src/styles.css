@@ -300,4 +300,45 @@
   .stripe-red {
     background-image: repeating-linear-gradient(45deg, var(--red) 0 12px, var(--ink) 12px 24px);
   }
+
+  /* Softer edges — still boxy, less harsh */
+  .soft-corners { border-radius: 6px; }
+
+  /* Page enter transition */
+  .animate-page-in { animation: pageIn 320ms cubic-bezier(.2,.7,.2,1) both; }
+  @keyframes pageIn {
+    0% { opacity: 0; transform: translateY(6px); }
+    100% { opacity: 1; transform: none; }
+  }
+
+  /* Reveal on scroll */
+  .reveal { opacity: 0; transform: translateY(14px); transition: opacity 500ms ease, transform 500ms cubic-bezier(.2,.7,.2,1); }
+  .reveal.in { opacity: 1; transform: none; }
+
+  /* Tilt / lift micro-interaction */
+  .tilt { transition: transform 220ms cubic-bezier(.2,.7,.2,1), box-shadow 220ms cubic-bezier(.2,.7,.2,1); }
+  .tilt:hover { transform: translate(-3px,-4px) rotate(-.35deg); box-shadow: 10px 12px 0 0 var(--ink); }
+
+  /* Shine sweep */
+  .shine { position: relative; overflow: hidden; }
+  .shine::after {
+    content: ""; position: absolute; inset: 0;
+    background: linear-gradient(120deg, transparent 30%, rgba(255,255,255,.35) 50%, transparent 70%);
+    transform: translateX(-120%);
+    transition: transform 700ms ease;
+    pointer-events: none;
+  }
+  .shine:hover::after { transform: translateX(120%); }
+
+  /* Custom cursor — hide native cursor on interactive elements */
+  html.has-custom-cursor,
+  html.has-custom-cursor * { cursor: none !important; }
+  @media (pointer: coarse) {
+    html.has-custom-cursor, html.has-custom-cursor * { cursor: auto !important; }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .animate-page-in, .reveal { animation: none !important; opacity: 1 !important; transform: none !important; transition: none !important; }
+    .tilt { transition: none !important; }
+  }
 }
