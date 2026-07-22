@@ -342,3 +342,9 @@
     .tilt { transition: none !important; }
   }
 }
+
+/* Hide the Lovable "Edit with Lovable" badge on published/preview deployments */
+#lovable-badge {
+  display: none !important;
+}
+
