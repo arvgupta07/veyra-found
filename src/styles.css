@@ -305,10 +305,10 @@
   .soft-corners { border-radius: 6px; }
 
   /* Page enter transition */
-  .animate-page-in { animation: pageIn 320ms cubic-bezier(.2,.7,.2,1) both; }
+  .animate-page-in { animation: pageIn 260ms ease-out both; }
   @keyframes pageIn {
-    0% { opacity: 0; transform: translateY(6px); }
-    100% { opacity: 1; transform: none; }
+    0% { opacity: 0; }
+    100% { opacity: 1; }
   }
 
   /* Reveal on scroll */
