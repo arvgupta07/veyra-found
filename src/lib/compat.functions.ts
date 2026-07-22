@@ -2,14 +2,27 @@ import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
 import { generateText } from "ai";
 import { createLovableAiGatewayProvider } from "./ai-gateway.server";
+import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 
 const Input = z.object({ conversationId: z.string().uuid() });
 
 export const generateCompatibilityReport = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
   .inputValidator((raw: unknown) => Input.parse(raw))
-  .handler(async ({ data }) => {
+  .handler(async ({ data, context }) => {
     const key = process.env.LOVABLE_API_KEY;
     if (!key) throw new Error("Missing LOVABLE_API_KEY");
+
+    // Verify the caller is a participant of the target conversation before
+    // triggering paid AI work or writing a report row. Uses the caller's
+    // RLS-scoped client so a non-party sees no conversation.
+    const { data: participantConvo, error: partErr } = await context.supabase
+      .from("conversations")
+      .select("id")
+      .eq("id", data.conversationId)
+      .maybeSingle();
+    if (partErr) throw new Error(partErr.message);
+    if (!participantConvo) throw new Error("Forbidden");
 
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
 
