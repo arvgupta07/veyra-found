@@ -2,9 +2,11 @@ import { createFileRoute, Link, useRouter } from "@tanstack/react-router";
 import { useState } from "react";
 import { Loader2 } from "lucide-react";
 import { toast } from "sonner";
+import { useServerFn } from "@tanstack/react-start";
 import { supabase } from "@/integrations/supabase/client";
 import { lovable } from "@/integrations/lovable";
 import { VeyraMark } from "@/components/VeyraLogo";
+import { claimDemoFounder } from "@/lib/demo.functions";
 
 export const Route = createFileRoute("/auth/login")({
   component: Login,
@@ -12,9 +14,11 @@ export const Route = createFileRoute("/auth/login")({
 
 function Login() {
   const router = useRouter();
+  const claimDemo = useServerFn(claimDemoFounder);
   const [email, setEmail] = useState("demo@cofound.ai");
   const [password, setPassword] = useState("demo1234");
   const [loading, setLoading] = useState(false);
+
 
   async function submit(e: React.FormEvent) {
     e.preventDefault();
@@ -46,10 +50,15 @@ function Login() {
 
     const { data: userData } = await supabase.auth.getUser();
     if (userData.user) {
-      // Claim the seeded demo founder via a security-definer RPC so the demo
-      // account owns the seeded conversations, requests and matches.
-      const { error: claimErr } = await supabase.rpc("claim_demo_founder", { target: cfg.founderId });
-      if (claimErr) { setLoading(false); return toast.error(claimErr.message); }
+      // Claim the seeded demo founder through an authenticated server function
+      // so the privileged database routine isn't exposed to the browser.
+      try {
+        await claimDemo({ data: { founderId: cfg.founderId } });
+      } catch {
+        setLoading(false);
+        return toast.error("Could not set up the demo profile");
+      }
+
       await supabase.from("profiles").update({ is_pro: cfg.isPro, full_name: cfg.name }).eq("id", userData.user.id);
     }
     setLoading(false);
