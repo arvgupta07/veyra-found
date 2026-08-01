@@ -2,9 +2,11 @@ import { createFileRoute, Link, useRouter } from "@tanstack/react-router";
 import { useState } from "react";
 import { Loader2 } from "lucide-react";
 import { toast } from "sonner";
+import { useServerFn } from "@tanstack/react-start";
 import { supabase } from "@/integrations/supabase/client";
 import { lovable } from "@/integrations/lovable";
 import { VeyraMark } from "@/components/VeyraLogo";
+import { claimDemoFounder } from "@/lib/demo.functions";
 
 export const Route = createFileRoute("/auth/login")({
   component: Login,
@@ -12,9 +14,11 @@ export const Route = createFileRoute("/auth/login")({
 
 function Login() {
   const router = useRouter();
+  const claimDemo = useServerFn(claimDemoFounder);
   const [email, setEmail] = useState("demo@cofound.ai");
   const [password, setPassword] = useState("demo1234");
   const [loading, setLoading] = useState(false);
+
 
   async function submit(e: React.FormEvent) {
     e.preventDefault();
