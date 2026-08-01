@@ -46,10 +46,15 @@ function Login() {
 
     const { data: userData } = await supabase.auth.getUser();
     if (userData.user) {
-      // Claim the seeded demo founder via a security-definer RPC so the demo
-      // account owns the seeded conversations, requests and matches.
-      const { error: claimErr } = await supabase.rpc("claim_demo_founder", { target: cfg.founderId });
-      if (claimErr) { setLoading(false); return toast.error(claimErr.message); }
+      // Claim the seeded demo founder through an authenticated server function
+      // so the privileged database routine isn't exposed to the browser.
+      try {
+        await claimDemo({ data: { founderId: cfg.founderId } });
+      } catch {
+        setLoading(false);
+        return toast.error("Could not set up the demo profile");
+      }
+
       await supabase.from("profiles").update({ is_pro: cfg.isPro, full_name: cfg.name }).eq("id", userData.user.id);
     }
     setLoading(false);
