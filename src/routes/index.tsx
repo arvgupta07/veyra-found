@@ -107,15 +107,16 @@ function Landing() {
               India's trust-first co-founder platform
             </div>
 
-            <h1 className="mt-6 text-5xl leading-[0.95] md:text-7xl lg:text-[5.5rem]">
+            <h1 className="mt-6 text-[2.6rem] leading-[1.02] sm:text-5xl md:text-6xl lg:text-7xl">
               The right<br />
-              <span className="relative inline-block">
-                <span className="relative z-10 bg-orange px-3 border-[3px] border-ink shadow-brutal">CO-FOUNDER</span>
+              <span className="my-1 inline-block whitespace-nowrap border-[3px] border-ink bg-orange px-2 py-0.5 shadow-brutal sm:px-3">
+                CO&#8209;FOUNDER
               </span>
               <br />
               changes<br />
               <span className="text-red">everything.</span>
             </h1>
+
 
             <p className="mt-6 max-w-lg text-lg font-medium text-ink/80">
               No swipes. No vibes. Verified founders, real compatibility science, and a structured process from first message to confirmed co-founder.
