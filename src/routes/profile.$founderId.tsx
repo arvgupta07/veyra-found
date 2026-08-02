@@ -148,7 +148,7 @@ function FounderProfile() {
               </div>
             </div>
 
-            {prompts.length > 0 && (
+            {prompts.length > 0 ? (
               <div>
                 <div className="text-xs font-black uppercase tracking-wider text-muted-text">Prompts</div>
                 <div className="mt-2 space-y-2">
@@ -158,6 +158,13 @@ function FounderProfile() {
                       <div className="mt-1 text-sm font-medium">{p.prompt_answer}</div>
                     </div>
                   ))}
+                </div>
+              </div>
+            ) : (
+              <div>
+                <div className="text-xs font-black uppercase tracking-wider text-muted-text">Prompts</div>
+                <div className="mt-2 rounded-xl border-2 border-ink/40 bg-cream p-3 text-sm font-bold text-muted-text">
+                  No prompts added yet
                 </div>
               </div>
             )}
