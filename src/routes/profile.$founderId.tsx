@@ -7,7 +7,7 @@ import { AppShell } from "@/components/AppShell";
 import { useRequireAuth } from "@/hooks/useRequireAuth";
 import { SkillTag, TierBadge, VerifiedBadges } from "@/components/FounderBits";
 import { founderAvatar } from "@/lib/founder-types";
-import { ArrowLeft, MapPin, Briefcase, Loader2, Send, X, Ban, ShieldCheck } from "lucide-react";
+import { ArrowLeft, MapPin, Briefcase, Loader2, Send, X, Ban, ShieldCheck, Linkedin, Github, EyeOff } from "lucide-react";
 import { toast } from "sonner";
 
 export const Route = createFileRoute("/profile/$founderId")({
@@ -72,7 +72,10 @@ function FounderProfile() {
 
   const name = data.profiles?.full_name ?? data.seed_name ?? "Founder";
   const prompts = (data.founder_prompts ?? []).sort((a: { display_order: number | null }, b: { display_order: number | null }) => (a.display_order ?? 0) - (b.display_order ?? 0));
-  const a = Array.isArray(data.assessments) ? data.assessments[0] : data.assessments;
+  const rawAssessment = Array.isArray(data.assessments) ? data.assessments[0] : data.assessments;
+  // Founders can keep their compatibility results private.
+  const assessmentPublic = (data as { assessment_public?: boolean | null }).assessment_public !== false;
+  const a = assessmentPublic ? rawAssessment : null;
   const dims = a ? [
     ["Openness", a.openness_score], ["Conscientiousness", a.conscientiousness_score],
     ["Extraversion", a.extraversion_score], ["Agreeableness", a.agreeableness_score],
@@ -139,6 +142,22 @@ function FounderProfile() {
             <div className="rounded-2xl border-2 border-ink bg-cream p-5 shadow-brutal-sm">
               <div className="text-sm">{data.bio}</div>
               <div className="mt-3"><VerifiedBadges f={data as never} /></div>
+              {(data.linkedin_url || data.github_url) && (
+                <div className="mt-3 flex flex-wrap gap-2">
+                  {data.linkedin_url && (
+                    <a href={data.linkedin_url} target="_blank" rel="noreferrer noopener"
+                      className="inline-flex items-center gap-1.5 rounded-md border-2 border-ink bg-white px-2 py-1 text-[11px] font-black box-hover">
+                      <Linkedin className="h-3 w-3" /> LinkedIn
+                    </a>
+                  )}
+                  {data.github_url && (
+                    <a href={data.github_url} target="_blank" rel="noreferrer noopener"
+                      className="inline-flex items-center gap-1.5 rounded-md border-2 border-ink bg-white px-2 py-1 text-[11px] font-black box-hover">
+                      <Github className="h-3 w-3" /> GitHub
+                    </a>
+                  )}
+                </div>
+              )}
             </div>
 
             <div>
@@ -169,6 +188,11 @@ function FounderProfile() {
               </div>
             )}
 
+            {!assessmentPublic && rawAssessment && (
+              <div className="flex items-center gap-2 rounded-xl border-2 border-dashed border-ink/50 bg-cream p-3 text-xs font-bold text-muted-text">
+                <EyeOff className="h-3.5 w-3.5" /> This founder keeps their compatibility results private.
+              </div>
+            )}
             {dims.length > 0 && (
               <div>
                 <div className="text-xs font-black uppercase tracking-wider text-muted-text">Personality dimensions</div>
