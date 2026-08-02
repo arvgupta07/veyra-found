@@ -7,7 +7,7 @@ import { AppShell } from "@/components/AppShell";
 import { useRequireAuth } from "@/hooks/useRequireAuth";
 import { founderAvatar } from "@/lib/founder-types";
 import { uploadImage } from "@/lib/uploads";
-import { deleteForumPost } from "@/lib/forum-actions";
+import { deleteForumPost, visibleToViewer } from "@/lib/forum-actions";
 import { ArrowBigUp, ArrowBigDown, MessageCircle, Plus, Loader2, X, MessageSquareText, ImagePlus, Trash2 } from "lucide-react";
 import { toast } from "sonner";
 
