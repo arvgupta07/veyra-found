@@ -122,9 +122,8 @@ function Signup() {
               {resending ? "Sending…" : "Resend email"}
             </button>
           </div>
-
-          </div>
         </div>
+
       </div>
     );
   }
