@@ -5,6 +5,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { useMyFounder, useMyProfile } from "@/hooks/useMyFounder";
 import { AppShell } from "@/components/AppShell";
 import { useRequireAuth } from "@/hooks/useRequireAuth";
+import { useConnectedIds } from "@/hooks/useConnectedIds";
 import { TierBadge, VerifiedBadges, SkillTag } from "@/components/FounderBits";
 import { founderAvatar } from "@/lib/founder-types";
 import { scoreCompatibility, bandLabel } from "@/lib/compatibility";
