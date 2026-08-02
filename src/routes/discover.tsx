@@ -43,6 +43,8 @@ function Discover() {
 
   const current = founders?.[index];
   const atEnd = !!founders && founders.length > 0 && index >= founders.length;
+  const allConnected = (allFounders?.length ?? 0) > 0 && founders.length === 0;
+
 
   function advance() {
     setSkipped((s) => s + 1);
