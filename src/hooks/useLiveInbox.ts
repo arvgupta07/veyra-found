@@ -63,6 +63,7 @@ export function useLiveInbox() {
         { event: "*", schema: "public", table: "conversations" },
         () => {
           qc.invalidateQueries({ queryKey: ["inbox-convos"] });
+          qc.invalidateQueries({ queryKey: ["connected-ids"] });
         },
       )
       .on(
@@ -75,6 +76,7 @@ export function useLiveInbox() {
             (myUserId && row["sender_id"] === myUserId) ||
             row["seed_sender_founder_id"] === myFounderId;
           qc.invalidateQueries({ queryKey: ["inbox-convos"] });
+          qc.invalidateQueries({ queryKey: ["connected-ids"] });
           if (fromMe || !conversationId) return;
           const onThisChat = pathRef.current.includes(conversationId);
           if (!onThisChat) {
