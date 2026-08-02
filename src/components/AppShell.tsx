@@ -1,9 +1,11 @@
 import { Link, useRouter, useRouterState } from "@tanstack/react-router";
 import { Compass, Inbox, MessagesSquare, User, LogOut, Heart, Moon, Sun, ShieldCheck } from "lucide-react";
+import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { useMyProfile } from "@/hooks/useMyFounder";
 import { useSession } from "@/hooks/useSession";
 import { useDarkMode } from "@/hooks/useDarkMode";
+import { useLiveInbox, useUnreadConversations } from "@/hooks/useLiveInbox";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { VeyraMark } from "@/components/VeyraLogo";
@@ -23,6 +25,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
   const { user } = useSession();
   const { data: isAdmin } = useQuery({
     queryKey: ["is-admin-nav", user?.id], enabled: !!user,
+    staleTime: 5 * 60_000,
     queryFn: async () => {
       const { data } = await supabase.from("user_roles").select("role")
         .eq("user_id", user!.id).eq("role", "admin").maybeSingle();
@@ -30,14 +33,20 @@ export function AppShell({ children }: { children: React.ReactNode }) {
     },
   });
   const { dark, toggle } = useDarkMode();
+  useLiveInbox();
+  const unread = useUnreadConversations();
+  const hasUnread = unread.length > 0;
+  const [confirmSignOut, setConfirmSignOut] = useState(false);
   const baseNav = founderNav;
   const nav = isAdmin ? [...baseNav, { to: "/admin", label: "Admin", icon: ShieldCheck }] : baseNav;
 
   async function signOut() {
+    setConfirmSignOut(false);
     await supabase.auth.signOut();
     toast.success("Signed out");
     router.navigate({ to: "/auth/login" });
   }
+
 
   return (
     <div className="flex min-h-screen bg-surface">
