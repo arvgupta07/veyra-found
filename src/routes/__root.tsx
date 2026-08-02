@@ -102,7 +102,7 @@ function RootComponent() {
       <div key={pathname} className="animate-page-in">
         <Outlet />
       </div>
-      <Toaster richColors position="top-right" />
+      <Toaster richColors closeButton position="top-right" duration={5000} offset={16} style={{ zIndex: 9999 }} toastOptions={{ style: { border: "3px solid var(--ink)", borderRadius: "6px", fontWeight: 700 } }} />
     </QueryClientProvider>
   );
 }
