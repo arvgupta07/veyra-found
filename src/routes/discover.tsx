@@ -43,6 +43,8 @@ function Discover() {
 
   const current = founders?.[index];
   const atEnd = !!founders && founders.length > 0 && index >= founders.length;
+  const allConnected = (allFounders?.length ?? 0) > 0 && founders.length === 0;
+
 
   function advance() {
     setSkipped((s) => s + 1);
@@ -122,13 +124,19 @@ function Discover() {
           </div>
         )}
 
-        {(atEnd || (founders && founders.length === 0)) && (
+        {!isLoading && (atEnd || (founders && founders.length === 0)) && (
           <div className="rounded-2xl border-2 border-ink bg-cream p-12 text-center shadow-brutal">
-            <div className="text-lg font-black">You've seen everyone</div>
-            <div className="mt-1 text-sm text-muted-text">
-              {atEnd ? `Skipped ${skipped}. ` : ""}New founders join weekly.
+            <div className="text-lg font-black">
+              {allConnected ? "You're connected with everyone" : atEnd ? "You've seen everyone" : "No founders to show yet"}
             </div>
-            {atEnd && (
+            <div className="mt-1 text-sm text-muted-text">
+              {allConnected
+                ? "Every founder on Veyra right now is already in your inbox. New founders join weekly."
+                : atEnd
+                  ? `Skipped ${skipped}. New founders join weekly.`
+                  : "Veyra is brand new — invite a founder or check back soon."}
+            </div>
+            {atEnd && founders.length > 0 && (
               <button
                 onClick={() => { setIndex(0); setSkipped(0); }}
                 className="mt-4 inline-flex items-center gap-2 rounded-lg border-2 border-ink bg-orange px-4 py-2 text-xs font-black text-white shadow-brutal-sm box-hover"
@@ -136,8 +144,15 @@ function Discover() {
                 Start over
               </button>
             )}
+            <Link
+              to="/inbox"
+              className="mt-4 ml-2 inline-flex items-center gap-2 rounded-lg border-2 border-ink bg-white px-4 py-2 text-xs font-black text-ink shadow-brutal-sm box-hover"
+            >
+              Go to DMs
+            </Link>
           </div>
         )}
+
 
         {connectFor && me && current && (
           <ConnectModal founder={current} myFounderId={me.id} onClose={() => setConnectFor(null)} />
