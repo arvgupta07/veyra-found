@@ -51,71 +51,71 @@ export function AppShell({ children }: { children: React.ReactNode }) {
   return (
     <div className="flex min-h-screen bg-surface">
       {/* Sidebar (desktop) */}
-      <aside className="fixed inset-y-0 left-0 z-40 hidden w-60 flex-col border-r-[3px] border-ink bg-ink px-4 py-6 md:flex">
+      <aside className="fixed inset-y-0 left-0 z-40 hidden w-60 flex-col border-r-[3px] border-nav-fg/25 bg-nav px-4 py-6 md:flex">
         <div className="pointer-events-none absolute inset-0 bg-dots opacity-[0.14]" />
         <Link to="/" className="relative flex items-center gap-2.5 px-1">
-          <div className="grid h-11 w-11 shrink-0 place-items-center border-[3px] border-cream bg-cream shadow-[3px_3px_0_0_var(--orange)]">
+          <div className="grid h-11 w-11 shrink-0 place-items-center border-[3px] border-nav-fg bg-nav-fg shadow-[3px_3px_0_0_var(--orange)]">
             <VeyraMark size={28} />
           </div>
-          <span className="text-2xl font-black tracking-tight text-cream">Veyra Found</span>
+          <span className="text-2xl font-black tracking-tight text-nav-fg">Veyra Found</span>
         </Link>
         <nav className="relative mt-8 space-y-1">
           {nav.map((n) => {
             const active = pathname === n.to || (n.to !== "/" && pathname.startsWith(n.to));
             const dot = n.to === "/inbox" && hasUnread;
             return (
-              <Link key={n.to} to={n.to} className={`flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium transition ${active ? "bg-indigo text-white" : "text-white/70 hover:bg-white/5 hover:text-white"}`}>
+              <Link key={n.to} to={n.to} className={`flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium transition ${active ? "bg-orange text-nav" : "text-nav-fg/75 hover:bg-nav-fg/10 hover:text-nav-fg"}`}>
                 <span className="relative">
                   <n.icon className="h-4 w-4" />
                   {dot && <span className="absolute -right-1.5 -top-1.5 h-2.5 w-2.5 rounded-full border border-ink bg-red" />}
                 </span>
                 {n.label}
                 {dot && (
-                  <span className="ml-auto rounded-full bg-red px-1.5 py-0.5 text-[10px] font-black text-white">{unread.length}</span>
+                  <span className="ml-auto rounded-full bg-red px-1.5 py-0.5 text-[10px] font-black text-nav">{unread.length}</span>
                 )}
               </Link>
             );
           })}
         </nav>
         <div className="relative mt-auto space-y-2">
-          <div className="rounded-lg bg-white/5 p-3">
-            <div className="text-xs text-white/50">Signed in as</div>
-            <div className="truncate text-sm font-medium text-white">{profile?.full_name ?? "…"}</div>
+          <div className="rounded-lg bg-nav-fg/10 p-3">
+            <div className="text-xs text-nav-fg/60">Signed in as</div>
+            <div className="truncate text-sm font-medium text-nav-fg">{profile?.full_name ?? "…"}</div>
           </div>
-          <button onClick={toggle} className="flex w-full items-center gap-2 rounded-lg px-3 py-2 text-sm text-white/70 hover:bg-white/5 hover:text-white">
+          <button onClick={toggle} className="flex w-full items-center gap-2 rounded-lg px-3 py-2 text-sm text-nav-fg/75 hover:bg-nav-fg/10 hover:text-nav-fg">
             {dark ? <Sun className="h-4 w-4" /> : <Moon className="h-4 w-4" />} {dark ? "Light mode" : "Dark mode"}
           </button>
-          <button onClick={() => setConfirmSignOut(true)} className="flex w-full items-center gap-2 rounded-lg px-3 py-2 text-sm text-white/70 hover:bg-white/5 hover:text-white">
+          <button onClick={() => setConfirmSignOut(true)} className="flex w-full items-center gap-2 rounded-lg px-3 py-2 text-sm text-nav-fg/75 hover:bg-nav-fg/10 hover:text-nav-fg">
             <LogOut className="h-4 w-4" /> Sign out
           </button>
         </div>
       </aside>
 
       {/* Compact top bar + tab strip (shown whenever the sidebar is hidden) */}
-      <div className="fixed inset-x-0 top-0 z-30 border-b-[3px] border-cream bg-ink md:hidden">
+      <div className="fixed inset-x-0 top-0 z-30 border-b-[3px] border-nav-fg/30 bg-nav md:hidden">
         <div className="flex items-center justify-between px-4 py-2.5">
           <Link to="/" className="flex items-center gap-2">
-            <div className="grid h-9 w-9 place-items-center border-2 border-cream bg-cream shadow-[2px_2px_0_0_var(--orange)]">
+            <div className="grid h-9 w-9 place-items-center border-2 border-nav-fg bg-nav-fg shadow-[2px_2px_0_0_var(--orange)]">
               <VeyraMark size={22} />
             </div>
-            <span className="text-lg font-black tracking-tight text-cream">Veyra Found</span>
+            <span className="text-lg font-black tracking-tight text-nav-fg">Veyra Found</span>
           </Link>
           <div className="flex items-center gap-3">
-            <button onClick={toggle} aria-label="Toggle dark mode" className="grid h-8 w-8 place-items-center border-2 border-cream bg-cream text-ink">
+            <button onClick={toggle} aria-label="Toggle dark mode" className="grid h-8 w-8 place-items-center border-2 border-nav-fg bg-nav-fg text-nav">
               {dark ? <Sun className="h-4 w-4" /> : <Moon className="h-4 w-4" />}
             </button>
-            <button onClick={() => setConfirmSignOut(true)} className="border-2 border-cream bg-orange px-2 py-1 text-[10px] font-black uppercase text-white">Sign out</button>
+            <button onClick={() => setConfirmSignOut(true)} className="border-2 border-nav-fg bg-orange px-2 py-1 text-[10px] font-black uppercase text-nav">Sign out</button>
           </div>
         </div>
-        <div className="flex gap-1 overflow-x-auto border-t-2 border-cream/30 px-2 py-1.5">
+        <div className="flex gap-1 overflow-x-auto border-t-2 border-nav-fg/25 px-2 py-1.5">
           {nav.map((n) => {
             const active = pathname === n.to || (n.to !== "/" && pathname.startsWith(n.to));
             const dot = n.to === "/inbox" && hasUnread;
             return (
               <Link key={n.to} to={n.to}
-                className={`relative flex shrink-0 items-center gap-1.5 border-2 px-2.5 py-1 text-[11px] font-black uppercase tracking-wider ${active ? "border-cream bg-orange text-white" : "border-cream/40 text-cream/70"}`}>
+                className={`relative flex shrink-0 items-center gap-1.5 border-2 px-2.5 py-1 text-[11px] font-black uppercase tracking-wider ${active ? "border-nav-fg bg-orange text-nav" : "border-nav-fg/40 text-nav-fg/80"}`}>
                 <n.icon className="h-3.5 w-3.5" /> {n.label}
-                {dot && <span className="ml-0.5 rounded-full bg-red px-1.5 text-[9px] font-black text-white">{unread.length}</span>}
+                {dot && <span className="ml-0.5 rounded-full bg-red px-1.5 text-[9px] font-black text-nav">{unread.length}</span>}
               </Link>
             );
           })}
