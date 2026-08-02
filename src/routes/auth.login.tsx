@@ -158,6 +158,7 @@ function Login() {
                     type="email"
                     autoComplete="email"
                     aria-invalid={!!errors.email}
+                    disabled={loading}
                     className={inputCls(errors.email)}
                   />
                   {errors.email && errors.email.trim() && <p className="mt-1 text-xs font-semibold text-red">{errors.email}</p>}
@@ -180,6 +181,7 @@ function Login() {
                     type="password"
                     autoComplete="current-password"
                     aria-invalid={!!errors.password}
+                    disabled={loading}
                     className={inputCls(errors.password)}
                   />
                   {errors.password && errors.password.trim() && <p className="mt-1 text-xs font-semibold text-red">{errors.password}</p>}
@@ -223,6 +225,7 @@ function Login() {
                     type="email"
                     autoComplete="email"
                     aria-invalid={!!errors.email}
+                    disabled={loading}
                     className={inputCls(errors.email)}
                   />
                   {errors.email && <p className="mt-1 text-xs font-semibold text-red">{errors.email}</p>}
