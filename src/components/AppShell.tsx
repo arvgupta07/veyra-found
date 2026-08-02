@@ -1,5 +1,5 @@
 import { Link, useRouter, useRouterState } from "@tanstack/react-router";
-import { Compass, Inbox, MessagesSquare, User, LogOut, TrendingUp, Heart, Moon, Sun, ShieldCheck } from "lucide-react";
+import { Compass, Inbox, MessagesSquare, User, LogOut, Heart, Moon, Sun, ShieldCheck } from "lucide-react";
 import { useQuery } from "@tanstack/react-query";
 import { useMyProfile } from "@/hooks/useMyFounder";
 import { useSession } from "@/hooks/useSession";
@@ -14,10 +14,6 @@ const founderNav = [
   { to: "/inbox", label: "Inbox", icon: Inbox },
   { to: "/forum", label: "Forum", icon: MessagesSquare },
   { to: "/profile/me", label: "Profile", icon: User },
-];
-const investorNav = [
-  { to: "/dashboard", label: "Dashboard", icon: TrendingUp },
-  { to: "/investor-feed", label: "Deal Feed", icon: Compass },
 ];
 
 export function AppShell({ children }: { children: React.ReactNode }) {
@@ -34,7 +30,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
     },
   });
   const { dark, toggle } = useDarkMode();
-  const baseNav = profile?.role === "investor" ? investorNav : founderNav;
+  const baseNav = founderNav;
   const nav = isAdmin ? [...baseNav, { to: "/admin", label: "Admin", icon: ShieldCheck }] : baseNav;
 
   async function signOut() {

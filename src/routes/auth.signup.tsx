@@ -1,6 +1,6 @@
 import { createFileRoute, Link, useRouter } from "@tanstack/react-router";
 import { useState } from "react";
-import { Loader2, Rocket, TrendingUp, Check, Mail, ArrowLeft } from "lucide-react";
+import { Loader2, Rocket, Check, Mail, ArrowLeft } from "lucide-react";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { AVATAR_PRESETS } from "@/lib/founder-types";
@@ -13,7 +13,7 @@ export const Route = createFileRoute("/auth/signup")({
 
 function Signup() {
   const router = useRouter();
-  const [role, setRole] = useState<"founder" | "investor">("founder");
+  const role = "founder" as const;
   const [fullName, setFullName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -50,7 +50,7 @@ function Signup() {
     if (me.user) {
       await supabase.from("profiles").update({ avatar_url: avatar, full_name: fullName }).eq("id", me.user.id);
     }
-    router.navigate({ to: role === "investor" ? "/investor-feed" : "/onboarding" });
+    router.navigate({ to: "/onboarding" });
   }
 
   async function verify(e: React.FormEvent) {
@@ -91,15 +91,15 @@ function Signup() {
             <Mail className="h-6 w-6" strokeWidth={3} />
           </div>
           <div>
-            <h1 className="text-3xl font-black tracking-tight">Verify your email</h1>
+            <h1 className="text-3xl font-black tracking-tight">Confirm your email</h1>
             <p className="mt-1 text-sm text-ink/70">
-              We sent a 6-digit code to <span className="font-black">{email}</span>. Enter it below to activate your account.
-              If you got a confirmation link instead, clicking it works too.
+              We emailed <span className="font-black">{email}</span>. Open it and click the confirmation link to activate
+              your account — you'll land straight back here, signed in. Check spam/promotions if it's not in your inbox.
             </p>
           </div>
           <form onSubmit={verify} className="space-y-4 border-[3px] border-ink bg-white p-6 shadow-brutal-sm">
             <div>
-              <label className="text-[10px] font-black uppercase tracking-wider text-ink/70">Verification code</label>
+              <label className="text-[10px] font-black uppercase tracking-wider text-ink/70">Got a 6-digit code? Enter it here</label>
               <input
                 value={code}
                 onChange={(e) => setCode(e.target.value)}
@@ -107,11 +107,10 @@ function Signup() {
                 autoComplete="one-time-code"
                 maxLength={6}
                 placeholder="123456"
-                required
                 className="mt-1 w-full border-[3px] border-ink bg-white px-3 py-3 text-center text-2xl font-black tracking-[0.4em]"
               />
             </div>
-            <button disabled={loading} className="flex w-full items-center justify-center gap-2 border-[3px] border-ink bg-orange py-3 text-sm font-black uppercase text-white shadow-brutal-sm box-hover disabled:opacity-60">
+            <button disabled={loading || code.replace(/\D/g, "").length < 6} className="flex w-full items-center justify-center gap-2 border-[3px] border-ink bg-orange py-3 text-sm font-black uppercase text-white shadow-brutal-sm box-hover disabled:opacity-60">
               {loading && <Loader2 className="h-4 w-4 animate-spin" />} Verify & continue
             </button>
           </form>
@@ -120,10 +119,11 @@ function Signup() {
               <ArrowLeft className="h-4 w-4" /> Change email
             </button>
             <button onClick={resend} disabled={resending} className="font-black text-orange disabled:opacity-60">
-              {resending ? "Sending…" : "Resend code"}
+              {resending ? "Sending…" : "Resend email"}
             </button>
           </div>
         </div>
+
       </div>
     );
   }
@@ -137,22 +137,19 @@ function Signup() {
       <div className="mx-auto flex max-w-xl flex-col gap-6 px-6 py-8">
         <div>
           <h1 className="text-3xl font-black tracking-tight">Create your account</h1>
-          <p className="mt-1 text-sm text-ink/70">Pick a role and an avatar. You can change them later.</p>
+          <p className="mt-1 text-sm text-ink/70">Pick an avatar. You can change it later.</p>
         </div>
 
-        <div className="grid grid-cols-2 gap-3">
-          {([
-            { r: "founder", icon: Rocket, title: "I'm a Founder", body: "Find a co-founder to build with." },
-            { r: "investor", icon: TrendingUp, title: "I'm an Investor", body: "Discover confirmed teams." },
-          ] as const).map(({ r, icon: Icon, title, body }) => (
-            <button key={r} onClick={() => setRole(r)} type="button"
-              className={`rounded-2xl border-2 border-ink p-4 text-left shadow-brutal-sm box-hover transition ${role === r ? "bg-orange text-white" : "bg-white"}`}>
-              <Icon className="h-6 w-6" />
-              <div className="mt-3 font-black">{title}</div>
-              <div className="mt-1 text-xs opacity-80">{body}</div>
-            </button>
-          ))}
+        <div className="rounded-2xl border-2 border-ink bg-white p-4 shadow-brutal-sm">
+          <div className="flex items-center gap-3">
+            <div className="grid h-10 w-10 place-items-center border-2 border-ink bg-orange text-white"><Rocket className="h-5 w-5" strokeWidth={3} /></div>
+            <div>
+              <div className="font-black">Founder account</div>
+              <div className="text-xs text-ink/70">Find a co-founder to build with.</div>
+            </div>
+          </div>
         </div>
+
 
         <div className="rounded-2xl border-2 border-ink bg-white p-5 shadow-brutal-sm">
           <div className="text-[10px] font-black uppercase tracking-wider text-orange">Choose your avatar</div>
