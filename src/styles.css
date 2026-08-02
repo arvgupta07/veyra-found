@@ -53,7 +53,12 @@
   --color-cream: var(--cream);
   --color-orange: var(--orange);
   --color-red: var(--red);
+
+  /* Navigation chrome — always a dark slab with light text, in both themes */
+  --color-nav: var(--nav-bg);
+  --color-nav-fg: var(--nav-fg);
 }
+
 
 :root {
   --radius: 0px;
@@ -91,7 +96,12 @@
   --border: #262626;
   --input: #262626;
   --ring: #FF7F11;
+
+  /* Nav chrome */
+  --nav-bg: #262626;
+  --nav-fg: #E2E8CE;
 }
+
 
 /*
  * Dark mode — warm charcoal paper, cream ink. We invert the paper/ink
@@ -105,8 +115,8 @@
   --ink-2: #D8D2BE;
   --ink-3: #B8B29E;
 
-  --sage: #8FA687;         /* slightly deepened for dark bg */
-  --cream: #1F1B17;        /* "cream paper" becomes warm charcoal card */
+  --sage: #2F3C2C;         /* deep moss so full-bleed sage sections read dark */
+  --cream: #1C1916;        /* "cream paper" becomes warm charcoal card */
   --orange: #FF8A2B;       /* touch warmer, less searing */
   --red:    #FF3B3C;
 
@@ -117,14 +127,14 @@
 
   --background: #14110F;
   --foreground: #EDE7D1;
-  --card: #1F1B17;
+  --card: #1C1916;
   --card-foreground: #EDE7D1;
-  --popover: #1F1B17;
+  --popover: #1C1916;
   --popover-foreground: #EDE7D1;
   --primary: #FF8A2B;
   --primary-foreground: #14110F;
-  --secondary: #8FA687;
-  --secondary-foreground: #14110F;
+  --secondary: #2F3C2C;
+  --secondary-foreground: #EDE7D1;
   --muted: #241F1A;
   --muted-foreground: #B8B29E;
   --accent: #FF3B3C;
@@ -134,18 +144,36 @@
   --border: #EDE7D1;
   --input: #EDE7D1;
   --ring: #FF8A2B;
+
+  /* Nav chrome stays a dark slab in dark mode too */
+  --nav-bg: #0E0C0A;
+  --nav-fg: #EDE7D1;
 }
 
 /* Dark-mode utility overrides — since --ink now resolves to cream in dark mode,
  * `border-ink`, `text-ink`, `bg-ink`, and shadow utilities that read var(--ink)
  * automatically flip. We only need to patch the few places that hardcoded
  * white/#E2E8CE/#262626 literals instead of using tokens. */
-.dark .bg-white { background-color: #1F1B17 !important; color: #EDE7D1; }
+.dark .bg-white { background-color: #1C1916 !important; color: #EDE7D1; }
 .dark .text-white { color: #14110F; } /* text-white sits on bg-ink slabs, which are now cream */
-.dark .bg-cream { background-color: #1F1B17; }
+.dark .bg-cream { background-color: #1C1916; }
 .dark .bg-surface { background-color: #14110F; }
 .dark .bg-surface-2 { background-color: #1A1613; }
 .dark .text-muted-text { color: #B8B29E; }
+
+/* Full-bleed "ink" bands (landing stats/footer) must stay dark, not flip to cream */
+.dark .bg-ink { background-color: #0B0A08; color: #EDE7D1; }
+.dark [class*="text-cream"] { color: #EDE7D1; }
+.dark .bg-ink .text-ink { color: #EDE7D1; }
+
+/* Bright orange/red slabs need dark ink on top of them in dark mode (inherited only,
+ * so nested cream/ink panels keep their own contrast) */
+.dark .bg-orange, .dark .bg-red { color: #14110F; }
+.dark .bg-orange :is(.bg-cream, .bg-white, .bg-ink),
+.dark .bg-red :is(.bg-cream, .bg-white, .bg-ink) { color: #EDE7D1; }
+
+
+
 
 /* Hero radial: warm charcoal gradient with a hint of sage */
 .dark .bg-hero-radial {
