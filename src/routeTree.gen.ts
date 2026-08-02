@@ -24,6 +24,7 @@ import { Route as InboxConversationIdRouteImport } from './routes/inbox.$convers
 import { Route as ForumPostIdRouteImport } from './routes/forum.$postId'
 import { Route as AuthSignupRouteImport } from './routes/auth.signup'
 import { Route as AuthLoginRouteImport } from './routes/auth.login'
+import { Route as AuthCallbackRouteImport } from './routes/auth.callback'
 
 const OnboardingRoute = OnboardingRouteImport.update({
   id: '/onboarding',
@@ -100,6 +101,11 @@ const AuthLoginRoute = AuthLoginRouteImport.update({
   path: '/auth/login',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AuthCallbackRoute = AuthCallbackRouteImport.update({
+  id: '/auth/callback',
+  path: '/auth/callback',
+  getParentRoute: () => rootRouteImport,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -109,6 +115,7 @@ export interface FileRoutesByFullPath {
   '/investor-feed': typeof InvestorFeedRoute
   '/matches': typeof MatchesRoute
   '/onboarding': typeof OnboardingRoute
+  '/auth/callback': typeof AuthCallbackRoute
   '/auth/login': typeof AuthLoginRoute
   '/auth/signup': typeof AuthSignupRoute
   '/forum/$postId': typeof ForumPostIdRoute
@@ -126,6 +133,7 @@ export interface FileRoutesByTo {
   '/investor-feed': typeof InvestorFeedRoute
   '/matches': typeof MatchesRoute
   '/onboarding': typeof OnboardingRoute
+  '/auth/callback': typeof AuthCallbackRoute
   '/auth/login': typeof AuthLoginRoute
   '/auth/signup': typeof AuthSignupRoute
   '/forum/$postId': typeof ForumPostIdRoute
@@ -144,6 +152,7 @@ export interface FileRoutesById {
   '/investor-feed': typeof InvestorFeedRoute
   '/matches': typeof MatchesRoute
   '/onboarding': typeof OnboardingRoute
+  '/auth/callback': typeof AuthCallbackRoute
   '/auth/login': typeof AuthLoginRoute
   '/auth/signup': typeof AuthSignupRoute
   '/forum/$postId': typeof ForumPostIdRoute
@@ -163,6 +172,7 @@ export interface FileRouteTypes {
     | '/investor-feed'
     | '/matches'
     | '/onboarding'
+    | '/auth/callback'
     | '/auth/login'
     | '/auth/signup'
     | '/forum/$postId'
@@ -180,6 +190,7 @@ export interface FileRouteTypes {
     | '/investor-feed'
     | '/matches'
     | '/onboarding'
+    | '/auth/callback'
     | '/auth/login'
     | '/auth/signup'
     | '/forum/$postId'
@@ -197,6 +208,7 @@ export interface FileRouteTypes {
     | '/investor-feed'
     | '/matches'
     | '/onboarding'
+    | '/auth/callback'
     | '/auth/login'
     | '/auth/signup'
     | '/forum/$postId'
@@ -215,6 +227,7 @@ export interface RootRouteChildren {
   InvestorFeedRoute: typeof InvestorFeedRoute
   MatchesRoute: typeof MatchesRoute
   OnboardingRoute: typeof OnboardingRoute
+  AuthCallbackRoute: typeof AuthCallbackRoute
   AuthLoginRoute: typeof AuthLoginRoute
   AuthSignupRoute: typeof AuthSignupRoute
   ForumPostIdRoute: typeof ForumPostIdRoute
@@ -332,6 +345,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthLoginRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/auth/callback': {
+      id: '/auth/callback'
+      path: '/auth/callback'
+      fullPath: '/auth/callback'
+      preLoaderRoute: typeof AuthCallbackRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
@@ -343,6 +363,7 @@ const rootRouteChildren: RootRouteChildren = {
   InvestorFeedRoute: InvestorFeedRoute,
   MatchesRoute: MatchesRoute,
   OnboardingRoute: OnboardingRoute,
+  AuthCallbackRoute: AuthCallbackRoute,
   AuthLoginRoute: AuthLoginRoute,
   AuthSignupRoute: AuthSignupRoute,
   ForumPostIdRoute: ForumPostIdRoute,
@@ -355,13 +376,3 @@ const rootRouteChildren: RootRouteChildren = {
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
-
-import type { getRouter } from './router.tsx'
-import type { startInstance } from './start.ts'
-declare module '@tanstack/react-start' {
-  interface Register {
-    ssr: true
-    router: Awaited<ReturnType<typeof getRouter>>
-    config: Awaited<ReturnType<typeof startInstance.getOptions>>
-  }
-}
