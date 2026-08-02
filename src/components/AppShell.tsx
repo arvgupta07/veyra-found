@@ -51,7 +51,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
   return (
     <div className="flex min-h-screen bg-surface">
       {/* Sidebar (desktop) */}
-      <aside className="fixed inset-y-0 left-0 hidden w-60 flex-col border-r-[3px] border-ink bg-ink px-4 py-6 md:flex">
+      <aside className="fixed inset-y-0 left-0 z-40 hidden w-60 flex-col border-r-[3px] border-ink bg-ink px-4 py-6 md:flex">
         <div className="pointer-events-none absolute inset-0 bg-dots opacity-[0.14]" />
         <Link to="/" className="relative flex items-center gap-2.5 px-1">
           <div className="grid h-11 w-11 shrink-0 place-items-center border-[3px] border-cream bg-cream shadow-[3px_3px_0_0_var(--orange)]">
@@ -161,7 +161,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
         </div>
       )}
 
-      <main className="page-paper w-full md:pl-60 pt-14 pb-16 md:pt-0 md:pb-0">{children}</main>
+      <main className="page-paper w-full md:pl-60 pt-[6.5rem] pb-16 md:pt-0 md:pb-0">{children}</main>
 
     </div>
   );

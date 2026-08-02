@@ -141,7 +141,7 @@ function ConversationView() {
 
   return (
     <AppShell>
-      <div className="mx-auto flex h-[calc(100vh-3.5rem)] max-w-5xl flex-col md:h-screen">
+      <div className="mx-auto flex h-[calc(100vh-6.5rem)] max-w-5xl flex-col md:h-screen">
         {/* Header */}
         <div className="flex items-center gap-3 border-b-2 border-ink bg-white px-4 py-3">
           <Link to="/inbox" className="text-muted-text hover:text-ink"><ArrowLeft className="h-5 w-5" /></Link>
