@@ -8,7 +8,8 @@ import { AppShell } from "@/components/AppShell";
 import { useRequireAuth } from "@/hooks/useRequireAuth";
 import { SkillTag, TierBadge, VerifiedBadges } from "@/components/FounderBits";
 import { founderAvatar, SKILLS_LIST, AVATAR_PRESETS } from "@/lib/founder-types";
-import { MapPin, Briefcase, Pencil, X, Loader2, Save, LogOut, Trash2 } from "lucide-react";
+import { uploadImage } from "@/lib/uploads";
+import { MapPin, Briefcase, Pencil, X, Loader2, Save, LogOut, Trash2, ImagePlus } from "lucide-react";
 
 export const Route = createFileRoute("/profile/me")({
   component: MyProfile,
@@ -247,6 +248,7 @@ function EditPanel({ initial, founderId, userId, onClose, onSaved }: {
   const [form, setForm] = useState(initial);
   const [custom, setCustom] = useState("");
   const [saving, setSaving] = useState(false);
+  const [uploading, setUploading] = useState(false);
   useEffect(() => setForm(initial), [initial]);
 
   async function save() {
@@ -279,6 +281,31 @@ function EditPanel({ initial, founderId, userId, onClose, onSaved }: {
         <div className="mt-4 space-y-3">
           <div>
             <label className="text-[11px] font-black uppercase text-muted-text">Avatar</label>
+            <div className="mt-2 flex items-center gap-3">
+              <img src={form.seed_avatar} alt="" className="h-14 w-14 rounded-xl border-2 border-ink object-cover" />
+              <label className={`inline-flex cursor-pointer items-center gap-2 rounded-lg border-2 border-ink bg-white px-3 py-2 text-xs font-black shadow-brutal-sm box-hover ${uploading ? "opacity-50" : ""}`}>
+                {uploading ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <ImagePlus className="h-3.5 w-3.5" />}
+                Upload photo
+                <input type="file" accept="image/*" className="hidden" disabled={uploading}
+                  onChange={async (e) => {
+                    const file = e.target.files?.[0];
+                    e.target.value = "";
+                    if (!file) return;
+                    setUploading(true);
+                    try {
+                      const url = await uploadImage(file, "avatars");
+                      setForm((f) => ({ ...f, seed_avatar: url }));
+                      toast.success("Photo ready — hit save");
+                    } catch (err) {
+                      toast.error(err instanceof Error ? err.message : "Upload failed");
+                    } finally {
+                      setUploading(false);
+                    }
+                  }} />
+              </label>
+              <span className="text-[10px] font-bold text-muted-text">PNG/JPG · max 5 MB</span>
+            </div>
+            <div className="mt-2 text-[10px] font-black uppercase text-muted-text">Or pick a preset</div>
             <div className="mt-2 grid grid-cols-6 gap-2">
               {AVATAR_PRESETS.map((url) => {
                 const on = form.seed_avatar === url;

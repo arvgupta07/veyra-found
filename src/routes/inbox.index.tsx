@@ -232,15 +232,20 @@ function Inbox() {
         {tab === "talking" && (
           <div className="mt-4 flex flex-wrap items-center gap-2">
             <div className="text-[10px] font-black uppercase text-muted-text"><Tag className="inline h-3 w-3" /> Filter:</div>
-            <button onClick={() => setLabelFilter(null)} className={`rounded-md border-2 border-ink px-2 py-0.5 text-[11px] font-black ${!labelFilter ? "bg-ink text-white" : "bg-white"}`}>
+            <button onClick={() => setLabelFilter(null)}
+              className={`rounded-md border-2 border-ink px-2 py-0.5 text-[11px] font-black transition ${!labelFilter ? "bg-ink text-white shadow-brutal-sm -translate-y-0.5 ring-2 ring-orange" : "bg-white opacity-80 hover:opacity-100"}`}>
               All <span className="opacity-70">{conversations?.length ?? 0}</span>
             </button>
-            {filterChips.map((l) => (
-              <button key={l.name} onClick={() => setLabelFilter(labelFilter === l.name ? null : l.name)}
-                className={`rounded-md border-2 border-ink px-2 py-0.5 text-[11px] font-black ${labelFilter === l.name ? l.color : "bg-white"}`}>
-                {l.emoji} {l.name} <span className="opacity-70">{l.count}</span>
-              </button>
-            ))}
+            {filterChips.map((l) => {
+              const on = labelFilter === l.name;
+              return (
+                <button key={l.name} onClick={() => setLabelFilter(on ? null : l.name)}
+                  className={`inline-flex items-center gap-1 rounded-md border-2 border-ink px-2 py-0.5 text-[11px] font-black transition ${on ? `${l.color} shadow-brutal-sm -translate-y-0.5 ring-2 ring-orange` : "bg-white opacity-80 hover:opacity-100 hover:-translate-y-0.5"}`}>
+                  {on && <Check className="h-3 w-3" />}
+                  {l.emoji} {l.name} <span className="opacity-70">{l.count}</span>
+                </button>
+              );
+            })}
             {filterChips.length === 0 && (
               <span className="text-[11px] text-muted-text">Add a label to a chat to filter by it.</span>
             )}

@@ -387,6 +387,7 @@ export type Database = {
           content: string
           created_at: string
           id: string
+          image_url: string | null
           industry_tag: string | null
           is_pinned: boolean | null
           seeking_feedback: boolean
@@ -400,6 +401,7 @@ export type Database = {
           content: string
           created_at?: string
           id?: string
+          image_url?: string | null
           industry_tag?: string | null
           is_pinned?: boolean | null
           seeking_feedback?: boolean
@@ -413,6 +415,7 @@ export type Database = {
           content?: string
           created_at?: string
           id?: string
+          image_url?: string | null
           industry_tag?: string | null
           is_pinned?: boolean | null
           seeking_feedback?: boolean

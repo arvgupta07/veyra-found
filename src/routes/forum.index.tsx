@@ -6,7 +6,8 @@ import { useMyFounder } from "@/hooks/useMyFounder";
 import { AppShell } from "@/components/AppShell";
 import { useRequireAuth } from "@/hooks/useRequireAuth";
 import { founderAvatar } from "@/lib/founder-types";
-import { ArrowBigUp, ArrowBigDown, MessageCircle, Plus, Loader2, X, MessageSquareText } from "lucide-react";
+import { uploadImage } from "@/lib/uploads";
+import { ArrowBigUp, ArrowBigDown, MessageCircle, Plus, Loader2, X, MessageSquareText, ImagePlus } from "lucide-react";
 import { toast } from "sonner";
 
 const CATEGORIES = [
@@ -105,6 +106,10 @@ function Forum() {
                 <Link to="/forum/$postId" params={{ postId: p.id }} className="mt-2 block">
                   <h2 className="text-lg font-black hover:text-orange">{p.title}</h2>
                   <p className="mt-1 line-clamp-2 text-sm text-muted-text">{p.content}</p>
+                  {p.image_url && (
+                    <img src={p.image_url} alt="" loading="lazy"
+                      className="mt-3 max-h-72 w-full rounded-xl border-2 border-ink object-cover" />
+                  )}
                 </Link>
                 <div className="mt-3 flex items-center gap-3 text-xs text-muted-text">
                   <div className="inline-flex items-stretch overflow-hidden rounded-lg border-2 border-ink bg-white shadow-brutal-sm">
@@ -153,13 +158,27 @@ function ComposeModal({ onClose, founderId }: { onClose: (postedCategory?: strin
   const [category, setCategory] = useState<string>("idea_validation");
   const [seeking, setSeeking] = useState(false);
   const [saving, setSaving] = useState(false);
+  const [imageUrl, setImageUrl] = useState<string | null>(null);
+  const [uploading, setUploading] = useState(false);
+
+  async function pickImage(file: File) {
+    setUploading(true);
+    try {
+      const url = await uploadImage(file, "forum");
+      setImageUrl(url);
+    } catch (err) {
+      toast.error(err instanceof Error ? err.message : "Upload failed");
+    } finally {
+      setUploading(false);
+    }
+  }
 
   async function submit() {
     if (!title.trim() || !content.trim()) return toast.error("Title and content required");
     setSaving(true);
     const { error } = await supabase.from("forum_posts").insert({
       title: title.trim(), content: content.trim(), category: category as never, author_id: founderId,
-      seeking_feedback: seeking,
+      seeking_feedback: seeking, image_url: imageUrl,
     });
     setSaving(false);
     if (error) return toast.error(error.message);
@@ -169,7 +188,7 @@ function ComposeModal({ onClose, founderId }: { onClose: (postedCategory?: strin
 
   return (
     <div className="fixed inset-0 z-40 grid place-items-center bg-ink/60 p-4" onClick={() => onClose()}>
-      <div onClick={(e) => e.stopPropagation()} className="w-full max-w-lg rounded-2xl border-2 border-ink bg-cream p-6 shadow-brutal">
+      <div onClick={(e) => e.stopPropagation()} className="max-h-[88vh] w-full max-w-lg overflow-y-auto rounded-2xl border-2 border-ink bg-cream p-6 shadow-brutal">
         <div className="flex items-start justify-between">
           <div className="text-xl font-black">New post</div>
           <button onClick={() => onClose()}><X className="h-5 w-5" /></button>
@@ -180,6 +199,24 @@ function ComposeModal({ onClose, founderId }: { onClose: (postedCategory?: strin
           </select>
           <input value={title} onChange={(e) => setTitle(e.target.value)} placeholder="Title" className="w-full rounded-lg border-2 border-ink bg-white px-3 py-2 text-sm" />
           <textarea rows={6} value={content} onChange={(e) => setContent(e.target.value)} placeholder="Share your thoughts…" className="w-full rounded-lg border-2 border-ink bg-white px-3 py-2 text-sm" />
+
+          {imageUrl ? (
+            <div className="relative">
+              <img src={imageUrl} alt="" className="max-h-60 w-full rounded-xl border-2 border-ink object-cover" />
+              <button type="button" onClick={() => setImageUrl(null)}
+                className="absolute right-2 top-2 rounded-md border-2 border-ink bg-white p-1 shadow-brutal-sm">
+                <X className="h-3.5 w-3.5" />
+              </button>
+            </div>
+          ) : (
+            <label className={`inline-flex cursor-pointer items-center gap-2 rounded-lg border-2 border-ink bg-white px-3 py-2 text-xs font-black shadow-brutal-sm box-hover ${uploading ? "opacity-50" : ""}`}>
+              {uploading ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <ImagePlus className="h-3.5 w-3.5" />}
+              Add photo
+              <input type="file" accept="image/*" className="hidden" disabled={uploading}
+                onChange={(e) => { const f = e.target.files?.[0]; e.target.value = ""; if (f) pickImage(f); }} />
+            </label>
+          )}
+
           <label className="flex items-center gap-2 text-sm font-semibold">
             <input type="checkbox" checked={seeking} onChange={(e) => setSeeking(e.target.checked)} className="h-4 w-4" />
             Seeking feedback (vs. just sharing)
