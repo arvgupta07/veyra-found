@@ -2,11 +2,9 @@ import { createFileRoute, Link, useRouter } from "@tanstack/react-router";
 import { useState } from "react";
 import { Loader2 } from "lucide-react";
 import { toast } from "sonner";
-import { useServerFn } from "@tanstack/react-start";
 import { supabase } from "@/integrations/supabase/client";
 import { lovable } from "@/integrations/lovable";
 import { VeyraMark } from "@/components/VeyraLogo";
-import { claimDemoFounder } from "@/lib/demo.functions";
 
 export const Route = createFileRoute("/auth/login")({
   component: Login,
@@ -14,11 +12,9 @@ export const Route = createFileRoute("/auth/login")({
 
 function Login() {
   const router = useRouter();
-  const claimDemo = useServerFn(claimDemoFounder);
-  const [email, setEmail] = useState("demo@cofound.ai");
-  const [password, setPassword] = useState("demo1234");
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
-
 
   async function submit(e: React.FormEvent) {
     e.preventDefault();
@@ -30,41 +26,6 @@ function Login() {
     router.navigate({ to: "/discover" });
   }
 
-  async function demoSignIn(tier: "free" | "pro") {
-    setLoading(true);
-    const cfg = tier === "pro"
-      ? { email: "demo-pro@cofound.ai", password: "demo1234", name: "Priya Nair", founderId: "44444444-4444-4444-4444-444444444444", isPro: true }
-      : { email: "demo@cofound.ai",     password: "demo1234", name: "Arjun Sharma", founderId: "11111111-1111-1111-1111-111111111111", isPro: false };
-
-    let { error } = await supabase.auth.signInWithPassword({ email: cfg.email, password: cfg.password });
-    if (error) {
-      const { error: sErr } = await supabase.auth.signUp({
-        email: cfg.email, password: cfg.password,
-        options: { data: { full_name: cfg.name, role: "founder" } },
-      });
-      if (sErr && !sErr.message.includes("registered")) { setLoading(false); return toast.error(sErr.message); }
-      const login2 = await supabase.auth.signInWithPassword({ email: cfg.email, password: cfg.password });
-      error = login2.error;
-    }
-    if (error) { setLoading(false); return toast.error(error.message); }
-
-    const { data: userData } = await supabase.auth.getUser();
-    if (userData.user) {
-      // Claim the seeded demo founder through an authenticated server function
-      // so the privileged database routine isn't exposed to the browser.
-      try {
-        await claimDemo({ data: { founderId: cfg.founderId } });
-      } catch {
-        setLoading(false);
-        return toast.error("Could not set up the demo profile");
-      }
-
-      await supabase.from("profiles").update({ is_pro: cfg.isPro, full_name: cfg.name }).eq("id", userData.user.id);
-    }
-    setLoading(false);
-    toast.success(`Signed in as ${cfg.name} (${tier === "pro" ? "Pro" : "Free"} demo)`);
-    router.navigate({ to: "/discover" });
-  }
 
 
   return (
