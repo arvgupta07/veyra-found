@@ -30,8 +30,10 @@ export async function updateForumPost(postId: string, patch: {
   seeking_feedback?: boolean;
   image_url?: string | null;
 }) {
+  const now = new Date().toISOString();
+  const payload = { ...patch, edited_at: now, updated_at: now } as Record<string, unknown>;
   const { error } = await supabase.from("forum_posts")
-    .update({ ...(patch as never), edited_at: new Date().toISOString(), updated_at: new Date().toISOString() } as never)
+    .update(payload as never)
     .eq("id", postId);
   if (error) throw new Error(error.message);
 }
