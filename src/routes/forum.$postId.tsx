@@ -286,6 +286,26 @@ function PostView() {
           </div>
         </article>
 
+        {editOpen && (
+          <EditPostPanel
+            post={post as never}
+            onClose={() => setEditOpen(false)}
+            onSaved={() => { setEditOpen(false); qc.invalidateQueries({ queryKey: ["post", postId] }); qc.invalidateQueries({ queryKey: ["forum"] }); }}
+          />
+        )}
+
+        {collabOpen && me && (
+          <CollabPanel
+            postId={postId}
+            myFounderId={me.id}
+            current={(collaborators ?? []).map((c) => ({ id: c.founder_id, name: c.founder?.profiles?.full_name ?? c.founder?.seed_name ?? "Founder" }))}
+            onClose={() => setCollabOpen(false)}
+            onChanged={() => qc.invalidateQueries({ queryKey: ["collaborators", postId] })}
+          />
+        )}
+
+
+
         {connectOpen && (
           <div className="mt-4 rounded-2xl border-2 border-ink bg-cream p-4 shadow-brutal-sm">
             <div className="text-sm font-black">Send a connection request</div>
