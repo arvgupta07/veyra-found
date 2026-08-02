@@ -120,18 +120,21 @@
   --orange: #FF8A2B;       /* touch warmer, less searing */
   --red:    #FF3B3C;
 
+  --surface:   #14110F;    /* page background */
+  --surface-2: #1A1613;
+  --muted-text: #B8B29E;
   --light-text: #8A8474;
 
   --background: #14110F;
   --foreground: #EDE7D1;
-  --card: #1F1B17;
+  --card: #1C1916;
   --card-foreground: #EDE7D1;
-  --popover: #1F1B17;
+  --popover: #1C1916;
   --popover-foreground: #EDE7D1;
   --primary: #FF8A2B;
   --primary-foreground: #14110F;
-  --secondary: #8FA687;
-  --secondary-foreground: #14110F;
+  --secondary: #2F3C2C;
+  --secondary-foreground: #EDE7D1;
   --muted: #241F1A;
   --muted-foreground: #B8B29E;
   --accent: #FF3B3C;
@@ -141,18 +144,33 @@
   --border: #EDE7D1;
   --input: #EDE7D1;
   --ring: #FF8A2B;
+
+  /* Nav chrome stays a dark slab in dark mode too */
+  --nav-bg: #0E0C0A;
+  --nav-fg: #EDE7D1;
 }
 
 /* Dark-mode utility overrides — since --ink now resolves to cream in dark mode,
  * `border-ink`, `text-ink`, `bg-ink`, and shadow utilities that read var(--ink)
  * automatically flip. We only need to patch the few places that hardcoded
  * white/#E2E8CE/#262626 literals instead of using tokens. */
-.dark .bg-white { background-color: #1F1B17 !important; color: #EDE7D1; }
+.dark .bg-white { background-color: #1C1916 !important; color: #EDE7D1; }
 .dark .text-white { color: #14110F; } /* text-white sits on bg-ink slabs, which are now cream */
-.dark .bg-cream { background-color: #1F1B17; }
+.dark .bg-cream { background-color: #1C1916; }
 .dark .bg-surface { background-color: #14110F; }
 .dark .bg-surface-2 { background-color: #1A1613; }
 .dark .text-muted-text { color: #B8B29E; }
+
+/* Full-bleed "ink" bands (landing stats/footer) must stay dark, not flip to cream */
+.dark .bg-ink { background-color: #0B0A08; }
+.dark .text-cream { color: #EDE7D1; }
+.dark .bg-ink .text-ink { color: #EDE7D1; }
+
+/* Bright orange/red slabs need dark ink on top of them in dark mode */
+.dark .bg-orange, .dark .bg-red { color: #14110F; }
+.dark .bg-orange .text-ink, .dark .bg-red .text-ink,
+.dark .bg-orange .text-cream, .dark .bg-red .text-cream { color: #14110F; }
+
 
 /* Hero radial: warm charcoal gradient with a hint of sage */
 .dark .bg-hero-radial {
