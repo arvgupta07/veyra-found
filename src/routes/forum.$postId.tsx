@@ -428,3 +428,160 @@ function PostView() {
     </AppShell>
   );
 }
+
+type PostLike = {
+  id: string; title: string; content: string; category: string;
+  cross_categories?: string[] | null; seeking_feedback: boolean; image_url: string | null;
+};
+
+function EditPostPanel({ post, onClose, onSaved }: { post: PostLike; onClose: () => void; onSaved: () => void }) {
+  const [title, setTitle] = useState(post.title);
+  const [content, setContent] = useState(post.content);
+  const [category, setCategory] = useState<string>(post.category);
+  const [cross, setCross] = useState<string[]>(post.cross_categories ?? []);
+  const [seeking, setSeeking] = useState(!!post.seeking_feedback);
+  const [busy, setBusy] = useState(false);
+
+  async function save() {
+    if (!title.trim() || !content.trim()) return toast.error("Title and content required");
+    setBusy(true);
+    try {
+      await updateForumPost(post.id, {
+        title: title.trim(), content: content.trim(), category,
+        cross_categories: cross.filter((c) => c !== category),
+        seeking_feedback: seeking,
+      });
+      toast.success("Post updated");
+      onSaved();
+    } catch (err) {
+      toast.error(err instanceof Error ? err.message : "Update failed");
+    } finally {
+      setBusy(false);
+    }
+  }
+
+  return (
+    <div className="fixed inset-0 z-40 grid place-items-center bg-ink/60 p-4" onClick={onClose}>
+      <div onClick={(e) => e.stopPropagation()} className="max-h-[88vh] w-full max-w-lg overflow-y-auto rounded-2xl border-2 border-ink bg-cream p-6 shadow-brutal">
+        <div className="flex items-start justify-between">
+          <div className="text-xl font-black">Edit post</div>
+          <button onClick={onClose}><X className="h-5 w-5" /></button>
+        </div>
+        <div className="mt-4 space-y-3">
+          <select value={category} onChange={(e) => setCategory(e.target.value)}
+            className="w-full rounded-lg border-2 border-ink bg-white px-3 py-2 text-sm font-semibold">
+            {CATEGORY_OPTIONS.map(([v, l]) => <option key={v} value={v}>{l}</option>)}
+          </select>
+          <div>
+            <div className="text-[10px] font-black uppercase text-muted-text">Also show in (reach more domains)</div>
+            <div className="mt-1.5 flex flex-wrap gap-1.5">
+              {CATEGORY_OPTIONS.filter(([v]) => v !== category).map(([v, l]) => {
+                const on = cross.includes(v);
+                return (
+                  <button key={v} type="button"
+                    onClick={() => setCross((c) => (on ? c.filter((x) => x !== v) : [...c, v]))}
+                    className={`rounded-md border-2 border-ink px-2 py-1 text-[11px] font-black ${on ? "bg-sage text-ink" : "bg-white"}`}>
+                    {l}
+                  </button>
+                );
+              })}
+            </div>
+          </div>
+          <input value={title} onChange={(e) => setTitle(e.target.value)} placeholder="Title"
+            className="w-full rounded-lg border-2 border-ink bg-white px-3 py-2 text-sm" />
+          <textarea rows={7} value={content} onChange={(e) => setContent(e.target.value)}
+            className="w-full rounded-lg border-2 border-ink bg-white px-3 py-2 text-sm" />
+          <label className="flex items-center gap-2 text-sm font-semibold">
+            <input type="checkbox" checked={seeking} onChange={(e) => setSeeking(e.target.checked)} className="h-4 w-4" />
+            Seeking feedback
+          </label>
+        </div>
+        <button onClick={save} disabled={busy}
+          className="mt-4 flex w-full items-center justify-center gap-2 rounded-lg border-2 border-ink bg-orange py-2.5 text-sm font-black text-white shadow-brutal-sm disabled:opacity-50">
+          {busy ? <Loader2 className="h-4 w-4 animate-spin" /> : <Save className="h-4 w-4" />} Save changes
+        </button>
+      </div>
+    </div>
+  );
+}
+
+function CollabPanel({ postId, myFounderId, current, onClose, onChanged }: {
+  postId: string;
+  myFounderId: string;
+  current: { id: string; name: string }[];
+  onClose: () => void;
+  onChanged: () => void;
+}) {
+  const [busy, setBusy] = useState(false);
+
+  // Collaborators are picked from founders you're already connected with.
+  const { data: candidates } = useQuery({
+    queryKey: ["collab-candidates", myFounderId],
+    queryFn: async () => {
+      const { data: reqs } = await supabase.from("connection_requests")
+        .select("from_founder_id, to_founder_id")
+        .eq("status", "accepted")
+        .or(`from_founder_id.eq.${myFounderId},to_founder_id.eq.${myFounderId}`);
+      const ids = [...new Set((reqs ?? []).map((r) =>
+        r.from_founder_id === myFounderId ? r.to_founder_id : r.from_founder_id))];
+      if (!ids.length) return [];
+      const { data } = await supabase.from("founders")
+        .select("id, seed_name, profiles(full_name)").in("id", ids);
+      return (data ?? []).map((f) => ({ id: f.id, name: f.profiles?.full_name ?? f.seed_name ?? "Founder" }));
+    },
+  });
+
+  async function add(founderId: string) {
+    setBusy(true);
+    try { await addForumCollaborator(postId, founderId); toast.success("Collaborator added"); onChanged(); }
+    catch (err) { toast.error(err instanceof Error ? err.message : "Failed"); }
+    finally { setBusy(false); }
+  }
+  async function remove(founderId: string) {
+    setBusy(true);
+    try { await removeForumCollaborator(postId, founderId); toast.success("Removed"); onChanged(); }
+    catch (err) { toast.error(err instanceof Error ? err.message : "Failed"); }
+    finally { setBusy(false); }
+  }
+
+  const currentIds = current.map((c) => c.id);
+  const available = (candidates ?? []).filter((c) => !currentIds.includes(c.id));
+
+  return (
+    <div className="fixed inset-0 z-40 grid place-items-center bg-ink/60 p-4" onClick={onClose}>
+      <div onClick={(e) => e.stopPropagation()} className="max-h-[85vh] w-full max-w-md overflow-y-auto rounded-2xl border-2 border-ink bg-cream p-6 shadow-brutal">
+        <div className="flex items-start justify-between">
+          <div>
+            <div className="text-xl font-black">Collaborators</div>
+            <div className="text-[11px] font-bold text-muted-text">Co-authors can edit this post too.</div>
+          </div>
+          <button onClick={onClose}><X className="h-5 w-5" /></button>
+        </div>
+
+        <div className="mt-4 space-y-2">
+          {current.length === 0 && <div className="text-sm font-bold text-muted-text">No collaborators yet.</div>}
+          {current.map((c) => (
+            <div key={c.id} className="flex items-center justify-between rounded-lg border-2 border-ink bg-white px-3 py-2">
+              <span className="text-sm font-black">{c.name}</span>
+              <button onClick={() => remove(c.id)} disabled={busy} className="text-[11px] font-black text-red">Remove</button>
+            </div>
+          ))}
+        </div>
+
+        <div className="mt-5">
+          <div className="text-[10px] font-black uppercase text-muted-text">Add from your connections</div>
+          <div className="mt-2 space-y-2">
+            {available.length === 0 && <div className="text-xs font-bold text-muted-text">No connections available to add.</div>}
+            {available.map((c) => (
+              <div key={c.id} className="flex items-center justify-between rounded-lg border-2 border-ink bg-white px-3 py-2">
+                <span className="text-sm font-semibold">{c.name}</span>
+                <button onClick={() => add(c.id)} disabled={busy}
+                  className="rounded-md border-2 border-ink bg-orange px-2 py-0.5 text-[11px] font-black text-white shadow-brutal-sm">Add</button>
+              </div>
+            ))}
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
