@@ -96,7 +96,12 @@
   --border: #262626;
   --input: #262626;
   --ring: #FF7F11;
+
+  /* Nav chrome */
+  --nav-bg: #262626;
+  --nav-fg: #E2E8CE;
 }
+
 
 /*
  * Dark mode — warm charcoal paper, cream ink. We invert the paper/ink
