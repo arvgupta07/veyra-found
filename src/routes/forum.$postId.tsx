@@ -156,12 +156,48 @@ function PostView() {
     setConnectMsg("");
   }
 
+  async function saveComment(commentId: string) {
+    const text = commentDraft.trim();
+    if (!text) return;
+    try {
+      await updateForumComment(commentId, text);
+      setEditingComment(null);
+      qc.invalidateQueries({ queryKey: ["comments", postId] });
+      toast.success("Updated");
+    } catch (err) {
+      toast.error(err instanceof Error ? err.message : "Update failed");
+    }
+  }
+
   if (!ready || !post) return null;
 
-  // group into top-level + replies
-  const topLevel = (comments ?? []).filter((c) => !c.parent_comment_id);
-  const repliesOf = (id: string) => (comments ?? []).filter((c) => c.parent_comment_id === id);
+  const collabIds = (collaborators ?? []).map((c) => c.founder_id);
+  const canEdit = !!me && (me.id === post.author_id || collabIds.includes(me.id));
+  const isAuthor = me?.id === post.author_id;
+
+  // Shadow-banned posts stay visible to their own author only.
+  const postHidden = !!post.author?.shadow_banned && post.author_id !== me?.id;
+  if (postHidden) {
+    return (
+      <AppShell>
+        <div className="mx-auto max-w-2xl px-4 py-16 text-center">
+          <div className="rounded-2xl border-2 border-dashed border-ink p-10 text-sm font-bold text-muted-text">
+            This post isn't available.
+          </div>
+          <Link to="/forum" className="mt-4 inline-flex items-center gap-1 text-xs font-black text-orange">
+            <ArrowLeft className="h-3 w-3" /> Back to forum
+          </Link>
+        </div>
+      </AppShell>
+    );
+  }
+
+  // group into top-level + replies (shadow-banned authors filtered out)
+  const visible = visibleToViewer(comments ?? [], me?.id);
+  const topLevel = visible.filter((c) => !c.parent_comment_id);
+  const repliesOf = (id: string) => visible.filter((c) => c.parent_comment_id === id);
   const isLFC = post.category === "looking_for_cofounder";
+  const crossCats: string[] = (post as { cross_categories?: string[] | null }).cross_categories ?? [];
 
   return (
     <AppShell>
@@ -173,12 +209,23 @@ function PostView() {
           <div className="flex items-center gap-2 text-xs text-muted-text">
             <img src={founderAvatar({ seed_avatar: post.author?.seed_avatar, seed_name: post.author?.seed_name, profile: post.author?.profiles })} className="h-6 w-6 rounded-full border border-ink" alt="" />
             <span className="font-semibold text-foreground">{post.author?.profiles?.full_name ?? post.author?.seed_name}</span>
+            {(collaborators ?? []).length > 0 && (
+              <span className="font-semibold text-foreground">
+                + {(collaborators ?? []).map((c) => c.founder?.profiles?.full_name ?? c.founder?.seed_name ?? "founder").join(", ")}
+              </span>
+            )}
             <span>·</span>
             <span className="font-black capitalize">{String(post.category).replace(/_/g, " ")}</span>
+            {crossCats.map((c) => (
+              <span key={c} className="rounded-md border-2 border-ink bg-cream px-1.5 py-0.5 text-[10px] font-black capitalize">
+                {c.replace(/_/g, " ")}
+              </span>
+            ))}
             {post.seeking_feedback && (
               <span className="ml-auto rounded-md border-2 border-ink bg-orange px-1.5 py-0.5 text-[10px] font-black uppercase text-white">Seeking feedback</span>
             )}
           </div>
+
           <h1 className="mt-3 text-2xl font-black tracking-tight">{post.title}</h1>
           <p className="mt-4 whitespace-pre-wrap text-sm leading-relaxed">{post.content}</p>
           {post.image_url && (
