@@ -63,6 +63,7 @@ export function useLiveInbox() {
         { event: "*", schema: "public", table: "conversations" },
         () => {
           qc.invalidateQueries({ queryKey: ["inbox-convos"] });
+          qc.invalidateQueries({ queryKey: ["connected-ids"] });
         },
       )
       .on(

@@ -1,5 +1,5 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { useMyFounder } from "@/hooks/useMyFounder";
@@ -9,6 +9,7 @@ import { MapPin, Sparkles, Send, X, Loader2, Keyboard, ChevronDown, Check } from
 import { toast } from "sonner";
 import { founderAvatar } from "@/lib/founder-types";
 import { useRequireAuth } from "@/hooks/useRequireAuth";
+import { useConnectedIds } from "@/hooks/useConnectedIds";
 
 export const Route = createFileRoute("/discover")({
   component: Discover,
@@ -22,7 +23,9 @@ function Discover() {
   const [skipped, setSkipped] = useState(0);
   const [openPrompt, setOpenPrompt] = useState<{ founderId: string; question: string } | null>(null);
 
-  const { data: founders, isLoading } = useQuery({
+  const connectedIds = useConnectedIds(me?.id);
+
+  const { data: allFounders, isLoading } = useQuery({
     queryKey: ["discover", me?.id],
     enabled: !!me?.id,
     queryFn: async () => {
@@ -32,6 +35,11 @@ function Discover() {
       return fs ?? [];
     },
   });
+
+  const founders = useMemo(
+    () => (allFounders ?? []).filter((f) => !connectedIds.has(f.id)),
+    [allFounders, connectedIds],
+  );
 
   const current = founders?.[index];
   const atEnd = !!founders && founders.length > 0 && index >= founders.length;
