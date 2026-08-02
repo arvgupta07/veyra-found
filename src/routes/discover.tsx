@@ -9,6 +9,7 @@ import { MapPin, Sparkles, Send, X, Loader2, Keyboard, ChevronDown, Check } from
 import { toast } from "sonner";
 import { founderAvatar } from "@/lib/founder-types";
 import { useRequireAuth } from "@/hooks/useRequireAuth";
+import { useConnectedIds } from "@/hooks/useConnectedIds";
 
 export const Route = createFileRoute("/discover")({
   component: Discover,
