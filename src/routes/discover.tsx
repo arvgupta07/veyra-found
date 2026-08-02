@@ -226,19 +226,25 @@ function FounderCard({
         </div>
 
         <div className="space-y-3">
-          {prompts.map((p: any) => (
-            <PromptCard
-              key={p.prompt_question}
-              question={p.prompt_question}
-              answer={p.prompt_answer}
-              myFounderId={/* injected via closure */ (founder as any).__me}
-              toFounderId={founder.id}
-              toName={name}
-              isOpen={openPrompt?.founderId === founder.id && openPrompt?.question === p.prompt_question}
-              onOpen={() => onOpenPrompt(p.prompt_question)}
-              onClose={onClosePrompt}
-            />
-          ))}
+          {prompts.length > 0 ? (
+            prompts.map((p: any) => (
+              <PromptCard
+                key={p.prompt_question}
+                question={p.prompt_question}
+                answer={p.prompt_answer}
+                myFounderId={/* injected via closure */ (founder as any).__me}
+                toFounderId={founder.id}
+                toName={name}
+                isOpen={openPrompt?.founderId === founder.id && openPrompt?.question === p.prompt_question}
+                onOpen={() => onOpenPrompt(p.prompt_question)}
+                onClose={onClosePrompt}
+              />
+            ))
+          ) : (
+            <div className="rounded-2xl border-2 border-ink/40 bg-cream p-4 text-center text-sm font-bold text-muted-text">
+              No prompts added yet
+            </div>
+          )}
         </div>
 
         <button onClick={onConnect} className="flex w-full items-center justify-center gap-2 rounded-xl border-2 border-ink bg-ink py-3 text-sm font-black text-white shadow-brutal-sm box-hover">
