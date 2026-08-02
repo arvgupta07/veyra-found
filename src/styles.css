@@ -53,7 +53,12 @@
   --color-cream: var(--cream);
   --color-orange: var(--orange);
   --color-red: var(--red);
+
+  /* Navigation chrome — always a dark slab with light text, in both themes */
+  --color-nav: var(--nav-bg);
+  --color-nav-fg: var(--nav-fg);
 }
+
 
 :root {
   --radius: 0px;
