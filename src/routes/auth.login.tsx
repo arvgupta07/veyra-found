@@ -184,9 +184,10 @@ function Login() {
                   />
                   {errors.password && errors.password.trim() && <p className="mt-1 text-xs font-semibold text-red">{errors.password}</p>}
                 </div>
-                <button disabled={loading} className="flex w-full items-center justify-center gap-2 rounded-lg bg-indigo py-2.5 text-sm font-semibold text-white hover:bg-indigo-dark disabled:opacity-60">
-                  {loading && <Loader2 className="h-4 w-4 animate-spin" />} Sign in
+                <button disabled={loading} aria-busy={loading} className="flex w-full items-center justify-center gap-2 rounded-lg bg-indigo py-2.5 text-sm font-semibold text-white hover:bg-indigo-dark disabled:cursor-not-allowed disabled:opacity-60">
+                  {loading && <Loader2 className="h-4 w-4 animate-spin" />} {loading ? "Signing in…" : "Sign in"}
                 </button>
+
               </form>
               <div className="flex items-center gap-3">
                 <div className="h-[3px] flex-1 bg-ink/20" />
