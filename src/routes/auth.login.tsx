@@ -33,7 +33,7 @@ function Login() {
       <header className="mx-auto flex max-w-7xl items-center justify-between px-6 py-5">
         <Link to="/" className="flex items-center gap-2">
           <div className="grid h-9 w-9 place-items-center border-2 border-ink bg-cream shadow-brutal-sm"><VeyraMark size={20} /></div>
-          <span className="text-lg font-black">veyra</span>
+          <span className="text-lg font-black">Veyra Found</span>
         </Link>
       </header>
       <div className="mx-auto flex max-w-md flex-col gap-6 px-6 py-12">

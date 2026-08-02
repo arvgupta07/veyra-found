@@ -1,8 +1,8 @@
-# CoFound.ai
+# Veyra Found
 
 > India's professional co-founder matching platform. Hinge-style, not Tinder — depth over swipes.
 
 ## Pages
-- [Home](/): Landing page introducing CoFound.ai
+- [Home](/): Landing page introducing Veyra Found
 - [Sign up](/auth/signup): Create a founder or investor account
 - [Sign in](/auth/login): Log in to your account

@@ -7,10 +7,10 @@ export const Route = createFileRoute("/auth/callback")({
   component: Callback,
   head: () => ({
     meta: [
-      { title: "Signing you in · Veyra" },
-      { name: "description", content: "Completing your Veyra sign-in." },
-      { property: "og:title", content: "Signing you in · Veyra" },
-      { property: "og:description", content: "Completing your Veyra sign-in." },
+      { title: "Signing you in · Veyra Found" },
+      { name: "description", content: "Completing your Veyra Found sign-in." },
+      { property: "og:title", content: "Signing you in · Veyra Found" },
+      { property: "og:description", content: "Completing your Veyra Found sign-in." },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary" },
     ],

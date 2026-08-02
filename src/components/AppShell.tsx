@@ -51,7 +51,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
           <div className="grid h-11 w-11 shrink-0 place-items-center border-[3px] border-cream bg-cream shadow-[3px_3px_0_0_var(--orange)]">
             <VeyraMark size={28} />
           </div>
-          <span className="text-2xl font-black tracking-tight text-cream lowercase">veyra</span>
+          <span className="text-2xl font-black tracking-tight text-cream">Veyra Found</span>
         </Link>
         <nav className="mt-8 space-y-1">
           {nav.map((n) => {
@@ -84,7 +84,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
           <div className="grid h-9 w-9 place-items-center border-2 border-cream bg-cream shadow-[2px_2px_0_0_var(--orange)]">
             <VeyraMark size={22} />
           </div>
-          <span className="text-lg font-black tracking-tight text-cream lowercase">veyra</span>
+          <span className="text-lg font-black tracking-tight text-cream">Veyra Found</span>
         </Link>
         <div className="flex items-center gap-3">
           <button onClick={toggle} aria-label="Toggle dark mode" className="grid h-8 w-8 place-items-center border-2 border-cream bg-cream text-ink">

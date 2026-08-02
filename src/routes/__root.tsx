@@ -19,7 +19,7 @@ function NotFoundComponent() {
         <h1 className="text-7xl font-black text-foreground">404</h1>
         <h2 className="mt-4 text-xl font-semibold">Page not found</h2>
         <p className="mt-2 text-sm text-muted-foreground">
-          This route doesn't exist on Veyra.
+          This route doesn't exist on Veyra Found.
         </p>
         <div className="mt-6">
           <Link to="/" className="inline-flex items-center rounded-lg bg-primary px-4 py-2 text-sm font-medium text-primary-foreground hover:opacity-90">Go home</Link>
@@ -51,14 +51,14 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
     meta: [
       { charSet: "utf-8" },
       { name: "viewport", content: "width=device-width, initial-scale=1" },
-      { title: "Veyra — Connect. Build. Beyond." },
-      { name: "description", content: "Veyra is India's co-founder matching platform. Verified founders, compatibility science, and a structured path from first message to confirmed co-founder." },
-      { property: "og:title", content: "Veyra — Connect. Build. Beyond." },
-      { property: "og:description", content: "Veyra is India's co-founder matching platform. Verified founders, compatibility science, and a structured path from first message to confirmed co-founder." },
+      { title: "Veyra Found — Connect. Build. Beyond." },
+      { name: "description", content: "Veyra Found is India's co-founder matching platform. Verified founders, compatibility science, and a structured path from first message to confirmed co-founder." },
+      { property: "og:title", content: "Veyra Found — Connect. Build. Beyond." },
+      { property: "og:description", content: "Veyra Found is India's co-founder matching platform. Verified founders, compatibility science, and a structured path from first message to confirmed co-founder." },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
-      { name: "twitter:title", content: "Veyra — Connect. Build. Beyond." },
-      { name: "twitter:description", content: "Veyra is India's co-founder matching platform. Verified founders, compatibility science, and a structured path from first message to confirmed co-founder." },
+      { name: "twitter:title", content: "Veyra Found — Connect. Build. Beyond." },
+      { name: "twitter:description", content: "Veyra Found is India's co-founder matching platform. Verified founders, compatibility science, and a structured path from first message to confirmed co-founder." },
       { property: "og:image", content: "https://storage.googleapis.com/gpt-engineer-file-uploads/attachments/og-images/34ba6fec-5eae-482f-b0cc-b8a8b7ac6ab6" },
       { name: "twitter:image", content: "https://storage.googleapis.com/gpt-engineer-file-uploads/attachments/og-images/34ba6fec-5eae-482f-b0cc-b8a8b7ac6ab6" },
     ],
