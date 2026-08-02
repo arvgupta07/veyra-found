@@ -58,30 +58,49 @@ function Login() {
     if (Object.keys(next).length) return;
 
     setLoading(true);
+    const toastId = toast.loading("Signing you in…");
     const { error } = await supabase.auth.signInWithPassword({ email: em.data!, password });
     setLoading(false);
     if (error) {
       const msg = friendlyAuthError(error.message);
       setErrors({ form: msg, password: msg.includes("incorrect") ? " " : undefined });
+      toast.error(msg, {
+        id: toastId,
+        description: msg.includes("incorrect")
+          ? "Double-check your email and password, or reset it."
+          : undefined,
+      });
       return;
     }
-    toast.success("Welcome back");
+    toast.success("Welcome back", { id: toastId, description: "Taking you to Discover…" });
     router.navigate({ to: "/discover" });
   }
 
   async function sendReset(e: React.FormEvent) {
     e.preventDefault();
     const em = emailSchema.safeParse(email);
-    if (!em.success) return setErrors({ email: em.error.issues[0].message });
+    if (!em.success) {
+      setErrors({ email: em.error.issues[0].message });
+      toast.error(em.error.issues[0].message);
+      return;
+    }
     setErrors({});
     setLoading(true);
+    const toastId = toast.loading("Sending reset link…");
     const { error } = await supabase.auth.resetPasswordForEmail(em.data, {
       redirectTo: `${window.location.origin}/auth/reset-password`,
     });
     setLoading(false);
-    if (error) return setErrors({ form: friendlyAuthError(error.message) });
+    if (error) {
+      const msg = friendlyAuthError(error.message);
+      setErrors({ form: msg });
+      toast.error(msg, { id: toastId, description: "Please try again in a moment." });
+      return;
+    }
+    toast.success("Reset link sent", { id: toastId, description: `Check ${em.data} for the email.` });
     setMode("sent");
   }
+
 
   return (
     <div className="relative min-h-screen overflow-hidden bg-surface">
@@ -139,6 +158,7 @@ function Login() {
                     type="email"
                     autoComplete="email"
                     aria-invalid={!!errors.email}
+                    disabled={loading}
                     className={inputCls(errors.email)}
                   />
                   {errors.email && errors.email.trim() && <p className="mt-1 text-xs font-semibold text-red">{errors.email}</p>}
@@ -161,13 +181,15 @@ function Login() {
                     type="password"
                     autoComplete="current-password"
                     aria-invalid={!!errors.password}
+                    disabled={loading}
                     className={inputCls(errors.password)}
                   />
                   {errors.password && errors.password.trim() && <p className="mt-1 text-xs font-semibold text-red">{errors.password}</p>}
                 </div>
-                <button disabled={loading} className="flex w-full items-center justify-center gap-2 rounded-lg bg-indigo py-2.5 text-sm font-semibold text-white hover:bg-indigo-dark disabled:opacity-60">
-                  {loading && <Loader2 className="h-4 w-4 animate-spin" />} Sign in
+                <button disabled={loading} aria-busy={loading} className="flex w-full items-center justify-center gap-2 rounded-lg bg-indigo py-2.5 text-sm font-semibold text-white hover:bg-indigo-dark disabled:cursor-not-allowed disabled:opacity-60">
+                  {loading && <Loader2 className="h-4 w-4 animate-spin" />} {loading ? "Signing in…" : "Sign in"}
                 </button>
+
               </form>
               <div className="flex items-center gap-3">
                 <div className="h-[3px] flex-1 bg-ink/20" />
@@ -203,13 +225,15 @@ function Login() {
                     type="email"
                     autoComplete="email"
                     aria-invalid={!!errors.email}
+                    disabled={loading}
                     className={inputCls(errors.email)}
                   />
                   {errors.email && <p className="mt-1 text-xs font-semibold text-red">{errors.email}</p>}
                 </div>
-                <button disabled={loading} className="flex w-full items-center justify-center gap-2 rounded-lg bg-indigo py-2.5 text-sm font-semibold text-white hover:bg-indigo-dark disabled:opacity-60">
-                  {loading && <Loader2 className="h-4 w-4 animate-spin" />} Send reset link
+                <button disabled={loading} aria-busy={loading} className="flex w-full items-center justify-center gap-2 rounded-lg bg-indigo py-2.5 text-sm font-semibold text-white hover:bg-indigo-dark disabled:cursor-not-allowed disabled:opacity-60">
+                  {loading && <Loader2 className="h-4 w-4 animate-spin" />} {loading ? "Sending link…" : "Send reset link"}
                 </button>
+
                 <button type="button" onClick={() => { setErrors({}); setMode("signin"); }} className="w-full text-center text-xs font-black uppercase tracking-wide text-ink/70">
                   Back to sign in
                 </button>
