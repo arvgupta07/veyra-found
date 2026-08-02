@@ -9,6 +9,7 @@ import { useLiveInbox, useUnreadConversations } from "@/hooks/useLiveInbox";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { VeyraMark } from "@/components/VeyraLogo";
+import { ChatDock } from "@/components/ChatDock";
 
 const founderNav = [
   { to: "/discover", label: "Discover", icon: Compass },
@@ -160,6 +161,8 @@ export function AppShell({ children }: { children: React.ReactNode }) {
           </div>
         </div>
       )}
+
+      <ChatDock />
 
       <main className="page-paper w-full md:pl-60 pt-[6.5rem] pb-16 md:pt-0 md:pb-0">{children}</main>
 
