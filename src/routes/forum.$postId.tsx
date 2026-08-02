@@ -105,6 +105,17 @@ function PostView() {
     qc.invalidateQueries({ queryKey: ["comments", postId] });
   }
 
+  async function removeComment(commentId: string, hasReplies: boolean) {
+    if (!confirm(hasReplies ? "Delete this comment and its replies?" : "Delete this comment?")) return;
+    try {
+      await deleteForumComment(commentId);
+      toast.success("Comment deleted");
+      qc.invalidateQueries({ queryKey: ["comments", postId] });
+    } catch (err) {
+      toast.error(err instanceof Error ? err.message : "Delete failed");
+    }
+  }
+
   async function sendConnect() {
     if (!me || !post?.author_id || connectMsg.trim().length < 20) return toast.error("Add 20+ characters");
     setConnectSending(true);
