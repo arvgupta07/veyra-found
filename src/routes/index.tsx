@@ -71,7 +71,7 @@ function Landing() {
               <VeyraMark size={22} />
             </div>
             <div className="flex flex-col leading-none">
-              <span className="text-xl font-black tracking-tight">veyra</span>
+              <span className="text-xl font-black tracking-tight">Veyra Found</span>
               <span className="mt-0.5 text-[9px] font-black uppercase tracking-widest text-orange">Connect · Build · Beyond</span>
             </div>
           </Link>
@@ -310,7 +310,7 @@ function Landing() {
       </section>
 
       <footer className="bg-ink py-8 text-center text-xs font-black uppercase tracking-widest text-cream/70">
-        © 2026 CoFound AI · Built for founders in India
+        © 2026 Veyra Found · Built for founders in India
       </footer>
     </div>
   );

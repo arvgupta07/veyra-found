@@ -19,7 +19,7 @@ export function VeyraWordmark({ className = "" }: { className?: string }) {
   return (
     <span className={`inline-flex items-center gap-2 ${className}`}>
       <VeyraMark size={28} />
-      <span className="text-xl font-black tracking-tight text-ink lowercase">veyra</span>
+      <span className="text-xl font-black tracking-tight text-ink">Veyra Found</span>
     </span>
   );
 }
