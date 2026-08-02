@@ -162,13 +162,16 @@
 .dark .text-muted-text { color: #B8B29E; }
 
 /* Full-bleed "ink" bands (landing stats/footer) must stay dark, not flip to cream */
-.dark .bg-ink { background-color: #0B0A08; }
+.dark .bg-ink { background-color: #0B0A08; color: #EDE7D1; }
 .dark [class*="text-cream"] { color: #EDE7D1; }
 .dark .bg-ink .text-ink { color: #EDE7D1; }
 
 /* Bright orange/red slabs need dark ink on top of them in dark mode (inherited only,
  * so nested cream/ink panels keep their own contrast) */
 .dark .bg-orange, .dark .bg-red { color: #14110F; }
+.dark .bg-orange :is(.bg-cream, .bg-white, .bg-ink),
+.dark .bg-red :is(.bg-cream, .bg-white, .bg-ink) { color: #EDE7D1; }
+
 
 
 
