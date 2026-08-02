@@ -58,30 +58,49 @@ function Login() {
     if (Object.keys(next).length) return;
 
     setLoading(true);
+    const toastId = toast.loading("Signing you in…");
     const { error } = await supabase.auth.signInWithPassword({ email: em.data!, password });
     setLoading(false);
     if (error) {
       const msg = friendlyAuthError(error.message);
       setErrors({ form: msg, password: msg.includes("incorrect") ? " " : undefined });
+      toast.error(msg, {
+        id: toastId,
+        description: msg.includes("incorrect")
+          ? "Double-check your email and password, or reset it."
+          : undefined,
+      });
       return;
     }
-    toast.success("Welcome back");
+    toast.success("Welcome back", { id: toastId, description: "Taking you to Discover…" });
     router.navigate({ to: "/discover" });
   }
 
   async function sendReset(e: React.FormEvent) {
     e.preventDefault();
     const em = emailSchema.safeParse(email);
-    if (!em.success) return setErrors({ email: em.error.issues[0].message });
+    if (!em.success) {
+      setErrors({ email: em.error.issues[0].message });
+      toast.error(em.error.issues[0].message);
+      return;
+    }
     setErrors({});
     setLoading(true);
+    const toastId = toast.loading("Sending reset link…");
     const { error } = await supabase.auth.resetPasswordForEmail(em.data, {
       redirectTo: `${window.location.origin}/auth/reset-password`,
     });
     setLoading(false);
-    if (error) return setErrors({ form: friendlyAuthError(error.message) });
+    if (error) {
+      const msg = friendlyAuthError(error.message);
+      setErrors({ form: msg });
+      toast.error(msg, { id: toastId, description: "Please try again in a moment." });
+      return;
+    }
+    toast.success("Reset link sent", { id: toastId, description: `Check ${em.data} for the email.` });
     setMode("sent");
   }
+
 
   return (
     <div className="relative min-h-screen overflow-hidden bg-surface">
