@@ -327,20 +327,25 @@ function Inbox() {
             const lastMsg = (c.messages ?? []).sort((a: Record<string, unknown>, b: Record<string, unknown>) => String(b.created_at ?? "").localeCompare(String(a.created_at ?? "")))[0];
             const labels = labelsByConv.get(c.id) ?? [];
             const pinned = pinnedSet.has(c.id);
+            const isUnread = unread.includes(c.id);
             return (
-              <div key={c.id} className={`rounded-2xl border-2 border-ink p-4 shadow-brutal-sm ${pinned ? "bg-cream" : "bg-white"}`}>
+              <div key={c.id} className={`rounded-2xl border-2 border-ink p-4 shadow-brutal-sm ${isUnread ? "bg-cream ring-2 ring-red" : pinned ? "bg-cream" : "bg-white"}`}>
                 <div className="flex items-center gap-4">
                   <Link to="/inbox/$conversationId" params={{ conversationId: c.id }} className="flex flex-1 items-center gap-4 min-w-0">
-                    <img src={founderAvatar({ seed_avatar: other.seed_avatar, seed_name: other.seed_name, profile: other.profiles })}
-                      className="h-12 w-12 rounded-xl border-2 border-ink object-cover" alt="" />
+                    <span className="relative shrink-0">
+                      <img src={founderAvatar({ seed_avatar: other.seed_avatar, seed_name: other.seed_name, profile: other.profiles })}
+                        className="h-12 w-12 rounded-xl border-2 border-ink object-cover" alt="" />
+                      {isUnread && <span className="absolute -right-1 -top-1 h-3.5 w-3.5 rounded-full border-2 border-ink bg-red" />}
+                    </span>
                     <div className="min-w-0 flex-1">
                       <div className="flex items-center gap-2">
                         {pinned && <Pin className="h-3 w-3 fill-orange text-orange" />}
                         <div className="font-black truncate">{other.profiles?.full_name ?? other.seed_name}</div>
                         <div className="ml-auto text-[10px] font-black uppercase text-muted-text">{c.stage?.replace("_", " ")}</div>
                       </div>
-                      <div className="truncate text-xs text-muted-text">{lastMsg?.content ?? "Start the conversation →"}</div>
+                      <div className={`truncate text-xs ${isUnread ? "font-bold text-ink" : "text-muted-text"}`}>{lastMsg?.content ?? "Start the conversation →"}</div>
                     </div>
+
                     <MessageSquare className="h-4 w-4 text-muted-text" />
                   </Link>
                   <button onClick={() => togglePin(c.id)}
