@@ -19,6 +19,7 @@ function PostView() {
   const { ready } = useRequireAuth({ requireOnboarded: true });
   const { data: me } = useMyFounder();
   const qc = useQueryClient();
+  const navigate = useNavigate();
   const [reply, setReply] = useState("");
   const [saving, setSaving] = useState(false);
   const [replyingTo, setReplyingTo] = useState<string | null>(null);
@@ -161,6 +162,22 @@ function PostView() {
             <button onClick={toggleSave} className={`inline-flex items-center gap-1 rounded-md border-2 border-ink px-2 py-1 text-xs font-black box-hover ${saved ? "bg-orange text-white" : "bg-white"}`}>
               <Bookmark className="h-3 w-3" /> {saved ? "Saved" : "Save"}
             </button>
+            {me?.id === post.author_id && (
+              <button
+                onClick={async () => {
+                  if (!confirm("Delete this post? This also removes its replies and votes.")) return;
+                  try {
+                    await deleteForumPost(postId);
+                    toast.success("Post deleted");
+                    navigate({ to: "/forum" });
+                  } catch (err) {
+                    toast.error(err instanceof Error ? err.message : "Delete failed");
+                  }
+                }}
+                className="inline-flex items-center gap-1 rounded-md border-2 border-ink bg-red px-2 py-1 text-xs font-black text-white shadow-brutal-sm box-hover">
+                <Trash2 className="h-3 w-3" /> Delete post
+              </button>
+            )}
             {isLFC && me?.id !== post.author_id && (
               <button onClick={() => setConnectOpen(true)} className="ml-auto inline-flex items-center gap-1.5 rounded-md border-2 border-ink bg-sage px-3 py-1.5 text-xs font-black text-ink shadow-brutal-sm box-hover">
                 <MessageSquareText className="h-3 w-3" /> Interested in connecting?
