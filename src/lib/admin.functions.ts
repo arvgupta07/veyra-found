@@ -18,7 +18,7 @@ export const adminDeleteUser = createServerFn({ method: "POST" })
     await assertAdmin(context);
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
     // Explicitly wipe app-side rows first so nothing survives if the account
-    // had been detached from a claimed founder (claim_demo_founder nulls user_id).
+    // ensures no orphan app rows survive the auth deletion.
     await supabaseAdmin.from("founders").delete().eq("user_id", data.userId);
     await supabaseAdmin.from("profiles").delete().eq("id", data.userId);
     // Hard-delete auth user (cascades to any remaining refs).
