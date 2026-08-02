@@ -88,9 +88,10 @@ export const adminListPosts = createServerFn({ method: "GET" })
   .handler(async ({ context }) => {
     await assertAdmin(context);
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
-    const { data } = await supabaseAdmin
+    const { data, error } = await supabaseAdmin
       .from("forum_posts")
-      .select("id, title, category, created_at, upvotes, author:founders(id, seed_name, profiles(full_name))")
+      .select("id, title, category, created_at, upvotes, author:founders!forum_posts_author_id_fkey(id, seed_name, profiles(full_name))")
       .order("created_at", { ascending: false }).limit(200);
+    if (error) throw new Error(error.message);
     return data ?? [];
   });
