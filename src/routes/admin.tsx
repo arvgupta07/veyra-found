@@ -123,13 +123,15 @@ function PostsPanel() {
   const qc = useQueryClient();
   const list = useServerFn(adminListPosts);
   const del = useServerFn(adminDeletePost);
-  const { data, isLoading } = useQuery({ queryKey: ["admin-posts"], queryFn: () => list() });
+  const { data, isLoading, error } = useQuery({ queryKey: ["admin-posts"], queryFn: () => list() });
   const mut = useMutation({
     mutationFn: (postId: string) => del({ data: { postId } }),
     onSuccess: () => { toast.success("Post deleted"); qc.invalidateQueries({ queryKey: ["admin-posts"] }); },
     onError: (e: any) => toast.error(e.message),
   });
   if (isLoading) return <div className="text-sm text-muted-text">Loading posts…</div>;
+  if (error) return <div className="border-[3px] border-ink bg-red p-3 text-sm font-black text-white">Couldn't load posts: {(error as any).message}</div>;
+  if ((data ?? []).length === 0) return <div className="border-[3px] border-dashed border-ink p-8 text-center text-sm font-black text-muted-text">No forum posts yet.</div>;
   return (
     <div className="space-y-2">
       {(data ?? []).map((p: any) => (
