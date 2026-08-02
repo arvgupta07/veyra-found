@@ -163,13 +163,13 @@
 
 /* Full-bleed "ink" bands (landing stats/footer) must stay dark, not flip to cream */
 .dark .bg-ink { background-color: #0B0A08; }
-.dark .text-cream { color: #EDE7D1; }
+.dark [class*="text-cream"] { color: #EDE7D1; }
 .dark .bg-ink .text-ink { color: #EDE7D1; }
 
-/* Bright orange/red slabs need dark ink on top of them in dark mode */
+/* Bright orange/red slabs need dark ink on top of them in dark mode (inherited only,
+ * so nested cream/ink panels keep their own contrast) */
 .dark .bg-orange, .dark .bg-red { color: #14110F; }
-.dark .bg-orange .text-ink, .dark .bg-red .text-ink,
-.dark .bg-orange .text-cream, .dark .bg-red .text-cream { color: #14110F; }
+
 
 
 /* Hero radial: warm charcoal gradient with a hint of sage */
