@@ -38,6 +38,8 @@ function Inbox() {
   const qc = useQueryClient();
   const [tab, setTab] = useState<"requests" | "sent" | "talking">("requests");
   const [labelFilter, setLabelFilter] = useState<string | null>(null);
+  const unread = useUnreadConversations();
+
 
   const { data: requests, refetch: refetchReq } = useQuery({
     queryKey: ["inbox-requests", me?.id],
