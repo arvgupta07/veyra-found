@@ -7,7 +7,8 @@ import { AppShell } from "@/components/AppShell";
 import { useRequireAuth } from "@/hooks/useRequireAuth";
 import { founderAvatar } from "@/lib/founder-types";
 import { uploadImage } from "@/lib/uploads";
-import { ArrowBigUp, ArrowBigDown, MessageCircle, Plus, Loader2, X, MessageSquareText, ImagePlus } from "lucide-react";
+import { deleteForumPost } from "@/lib/forum-actions";
+import { ArrowBigUp, ArrowBigDown, MessageCircle, Plus, Loader2, X, MessageSquareText, ImagePlus, Trash2 } from "lucide-react";
 import { toast } from "sonner";
 
 const CATEGORIES = [
@@ -133,9 +134,20 @@ function Forum() {
                     <MessageCircle className="h-4 w-4" /> Reply
                   </Link>
                   {p.category === "looking_for_cofounder" && (
-                    <Link to="/forum/$postId" params={{ postId: p.id }} className="ml-auto inline-flex items-center gap-1 rounded-md border-2 border-ink bg-sage px-2 py-0.5 text-[11px] font-black text-ink">
+                    <Link to="/forum/$postId" params={{ postId: p.id }} className="inline-flex items-center gap-1 rounded-md border-2 border-ink bg-sage px-2 py-0.5 text-[11px] font-black text-ink">
                       <MessageSquareText className="h-3 w-3" /> Interested?
                     </Link>
+                  )}
+                  {me?.id === p.author_id && (
+                    <button
+                      onClick={async () => {
+                        if (!confirm("Delete this post? This also removes its replies and votes.")) return;
+                        try { await deleteForumPost(p.id); toast.success("Post deleted"); refetch(); }
+                        catch (err) { toast.error(err instanceof Error ? err.message : "Delete failed"); }
+                      }}
+                      className="ml-auto inline-flex items-center gap-1 rounded-md border-2 border-ink bg-red px-2 py-0.5 text-[11px] font-black text-white shadow-brutal-sm">
+                      <Trash2 className="h-3 w-3" /> Delete
+                    </button>
                   )}
                 </div>
               </article>
