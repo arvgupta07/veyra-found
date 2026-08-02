@@ -42,15 +42,18 @@ function MatchesPage() {
     },
   });
 
+  const connectedIds = useConnectedIds(me?.id);
+
   const ranked = useMemo(() => {
     if (!pool || !myAssessment) return [];
     return pool
+      .filter((f) => !connectedIds.has(f.id))
       .map((f: Record<string, unknown> & { assessments?: unknown }) => {
         const a = Array.isArray(f.assessments) ? f.assessments[0] : f.assessments;
         return { f, score: scoreCompatibility(myAssessment as Record<string, unknown>, a as Record<string, unknown> | null) };
       })
       .sort((a, b) => b.score - a.score);
-  }, [pool, myAssessment]);
+  }, [pool, myAssessment, connectedIds]);
 
   if (!ready) return null;
 
