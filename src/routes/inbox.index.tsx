@@ -3,6 +3,7 @@ import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useMemo, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { useMyFounder } from "@/hooks/useMyFounder";
+import { isDockViewport, openDockedChat } from "@/lib/chat-dock";
 import { AppShell } from "@/components/AppShell";
 import { useRequireAuth } from "@/hooks/useRequireAuth";
 import { founderAvatar } from "@/lib/founder-types";
@@ -354,7 +355,8 @@ function Inbox() {
             return (
               <div key={c.id} className={`rounded-2xl border-2 border-ink p-4 shadow-brutal-sm ${isUnread ? "bg-cream ring-2 ring-red" : pinned ? "bg-cream" : "bg-white"}`}>
                 <div className="flex items-center gap-4">
-                  <Link to="/inbox/$conversationId" params={{ conversationId: c.id }} className="flex flex-1 items-center gap-4 min-w-0">
+                  <Link to="/inbox/$conversationId" params={{ conversationId: c.id }} className="flex flex-1 items-center gap-4 min-w-0"
+                    onClick={(e) => { if (isDockViewport()) { e.preventDefault(); openDockedChat(c.id); } }}>
                     <span className="relative shrink-0">
                       <img src={founderAvatar({ seed_avatar: other.seed_avatar, seed_name: other.seed_name, profile: other.profiles })}
                         className="h-12 w-12 rounded-xl border-2 border-ink object-cover" alt="" />
