@@ -8,7 +8,8 @@ import { AppShell } from "@/components/AppShell";
 import { useRequireAuth } from "@/hooks/useRequireAuth";
 import { SkillTag, TierBadge, VerifiedBadges } from "@/components/FounderBits";
 import { founderAvatar, SKILLS_LIST, AVATAR_PRESETS } from "@/lib/founder-types";
-import { MapPin, Briefcase, Pencil, X, Loader2, Save, LogOut, Trash2 } from "lucide-react";
+import { uploadImage } from "@/lib/uploads";
+import { MapPin, Briefcase, Pencil, X, Loader2, Save, LogOut, Trash2, ImagePlus } from "lucide-react";
 
 export const Route = createFileRoute("/profile/me")({
   component: MyProfile,
@@ -247,6 +248,7 @@ function EditPanel({ initial, founderId, userId, onClose, onSaved }: {
   const [form, setForm] = useState(initial);
   const [custom, setCustom] = useState("");
   const [saving, setSaving] = useState(false);
+  const [uploading, setUploading] = useState(false);
   useEffect(() => setForm(initial), [initial]);
 
   async function save() {
