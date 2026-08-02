@@ -380,12 +380,35 @@ function PostView() {
                           <img src={founderAvatar({ seed_avatar: r.author?.seed_avatar, seed_name: r.author?.seed_name, profile: r.author?.profiles })} className="h-4 w-4 rounded-full" alt="" />
                           <span className="font-semibold text-foreground">{r.author?.profiles?.full_name ?? r.author?.seed_name}</span>
                         </div>
-                        <p className="mt-1 whitespace-pre-wrap text-xs">{r.content}</p>
-                        {me?.id === r.author_id && (
-                          <button onClick={() => removeComment(r.id, false)} className="mt-1 inline-flex items-center gap-1 text-[10px] font-black text-red hover:underline">
-                            <Trash2 className="h-3 w-3" /> Delete
-                          </button>
+                        {editingComment === r.id ? (
+                          <div className="mt-1">
+                            <textarea rows={2} value={commentDraft} onChange={(e) => setCommentDraft(e.target.value)}
+                              className="w-full rounded-lg border-2 border-ink bg-white px-2 py-1 text-xs" />
+                            <div className="mt-1 flex gap-2">
+                              <button onClick={() => saveComment(r.id)} className="rounded-md border-2 border-ink bg-orange px-2 py-0.5 text-[10px] font-black text-white">Save</button>
+                              <button onClick={() => setEditingComment(null)} className="rounded-md border-2 border-ink bg-white px-2 py-0.5 text-[10px] font-black">Cancel</button>
+                            </div>
+                          </div>
+                        ) : (
+                          <p className="mt-1 whitespace-pre-wrap text-xs">
+                            {r.content}
+                            {(r as { edited_at?: string | null }).edited_at && (
+                              <span className="ml-1.5 text-[9px] font-black uppercase text-muted-text">edited</span>
+                            )}
+                          </p>
                         )}
+                        {me?.id === r.author_id && (
+                          <div className="mt-1 flex items-center gap-3">
+                            <button onClick={() => { setEditingComment(r.id); setCommentDraft(r.content); }}
+                              className="inline-flex items-center gap-1 text-[10px] font-black text-ink hover:underline">
+                              <Pencil className="h-3 w-3" /> Edit
+                            </button>
+                            <button onClick={() => removeComment(r.id, false)} className="inline-flex items-center gap-1 text-[10px] font-black text-red hover:underline">
+                              <Trash2 className="h-3 w-3" /> Delete
+                            </button>
+                          </div>
+                        )}
+
                       </div>
                     ))}
                   </div>
