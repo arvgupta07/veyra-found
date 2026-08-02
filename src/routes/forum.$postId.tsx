@@ -228,6 +228,9 @@ function PostView() {
 
           <h1 className="mt-3 text-2xl font-black tracking-tight">{post.title}</h1>
           <p className="mt-4 whitespace-pre-wrap text-sm leading-relaxed">{post.content}</p>
+          {(post as { edited_at?: string | null }).edited_at && (
+            <div className="mt-2 text-[10px] font-black uppercase text-muted-text">Edited</div>
+          )}
           {post.image_url && (
             <img src={post.image_url} alt="" className="mt-4 w-full rounded-xl border-2 border-ink object-cover" />
           )}
@@ -246,7 +249,20 @@ function PostView() {
             <button onClick={toggleSave} className={`inline-flex items-center gap-1 rounded-md border-2 border-ink px-2 py-1 text-xs font-black box-hover ${saved ? "bg-orange text-white" : "bg-white"}`}>
               <Bookmark className="h-3 w-3" /> {saved ? "Saved" : "Save"}
             </button>
+            {canEdit && (
+              <button onClick={() => setEditOpen(true)}
+                className="inline-flex items-center gap-1 rounded-md border-2 border-ink bg-white px-2 py-1 text-xs font-black shadow-brutal-sm box-hover">
+                <Pencil className="h-3 w-3" /> Edit post
+              </button>
+            )}
+            {isAuthor && (
+              <button onClick={() => setCollabOpen(true)}
+                className="inline-flex items-center gap-1 rounded-md border-2 border-ink bg-sage px-2 py-1 text-xs font-black text-ink shadow-brutal-sm box-hover">
+                <Users className="h-3 w-3" /> Collaborators
+              </button>
+            )}
             {me?.id === post.author_id && (
+
               <button
                 onClick={async () => {
                   if (!confirm("Delete this post? This also removes its replies and votes.")) return;
