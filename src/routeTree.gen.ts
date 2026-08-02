@@ -11,7 +11,6 @@
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as OnboardingRouteImport } from './routes/onboarding'
 import { Route as MatchesRouteImport } from './routes/matches'
-import { Route as InvestorFeedRouteImport } from './routes/investor-feed'
 import { Route as DiscoverRouteImport } from './routes/discover'
 import { Route as DashboardRouteImport } from './routes/dashboard'
 import { Route as AdminRouteImport } from './routes/admin'
@@ -35,11 +34,6 @@ const OnboardingRoute = OnboardingRouteImport.update({
 const MatchesRoute = MatchesRouteImport.update({
   id: '/matches',
   path: '/matches',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const InvestorFeedRoute = InvestorFeedRouteImport.update({
-  id: '/investor-feed',
-  path: '/investor-feed',
   getParentRoute: () => rootRouteImport,
 } as any)
 const DiscoverRoute = DiscoverRouteImport.update({
@@ -118,7 +112,6 @@ export interface FileRoutesByFullPath {
   '/admin': typeof AdminRoute
   '/dashboard': typeof DashboardRoute
   '/discover': typeof DiscoverRoute
-  '/investor-feed': typeof InvestorFeedRoute
   '/matches': typeof MatchesRoute
   '/onboarding': typeof OnboardingRoute
   '/auth/callback': typeof AuthCallbackRoute
@@ -137,7 +130,6 @@ export interface FileRoutesByTo {
   '/admin': typeof AdminRoute
   '/dashboard': typeof DashboardRoute
   '/discover': typeof DiscoverRoute
-  '/investor-feed': typeof InvestorFeedRoute
   '/matches': typeof MatchesRoute
   '/onboarding': typeof OnboardingRoute
   '/auth/callback': typeof AuthCallbackRoute
@@ -157,7 +149,6 @@ export interface FileRoutesById {
   '/admin': typeof AdminRoute
   '/dashboard': typeof DashboardRoute
   '/discover': typeof DiscoverRoute
-  '/investor-feed': typeof InvestorFeedRoute
   '/matches': typeof MatchesRoute
   '/onboarding': typeof OnboardingRoute
   '/auth/callback': typeof AuthCallbackRoute
@@ -178,7 +169,6 @@ export interface FileRouteTypes {
     | '/admin'
     | '/dashboard'
     | '/discover'
-    | '/investor-feed'
     | '/matches'
     | '/onboarding'
     | '/auth/callback'
@@ -197,7 +187,6 @@ export interface FileRouteTypes {
     | '/admin'
     | '/dashboard'
     | '/discover'
-    | '/investor-feed'
     | '/matches'
     | '/onboarding'
     | '/auth/callback'
@@ -216,7 +205,6 @@ export interface FileRouteTypes {
     | '/admin'
     | '/dashboard'
     | '/discover'
-    | '/investor-feed'
     | '/matches'
     | '/onboarding'
     | '/auth/callback'
@@ -236,7 +224,6 @@ export interface RootRouteChildren {
   AdminRoute: typeof AdminRoute
   DashboardRoute: typeof DashboardRoute
   DiscoverRoute: typeof DiscoverRoute
-  InvestorFeedRoute: typeof InvestorFeedRoute
   MatchesRoute: typeof MatchesRoute
   OnboardingRoute: typeof OnboardingRoute
   AuthCallbackRoute: typeof AuthCallbackRoute
@@ -265,13 +252,6 @@ declare module '@tanstack/react-router' {
       path: '/matches'
       fullPath: '/matches'
       preLoaderRoute: typeof MatchesRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/investor-feed': {
-      id: '/investor-feed'
-      path: '/investor-feed'
-      fullPath: '/investor-feed'
-      preLoaderRoute: typeof InvestorFeedRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/discover': {
@@ -380,7 +360,6 @@ const rootRouteChildren: RootRouteChildren = {
   AdminRoute: AdminRoute,
   DashboardRoute: DashboardRoute,
   DiscoverRoute: DiscoverRoute,
-  InvestorFeedRoute: InvestorFeedRoute,
   MatchesRoute: MatchesRoute,
   OnboardingRoute: OnboardingRoute,
   AuthCallbackRoute: AuthCallbackRoute,
