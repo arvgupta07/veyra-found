@@ -115,14 +115,11 @@
   --ink-2: #D8D2BE;
   --ink-3: #B8B29E;
 
-  --sage: #8FA687;         /* slightly deepened for dark bg */
-  --cream: #1F1B17;        /* "cream paper" becomes warm charcoal card */
+  --sage: #2F3C2C;         /* deep moss so full-bleed sage sections read dark */
+  --cream: #1C1916;        /* "cream paper" becomes warm charcoal card */
   --orange: #FF8A2B;       /* touch warmer, less searing */
   --red:    #FF3B3C;
 
-  --surface:   #14110F;    /* page background */
-  --surface-2: #1A1613;
-  --muted-text: #B8B29E;
   --light-text: #8A8474;
 
   --background: #14110F;
