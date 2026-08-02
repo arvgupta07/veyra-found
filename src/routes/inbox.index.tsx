@@ -7,7 +7,9 @@ import { AppShell } from "@/components/AppShell";
 import { useRequireAuth } from "@/hooks/useRequireAuth";
 import { founderAvatar } from "@/lib/founder-types";
 import { Check, X, Loader2, MessageSquare, Tag, Plus, Pin, PinOff } from "lucide-react";
+import { useUnreadConversations } from "@/hooks/useLiveInbox";
 import { toast } from "sonner";
+
 
 export const Route = createFileRoute("/inbox/")({
   component: Inbox,
