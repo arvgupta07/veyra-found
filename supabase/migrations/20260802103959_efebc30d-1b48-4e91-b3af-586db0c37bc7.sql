@@ -1,0 +1,1 @@
+DROP FUNCTION IF EXISTS public.claim_demo_founder(uuid);
