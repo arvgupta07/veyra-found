@@ -79,7 +79,7 @@ function Landing() {
             {[
               ["#founders", "Founders"],
               ["#how", "How it works"],
-              ["#investors", "Investors"],
+              ["#start", "Get started"],
             ].map(([h, l]) => (
               <a key={h} href={h} className="border-2 border-transparent px-3 py-1.5 text-sm font-bold uppercase hover:border-ink hover:bg-sage">
                 {l}
@@ -264,7 +264,7 @@ function Landing() {
               ["01", "Build profile", "Prompts, verified skills, video intro.", Users],
               ["02", "Take the quiz", "20 questions. 4 minutes. Locked after.", BarChart3],
               ["03", "Browse & connect", "Tap a prompt you loved. Skip small talk.", MessagesSquare],
-              ["04", "Confirm & ship", "Log stages. Get in front of investors.", Rocket],
+              ["04", "Confirm & ship", "Log stages. Build together, week by week.", Rocket],
             ] as const).map(([n, t, b, Icon], i) => (
               <div key={n} className={`border-[3px] border-ink bg-cream p-5 shadow-brutal box-hover`} style={{ transform: `rotate(${i % 2 === 0 ? -1 : 1}deg)` }}>
                 <div className="flex items-center justify-between">
@@ -299,7 +299,7 @@ function Landing() {
       </section>
 
       {/* CTA */}
-      <section id="investors" className="cv-auto border-b-[3px] border-ink bg-red text-cream">
+      <section id="start" className="cv-auto border-b-[3px] border-ink bg-red text-cream">
         <div className="mx-auto max-w-7xl px-4 py-20 text-center sm:px-6 md:py-28">
           <h2 className="text-5xl md:text-7xl">Ready to find<br /><span className="bg-cream px-3 text-ink border-[3px] border-ink shadow-brutal inline-block">your co-founder?</span></h2>
           <p className="mt-6 text-lg font-bold text-cream/90">Free. No credit card. Real founders only.</p>
