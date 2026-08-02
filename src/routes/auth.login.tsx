@@ -31,40 +31,43 @@ function Login() {
   return (
     <div className="relative min-h-screen overflow-hidden bg-surface">
       {/* Animated background layer */}
-      <div className="pointer-events-none fixed inset-0 -z-10 overflow-hidden">
-        <div className="absolute inset-0 bg-grid opacity-[0.04]" />
+      <div className="pointer-events-none absolute inset-0 z-0 overflow-hidden">
+        <div className="absolute inset-0 bg-grid opacity-100" />
 
         {/* Large outlined square */}
-        <div className="animate-drift absolute -left-8 top-[12%] h-32 w-32 border-4 border-ink/10 rotate-12 sm:left-[6%] sm:h-40 sm:w-40" />
+        <div className="animate-drift absolute -left-6 top-[10%] h-36 w-36 border-[3px] border-ink/40 rotate-12 sm:left-[5%] sm:h-48 sm:w-48" />
 
         {/* Large outlined circle */}
-        <div className="animate-drift-reverse absolute -right-10 top-[18%] h-40 w-40 rounded-full border-4 border-ink/10 sm:right-[8%] sm:h-48 sm:w-48" />
+        <div className="animate-drift-reverse absolute -right-8 top-[16%] h-44 w-44 rounded-full border-[3px] border-ink/40 sm:right-[6%] sm:h-56 sm:w-56" />
 
-        {/* Small orange diamond */}
-        <div className="animate-drift absolute left-[12%] top-[35%] h-12 w-12 bg-orange/20 rotate-45 sm:h-16 sm:w-16" />
+        {/* Orange diamond */}
+        <div className="animate-drift absolute left-[10%] top-[34%] h-14 w-14 bg-orange rotate-45 shadow-brutal-sm sm:h-20 sm:w-20" />
 
-        {/* Small sage square */}
-        <div className="animate-drift-reverse absolute right-[10%] top-[42%] h-14 w-14 bg-sage/25 sm:h-20 sm:w-20" />
+        {/* Red square */}
+        <div className="animate-drift-reverse absolute right-[8%] top-[40%] h-16 w-16 bg-red shadow-brutal-sm sm:h-24 sm:w-24" />
 
         {/* Rotating cross */}
-        <div className="animate-rotate-slow absolute left-[8%] bottom-[20%] h-16 w-16 sm:left-[14%] sm:bottom-[18%]">
-          <div className="absolute left-1/2 top-0 h-full w-1.5 -translate-x-1/2 bg-ink/10" />
-          <div className="absolute left-0 top-1/2 h-1.5 w-full -translate-y-1/2 bg-ink/10" />
+        <div className="animate-rotate-slow absolute left-[6%] bottom-[18%] h-20 w-20 sm:left-[12%] sm:bottom-[16%]">
+          <div className="absolute left-1/2 top-0 h-full w-2 -translate-x-1/2 bg-ink/40" />
+          <div className="absolute left-0 top-1/2 h-2 w-full -translate-y-1/2 bg-ink/40" />
         </div>
 
         {/* Pulsing red blob */}
-        <div className="animate-pulse-slow absolute right-[8%] bottom-[25%] h-20 w-20 rounded-full bg-red/10 blur-xl sm:right-[12%] sm:h-28 sm:w-28" />
+        <div className="animate-pulse-slow absolute right-[6%] bottom-[22%] h-24 w-24 rounded-full bg-red blur-2xl sm:right-[10%] sm:h-36 sm:w-36" />
 
         {/* Dotted strip */}
-        <div className="animate-drift absolute bottom-[10%] left-[30%] flex gap-4 sm:bottom-[14%]">
-          <div className="h-3 w-3 rounded-full bg-ink/10" />
-          <div className="h-3 w-3 rounded-full bg-ink/10" />
-          <div className="h-3 w-3 rounded-full bg-ink/10" />
+        <div className="animate-drift absolute bottom-[12%] left-[28%] flex gap-4 sm:bottom-[16%]">
+          <div className="h-3 w-3 rounded-full bg-ink" />
+          <div className="h-3 w-3 rounded-full bg-ink" />
+          <div className="h-3 w-3 rounded-full bg-ink" />
         </div>
 
-        {/* Tiny floating squares */}
-        <div className="animate-drift-reverse absolute right-[25%] top-[10%] h-4 w-4 border-2 border-ink/15" />
-        <div className="animate-drift absolute left-[55%] top-[8%] h-3 w-3 bg-ink/10" />
+        {/* Floating squares */}
+        <div className="animate-drift-reverse absolute right-[22%] top-[8%] h-5 w-5 border-2 border-ink/50" />
+        <div className="animate-drift absolute left-[50%] top-[6%] h-4 w-4 bg-ink/50" />
+
+        {/* Orange stripe */}
+        <div className="animate-drift absolute left-[75%] top-[60%] h-16 w-4 bg-orange rotate-12 sm:h-24 sm:w-6" />
       </div>
 
       <div className="relative z-10">
