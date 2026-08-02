@@ -170,9 +170,12 @@ function Landing() {
                   "{prompt.a}
                   <span className="animate-blink">▍</span>"
                 </div>
-                <button className="mt-3 inline-flex items-center gap-1 border-2 border-ink bg-red px-3 py-1.5 text-xs font-black uppercase text-cream box-press">
+                <Link
+                  to="/auth/login"
+                  className="mt-3 inline-flex items-center gap-1 border-2 border-ink bg-red px-3 py-1.5 text-xs font-black uppercase text-cream box-press"
+                >
                   Text about this <ArrowRight className="h-3 w-3" strokeWidth={3} />
-                </button>
+                </Link>
               </div>
 
               <div className="mt-4 grid grid-cols-2 gap-2 border-t-[3px] border-ink pt-3">
