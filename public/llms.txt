@@ -4,5 +4,5 @@
 
 ## Pages
 - [Home](/): Landing page introducing Veyra Found
-- [Sign up](/auth/signup): Create a founder or investor account
+- [Sign up](/auth/signup): Create a founder account
 - [Sign in](/auth/login): Log in to your account

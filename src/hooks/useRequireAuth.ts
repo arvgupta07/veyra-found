@@ -15,12 +15,6 @@ export function useRequireAuth(opts: { requireOnboarded?: boolean } = {}) {
     if (loading) return;
     if (!session) { router.navigate({ to: "/auth/login" }); return; }
     if (pLoading || fLoading) return;
-    if (profile?.role === "investor") {
-      if (!window.location.pathname.startsWith("/dashboard") && !window.location.pathname.startsWith("/investor-feed")) {
-        router.navigate({ to: "/investor-feed" });
-      }
-      return;
-    }
     if (opts.requireOnboarded && (!founder || !founder.profile_complete)) {
       router.navigate({ to: "/onboarding" });
     }
