@@ -330,17 +330,42 @@ function PostView() {
                   <img src={founderAvatar({ seed_avatar: c.author?.seed_avatar, seed_name: c.author?.seed_name, profile: c.author?.profiles })} className="h-5 w-5 rounded-full border border-ink" alt="" />
                   <span className="font-semibold text-foreground">{c.author?.profiles?.full_name ?? c.author?.seed_name}</span>
                 </div>
-                <p className="mt-2 whitespace-pre-wrap text-sm">{c.content}</p>
+                {editingComment === c.id ? (
+                  <div className="mt-2">
+                    <textarea rows={3} value={commentDraft} onChange={(e) => setCommentDraft(e.target.value)}
+                      className="w-full rounded-lg border-2 border-ink bg-cream px-3 py-2 text-sm" />
+                    <div className="mt-1 flex gap-2">
+                      <button onClick={() => saveComment(c.id)} className="inline-flex items-center gap-1 rounded-md border-2 border-ink bg-orange px-3 py-1 text-xs font-black text-white shadow-brutal-sm">
+                        <Save className="h-3 w-3" /> Save
+                      </button>
+                      <button onClick={() => setEditingComment(null)} className="rounded-md border-2 border-ink bg-white px-3 py-1 text-xs font-black">Cancel</button>
+                    </div>
+                  </div>
+                ) : (
+                  <p className="mt-2 whitespace-pre-wrap text-sm">
+                    {c.content}
+                    {(c as { edited_at?: string | null }).edited_at && (
+                      <span className="ml-2 text-[10px] font-black uppercase text-muted-text">edited</span>
+                    )}
+                  </p>
+                )}
                 <div className="mt-2 flex items-center gap-3">
                   <button onClick={() => setReplyingTo(replyingTo === c.id ? null : c.id)} className="text-[11px] font-black text-orange hover:underline">
                     {replyingTo === c.id ? "Cancel" : "Reply"}
                   </button>
                   {me?.id === c.author_id && (
-                    <button onClick={() => removeComment(c.id, true)} className="inline-flex items-center gap-1 text-[11px] font-black text-red hover:underline">
-                      <Trash2 className="h-3 w-3" /> Delete
-                    </button>
+                    <>
+                      <button onClick={() => { setEditingComment(c.id); setCommentDraft(c.content); }}
+                        className="inline-flex items-center gap-1 text-[11px] font-black text-ink hover:underline">
+                        <Pencil className="h-3 w-3" /> Edit
+                      </button>
+                      <button onClick={() => removeComment(c.id, true)} className="inline-flex items-center gap-1 text-[11px] font-black text-red hover:underline">
+                        <Trash2 className="h-3 w-3" /> Delete
+                      </button>
+                    </>
                   )}
                 </div>
+
                 {replyingTo === c.id && (
                   <div className="mt-2">
                     <textarea rows={2} value={replyText} onChange={(e) => setReplyText(e.target.value)} placeholder="Your reply…" className="w-full rounded-lg border-2 border-ink bg-cream px-3 py-2 text-sm" />
