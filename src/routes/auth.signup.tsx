@@ -6,6 +6,8 @@ import { supabase } from "@/integrations/supabase/client";
 import { AVATAR_PRESETS } from "@/lib/founder-types";
 import { VeyraWordmark } from "@/components/VeyraLogo";
 import { GoogleButton } from "@/components/GoogleButton";
+import { AppleButton, MagicLinkBox } from "@/components/AuthProviders";
+import { PasswordField } from "@/components/PasswordField";
 
 export const Route = createFileRoute("/auth/signup")({
   component: Signup,
@@ -178,7 +180,7 @@ function Signup() {
           </div>
           <div>
             <label className="text-[10px] font-black uppercase tracking-wider text-ink/70">Password</label>
-            <input value={password} onChange={(e) => setPassword(e.target.value)} type="password" required minLength={6} className="mt-1 w-full rounded-lg border-2 border-ink bg-white px-3 py-2 text-sm" />
+            <PasswordField value={password} onChange={setPassword} autoComplete="new-password" required minLength={6} />
           </div>
           <button disabled={loading} className="flex w-full items-center justify-center gap-2 rounded-lg border-2 border-ink bg-orange py-2.5 text-sm font-black text-white shadow-brutal-sm box-hover disabled:opacity-60">
             {loading && <Loader2 className="h-4 w-4 animate-spin" />} Create account
@@ -189,7 +191,11 @@ function Signup() {
           <span className="text-[10px] font-black uppercase tracking-wider text-ink/60">or</span>
           <div className="h-[3px] flex-1 bg-ink/20" />
         </div>
-        <GoogleButton label="Sign up with Google" />
+        <div className="space-y-2">
+          <GoogleButton label="Sign up with Google" />
+          <AppleButton label="Sign up with Apple" />
+          <MagicLinkBox />
+        </div>
 
         <div className="text-center text-sm text-ink/70">
           Already have an account?{" "}<Link to="/auth/login" className="font-black text-orange">Sign in</Link>

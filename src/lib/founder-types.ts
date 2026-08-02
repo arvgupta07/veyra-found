@@ -29,6 +29,12 @@ export type Founder = {
   seed_name: string | null;
   seed_avatar: string | null;
   created_at: string;
+  education?: string | null;
+  remote_pref?: "onsite" | "hybrid" | "remote" | null;
+  looking_for?: string[];
+  shadow_banned?: boolean;
+  spam_strikes?: number;
+  assessment_public?: boolean;
 };
 
 export type Prompt = {

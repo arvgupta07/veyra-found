@@ -7,7 +7,7 @@ import { AppShell } from "@/components/AppShell";
 import { useRequireAuth } from "@/hooks/useRequireAuth";
 import { founderAvatar } from "@/lib/founder-types";
 import { uploadImage } from "@/lib/uploads";
-import { deleteForumPost } from "@/lib/forum-actions";
+import { deleteForumPost, visibleToViewer } from "@/lib/forum-actions";
 import { ArrowBigUp, ArrowBigDown, MessageCircle, Plus, Loader2, X, MessageSquareText, ImagePlus, Trash2 } from "lucide-react";
 import { toast } from "sonner";
 
@@ -35,15 +35,19 @@ function Forum() {
       let q = supabase.from("forum_posts")
         .select("*, author:founders!forum_posts_author_id_fkey(*, profiles(full_name)), my_vote:forum_upvotes(value, founder_id)")
         .order("created_at", { ascending: false }).limit(50);
-      if (cat !== "all") q = q.eq("category", cat as never);
+      // Cross-posted categories widen a post's reach across domains.
+      if (cat !== "all") q = q.or(`category.eq.${cat},cross_categories.cs.{${cat}}`);
       const { data } = await q;
       // Reduce my_vote array (all voters) to just this user's vote for quick lookup.
-      return (data ?? []).map((p: any) => ({
+      const rows = (data ?? []).map((p: any) => ({
         ...p,
         my_value: (p.my_vote ?? []).find((v: any) => v.founder_id === me?.id)?.value ?? 0,
       }));
+      // Hide shadow-banned spammers from everyone but themselves.
+      return visibleToViewer(rows, me?.id);
     },
   });
+
 
   async function vote(postId: string, next: 1 | -1, current: number) {
     if (!me) return;
@@ -91,7 +95,7 @@ function Forum() {
         </div>
 
         <div className="mt-6 space-y-3">
-          {posts?.map((p) => {
+          {posts?.map((p: any) => {
             const catLabel = CATEGORIES.find((c) => c.v === p.category)?.label ?? p.category;
             return (
               <article key={p.id} className="rounded-2xl border-2 border-ink bg-white p-5 shadow-brutal-sm box-hover">

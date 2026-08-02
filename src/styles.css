@@ -446,3 +446,14 @@
   display: none !important;
 }
 
+
+/* Smooth in-page navigation (homepage anchor buttons) */
+html {
+  scroll-behavior: smooth;
+}
+[id] {
+  scroll-margin-top: 88px;
+}
+@media (prefers-reduced-motion: reduce) {
+  html { scroll-behavior: auto; }
+}

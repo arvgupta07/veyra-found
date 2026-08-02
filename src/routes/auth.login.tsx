@@ -6,6 +6,8 @@ import { z } from "zod";
 import { supabase } from "@/integrations/supabase/client";
 import { VeyraMark } from "@/components/VeyraLogo";
 import { GoogleButton } from "@/components/GoogleButton";
+import { AppleButton, MagicLinkBox } from "@/components/AuthProviders";
+import { PasswordField } from "@/components/PasswordField";
 
 export const Route = createFileRoute("/auth/login")({
   component: Login,
@@ -174,15 +176,14 @@ function Login() {
                       Forgot password?
                     </button>
                   </div>
-                  <input
+                  <PasswordField
                     id="password"
                     value={password}
-                    onChange={(e) => { setPassword(e.target.value); setErrors((p) => ({ ...p, password: undefined, form: undefined })); }}
-                    type="password"
+                    onChange={(v) => { setPassword(v); setErrors((p) => ({ ...p, password: undefined, form: undefined })); }}
                     autoComplete="current-password"
-                    aria-invalid={!!errors.password}
+                    invalid={!!errors.password}
                     disabled={loading}
-                    className={inputCls(errors.password)}
+                    className={`${inputCls(errors.password)} pr-11`}
                   />
                   {errors.password && errors.password.trim() && <p className="mt-1 text-xs font-semibold text-red">{errors.password}</p>}
                 </div>
@@ -196,7 +197,11 @@ function Login() {
                 <span className="text-[10px] font-black uppercase tracking-wider text-ink/60">or</span>
                 <div className="h-[3px] flex-1 bg-ink/20" />
               </div>
-              <GoogleButton />
+              <div className="space-y-2">
+                <GoogleButton />
+                <AppleButton />
+                <MagicLinkBox />
+              </div>
               <div className="text-center text-sm text-muted-text">
                 New here?{" "}<Link to="/auth/signup" className="font-semibold text-indigo">Create an account</Link>
               </div>

@@ -7,9 +7,9 @@ import { useMyFounder, useMyProfile } from "@/hooks/useMyFounder";
 import { AppShell } from "@/components/AppShell";
 import { useRequireAuth } from "@/hooks/useRequireAuth";
 import { SkillTag, TierBadge, VerifiedBadges } from "@/components/FounderBits";
-import { founderAvatar, SKILLS_LIST, AVATAR_PRESETS } from "@/lib/founder-types";
+import { founderAvatar, SKILLS_LIST, AVATAR_PRESETS, PROMPT_GROUPS, LOOKING_FOR_OPTIONS, INDUSTRIES } from "@/lib/founder-types";
 import { uploadImage } from "@/lib/uploads";
-import { MapPin, Briefcase, Pencil, X, Loader2, Save, LogOut, Trash2, ImagePlus } from "lucide-react";
+import { MapPin, Briefcase, Pencil, X, Loader2, Save, LogOut, Trash2, ImagePlus, Linkedin, Github, Eye, EyeOff, Plus, MessageSquareQuote } from "lucide-react";
 
 export const Route = createFileRoute("/profile/me")({
   component: MyProfile,
@@ -22,8 +22,10 @@ function MyProfile() {
   const qc = useQueryClient();
   const router = useRouter();
   const [editing, setEditing] = useState(false);
+  const [editingPrompts, setEditingPrompts] = useState(false);
   const [deleting, setDeleting] = useState(false);
   const [confirmDelete, setConfirmDelete] = useState(false);
+  const [privacyBusy, setPrivacyBusy] = useState(false);
 
   async function signOut() {
     await supabase.auth.signOut();
@@ -45,6 +47,19 @@ function MyProfile() {
       setConfirmDelete(false);
     }
   }
+
+  async function toggleAssessmentPrivacy() {
+    if (!me) return;
+    setPrivacyBusy(true);
+    const next = !me.assessment_public;
+    const { error } = await supabase.from("founders").update({ assessment_public: next }).eq("id", me.id);
+    setPrivacyBusy(false);
+    if (error) return toast.error(error.message);
+    toast.success(next ? "Compatibility results are now public" : "Compatibility results are now private");
+    qc.invalidateQueries({ queryKey: ["my-founder"] });
+    qc.invalidateQueries();
+  }
+
   const { data: assessment } = useQuery({
     queryKey: ["assessment", me?.id],
     enabled: !!me?.id,
@@ -88,7 +103,8 @@ function MyProfile() {
     { key: "3+ skills",   ok: (me.skills ?? []).length >= 3 },
     { key: "3 prompts",   ok: (prompts ?? []).length >= 3 },
     { key: "Assessment",  ok: !!assessment },
-    { key: "Verified",    ok: !!(me.linkedin_verified || me.github_verified || me.aadhaar_verified) },
+    // "Verified" = at least one linked professional profile (LinkedIn / GitHub).
+    { key: "LinkedIn or GitHub link", ok: !!(me.linkedin_url || me.github_url) },
   ];
   const done = checks.filter((c) => c.ok).length;
   const pct = Math.round((done / checks.length) * 100);
@@ -117,16 +133,47 @@ function MyProfile() {
                 <button onClick={() => setEditing(true)} className="inline-flex items-center gap-1 rounded-md border-2 border-ink bg-orange px-2 py-1 text-[11px] font-black text-white shadow-brutal-sm">
                   <Pencil className="h-3 w-3" /> Customize
                 </button>
+                <button onClick={() => setEditingPrompts(true)} className="inline-flex items-center gap-1 rounded-md border-2 border-ink bg-white px-2 py-1 text-[11px] font-black text-ink shadow-brutal-sm">
+                  <MessageSquareQuote className="h-3 w-3" /> Prompts
+                </button>
               </div>
             </div>
           </div>
 
           {editing && <EditPanel
-            initial={{ full_name: profile?.full_name ?? "", headline: me.headline ?? "", bio: me.bio ?? "", location: me.location ?? "", age: me.age ?? 0, skills: me.skills ?? [], seed_avatar: me.seed_avatar ?? AVATAR_PRESETS[0] }}
+            initial={{
+              full_name: profile?.full_name ?? "",
+              headline: me.headline ?? "",
+              bio: me.bio ?? "",
+              location: me.location ?? "",
+              age: me.age ?? 0,
+              years_experience: me.years_experience ?? 0,
+              education: me.education ?? "",
+              skills: me.skills ?? [],
+              industry_focus: me.industry_focus ?? [],
+              looking_for: me.looking_for ?? [],
+              linkedin_url: me.linkedin_url ?? "",
+              github_url: me.github_url ?? "",
+              commitment: me.commitment ?? "full_time",
+              remote_pref: me.remote_pref ?? "hybrid",
+              active_status: me.active_status ?? "active",
+              has_idea: !!me.has_idea,
+              idea_description: me.idea_description ?? "",
+              idea_industry: me.idea_industry ?? "",
+              idea_stage: me.idea_stage ?? "idea",
+              seed_avatar: me.seed_avatar ?? AVATAR_PRESETS[0],
+            }}
             founderId={me.id}
             userId={me.user_id ?? ""}
             onClose={() => setEditing(false)}
             onSaved={() => { qc.invalidateQueries(); setEditing(false); }}
+          />}
+
+          {editingPrompts && <PromptsPanel
+            founderId={me.id}
+            existing={(prompts ?? []) as { id: string; prompt_question: string; prompt_answer: string; display_order: number | null }[]}
+            onClose={() => setEditingPrompts(false)}
+            onSaved={() => { qc.invalidateQueries({ queryKey: ["my-prompts", me.id] }); setEditingPrompts(false); }}
           />}
 
           <div className="-mt-8 space-y-6 p-6">
@@ -160,6 +207,22 @@ function MyProfile() {
             <div className="rounded-2xl bg-white p-5 shadow-card">
               <div className="text-sm">{me.bio}</div>
               <div className="mt-3"><VerifiedBadges f={me} /></div>
+              {(me.linkedin_url || me.github_url) && (
+                <div className="mt-3 flex flex-wrap gap-2">
+                  {me.linkedin_url && (
+                    <a href={me.linkedin_url} target="_blank" rel="noreferrer noopener"
+                      className="inline-flex items-center gap-1.5 rounded-md border-2 border-ink bg-white px-2 py-1 text-[11px] font-black box-hover">
+                      <Linkedin className="h-3 w-3" /> LinkedIn
+                    </a>
+                  )}
+                  {me.github_url && (
+                    <a href={me.github_url} target="_blank" rel="noreferrer noopener"
+                      className="inline-flex items-center gap-1.5 rounded-md border-2 border-ink bg-white px-2 py-1 text-[11px] font-black box-hover">
+                      <Github className="h-3 w-3" /> GitHub
+                    </a>
+                  )}
+                </div>
+              )}
             </div>
 
             <div>
@@ -170,8 +233,18 @@ function MyProfile() {
             </div>
 
             <div>
-              <div className="text-xs font-bold uppercase tracking-wider text-muted-text">Prompts</div>
+              <div className="flex items-center justify-between">
+                <div className="text-xs font-bold uppercase tracking-wider text-muted-text">Prompts</div>
+                <button onClick={() => setEditingPrompts(true)} className="inline-flex items-center gap-1 rounded-md border-2 border-ink bg-white px-2 py-0.5 text-[10px] font-black box-hover">
+                  <Pencil className="h-3 w-3" /> Edit prompts
+                </button>
+              </div>
               <div className="mt-2 space-y-2">
+                {(prompts ?? []).length === 0 && (
+                  <div className="rounded-xl border-2 border-dashed border-ink/40 p-4 text-sm font-bold text-muted-text">
+                    No prompts yet — add up to 3 so founders know how to open a conversation.
+                  </div>
+                )}
                 {prompts?.map((p) => (
                   <div key={p.id} className="rounded-xl border bg-surface p-3">
                     <div className="text-[10px] font-semibold uppercase tracking-wider text-indigo">{p.prompt_question}</div>
@@ -183,7 +256,24 @@ function MyProfile() {
 
             {assessment && (
               <div>
-                <div className="text-xs font-bold uppercase tracking-wider text-muted-text">Compatibility dimensions</div>
+                <div className="rounded-2xl border-2 border-ink bg-cream p-4 shadow-brutal-sm">
+                  <div className="flex items-center justify-between gap-3">
+                    <div>
+                      <div className="text-xs font-black uppercase tracking-wider">Compatibility results</div>
+                      <div className="mt-0.5 text-[11px] font-bold text-muted-text">
+                        {me.assessment_public
+                          ? "Public — other founders can see your personality dimensions."
+                          : "Private — only you (and admins) can see your dimensions."}
+                      </div>
+                    </div>
+                    <button onClick={toggleAssessmentPrivacy} disabled={privacyBusy}
+                      className={`inline-flex shrink-0 items-center gap-1.5 rounded-lg border-2 border-ink px-3 py-2 text-[11px] font-black shadow-brutal-sm box-hover disabled:opacity-60 ${me.assessment_public ? "bg-sage text-ink" : "bg-white text-ink"}`}>
+                      {privacyBusy ? <Loader2 className="h-3 w-3 animate-spin" /> : me.assessment_public ? <Eye className="h-3 w-3" /> : <EyeOff className="h-3 w-3" />}
+                      {me.assessment_public ? "Public" : "Private"}
+                    </button>
+                  </div>
+                </div>
+                <div className="mt-3 text-xs font-bold uppercase tracking-wider text-muted-text">Compatibility dimensions</div>
                 <div className="mt-3 grid gap-2">
                   {dims.map((d) => (
                     <div key={d.label}>
@@ -238,25 +328,58 @@ function MyProfile() {
   );
 }
 
+type EditForm = {
+  full_name: string; headline: string; bio: string; location: string; age: number;
+  years_experience: number; education: string; skills: string[]; industry_focus: string[];
+  looking_for: string[]; linkedin_url: string; github_url: string;
+  commitment: string; remote_pref: string; active_status: string;
+  has_idea: boolean; idea_description: string; idea_industry: string; idea_stage: string;
+  seed_avatar: string;
+};
+
 function EditPanel({ initial, founderId, userId, onClose, onSaved }: {
-  initial: { full_name: string; headline: string; bio: string; location: string; age: number; skills: string[]; seed_avatar: string };
+  initial: EditForm;
   founderId: string;
   userId: string;
   onClose: () => void;
   onSaved: () => void;
 }) {
-  const [form, setForm] = useState(initial);
+  const [form, setForm] = useState<EditForm>(initial);
   const [custom, setCustom] = useState("");
   const [saving, setSaving] = useState(false);
   const [uploading, setUploading] = useState(false);
   useEffect(() => setForm(initial), [initial]);
 
+  function cleanUrl(v: string) {
+    const t = v.trim();
+    if (!t) return "";
+    return /^https?:\/\//i.test(t) ? t : `https://${t}`;
+  }
+
   async function save() {
+    const linkedin = cleanUrl(form.linkedin_url);
+    const github = cleanUrl(form.github_url);
     setSaving(true);
     const [{ error: e1 }, { error: e2 }] = await Promise.all([
       supabase.from("founders").update({
         headline: form.headline, bio: form.bio, location: form.location, skills: form.skills,
+        industry_focus: form.industry_focus,
+        looking_for: form.looking_for,
+        education: form.education || null,
+        years_experience: form.years_experience > 0 ? form.years_experience : null,
         age: form.age > 0 ? form.age : null,
+        linkedin_url: linkedin || null,
+        github_url: github || null,
+        // A linked profile counts as verified for badge purposes.
+        linkedin_verified: !!linkedin,
+        github_verified: !!github,
+        commitment: form.commitment as never,
+        remote_pref: form.remote_pref as never,
+        active_status: form.active_status as never,
+        has_idea: form.has_idea,
+        idea_description: form.has_idea ? form.idea_description : null,
+        idea_industry: form.has_idea ? form.idea_industry : null,
+        idea_stage: form.has_idea ? (form.idea_stage as never) : null,
         seed_avatar: form.seed_avatar,
       }).eq("id", founderId),
       userId ? supabase.from("profiles").update({ full_name: form.full_name, avatar_url: form.seed_avatar }).eq("id", userId) : Promise.resolve({ error: null }),
@@ -269,6 +392,9 @@ function EditPanel({ initial, founderId, userId, onClose, onSaved }: {
 
   function toggleSkill(s: string) {
     setForm((f) => ({ ...f, skills: f.skills.includes(s) ? f.skills.filter((x) => x !== s) : [...f.skills, s] }));
+  }
+  function toggleIn(key: "industry_focus" | "looking_for", v: string) {
+    setForm((f) => ({ ...f, [key]: f[key].includes(v) ? f[key].filter((x) => x !== v) : [...f[key], v] }));
   }
 
   return (
@@ -335,6 +461,66 @@ function EditPanel({ initial, founderId, userId, onClose, onSaved }: {
                 className="mt-1 w-full rounded-lg border-2 border-ink bg-white px-3 py-2 text-sm" />
             </div>
           </div>
+          <div className="grid grid-cols-2 gap-3">
+            <div>
+              <label className="text-[11px] font-black uppercase text-muted-text">Years of experience</label>
+              <input type="number" min={0} max={60} value={form.years_experience || ""}
+                onChange={(e) => setForm({ ...form, years_experience: +e.target.value || 0 })}
+                className="mt-1 w-full rounded-lg border-2 border-ink bg-white px-3 py-2 text-sm" />
+            </div>
+            <Field label="Education" v={form.education} onChange={(v) => setForm({ ...form, education: v })} />
+          </div>
+
+          {/* Links */}
+          <div className="rounded-xl border-2 border-ink bg-white p-3">
+            <div className="text-[11px] font-black uppercase text-muted-text">Links</div>
+            <div className="mt-2 space-y-2">
+              <div>
+                <label className="flex items-center gap-1 text-[10px] font-black uppercase text-muted-text"><Linkedin className="h-3 w-3" /> LinkedIn URL</label>
+                <input value={form.linkedin_url} placeholder="linkedin.com/in/yourname"
+                  onChange={(e) => setForm({ ...form, linkedin_url: e.target.value })}
+                  className="mt-1 w-full rounded-lg border-2 border-ink bg-white px-3 py-2 text-sm" />
+              </div>
+              <div>
+                <label className="flex items-center gap-1 text-[10px] font-black uppercase text-muted-text"><Github className="h-3 w-3" /> GitHub URL</label>
+                <input value={form.github_url} placeholder="github.com/yourhandle"
+                  onChange={(e) => setForm({ ...form, github_url: e.target.value })}
+                  className="mt-1 w-full rounded-lg border-2 border-ink bg-white px-3 py-2 text-sm" />
+              </div>
+            </div>
+          </div>
+
+          {/* Preferences */}
+          <div className="grid grid-cols-3 gap-3">
+            <Select label="Commitment" v={form.commitment} onChange={(v) => setForm({ ...form, commitment: v })}
+              opts={[["full_time", "Full time"], ["part_time", "Part time"], ["exploring", "Exploring"]]} />
+            <Select label="Work setup" v={form.remote_pref} onChange={(v) => setForm({ ...form, remote_pref: v })}
+              opts={[["onsite", "On-site"], ["hybrid", "Hybrid"], ["remote", "Remote"]]} />
+            <Select label="Status" v={form.active_status} onChange={(v) => setForm({ ...form, active_status: v })}
+              opts={[["active", "Actively looking"], ["open", "Open to chats"], ["paused", "Paused"]]} />
+          </div>
+
+          {/* Idea */}
+          <div className="rounded-xl border-2 border-ink bg-white p-3">
+            <label className="flex items-center gap-2 text-sm font-black">
+              <input type="checkbox" checked={form.has_idea} onChange={(e) => setForm({ ...form, has_idea: e.target.checked })} className="h-4 w-4" />
+              I have an idea I'm building
+            </label>
+            {form.has_idea && (
+              <div className="mt-3 space-y-2">
+                <textarea rows={3} maxLength={400} value={form.idea_description} placeholder="What are you building?"
+                  onChange={(e) => setForm({ ...form, idea_description: e.target.value })}
+                  className="w-full rounded-lg border-2 border-ink bg-white px-3 py-2 text-sm" />
+                <div className="grid grid-cols-2 gap-2">
+                  <Select label="Industry" v={form.idea_industry || INDUSTRIES[0]} onChange={(v) => setForm({ ...form, idea_industry: v })}
+                    opts={INDUSTRIES.map((i) => [i, i] as [string, string])} />
+                  <Select label="Stage" v={form.idea_stage} onChange={(v) => setForm({ ...form, idea_stage: v })}
+                    opts={[["idea", "Idea"], ["mvp", "MVP"], ["revenue", "Revenue"], ["funded", "Funded"]]} />
+                </div>
+              </div>
+            )}
+          </div>
+
           <div>
             <label className="text-[11px] font-black uppercase text-muted-text">Skills</label>
             <div className="mt-2 flex flex-wrap gap-1.5">
@@ -357,9 +543,127 @@ function EditPanel({ initial, founderId, userId, onClose, onSaved }: {
               }} className="rounded-lg border-2 border-ink bg-ink px-4 py-2 text-sm font-black text-white">Add</button>
             </div>
           </div>
+
+          <div>
+            <label className="text-[11px] font-black uppercase text-muted-text">Industry focus</label>
+            <div className="mt-2 flex flex-wrap gap-1.5">
+              {INDUSTRIES.map((i) => (
+                <button key={i} type="button" onClick={() => toggleIn("industry_focus", i)}
+                  className={`rounded-md border-2 border-ink px-2 py-1 text-xs font-black ${form.industry_focus.includes(i) ? "bg-sage text-ink" : "bg-white"}`}>{i}</button>
+              ))}
+            </div>
+          </div>
+
+          <div>
+            <label className="text-[11px] font-black uppercase text-muted-text">What I'm looking for</label>
+            <div className="mt-2 flex flex-wrap gap-1.5">
+              {LOOKING_FOR_OPTIONS.map((i) => (
+                <button key={i} type="button" onClick={() => toggleIn("looking_for", i)}
+                  className={`rounded-md border-2 border-ink px-2 py-1 text-xs font-black ${form.looking_for.includes(i) ? "bg-orange text-white" : "bg-white"}`}>{i}</button>
+              ))}
+            </div>
+          </div>
         </div>
         <button onClick={save} disabled={saving} className="mt-5 flex w-full items-center justify-center gap-2 rounded-lg border-2 border-ink bg-orange py-2.5 text-sm font-black text-white shadow-brutal-sm disabled:opacity-50">
           {saving ? <Loader2 className="h-4 w-4 animate-spin" /> : <Save className="h-4 w-4" />} Save changes
+        </button>
+      </div>
+    </div>
+  );
+}
+
+type PromptRow = { id: string; prompt_question: string; prompt_answer: string; display_order: number | null };
+
+function PromptsPanel({ founderId, existing, onClose, onSaved }: {
+  founderId: string;
+  existing: PromptRow[];
+  onClose: () => void;
+  onSaved: () => void;
+}) {
+  const [rows, setRows] = useState(
+    existing.length
+      ? existing.map((p) => ({ question: p.prompt_question, answer: p.prompt_answer }))
+      : [{ question: "", answer: "" }],
+  );
+  const [saving, setSaving] = useState(false);
+
+  function update(i: number, patch: Partial<{ question: string; answer: string }>) {
+    setRows((r) => r.map((row, idx) => (idx === i ? { ...row, ...patch } : row)));
+  }
+
+  async function save() {
+    const clean = rows.filter((r) => r.question.trim() && r.answer.trim()).slice(0, 3);
+    setSaving(true);
+    // Replace the founder's prompt set with the edited list.
+    const { error: delErr } = await supabase.from("founder_prompts").delete().eq("founder_id", founderId);
+    if (delErr) { setSaving(false); return toast.error(delErr.message); }
+    if (clean.length) {
+      const { error } = await supabase.from("founder_prompts").insert(
+        clean.map((r, i) => ({
+          founder_id: founderId,
+          prompt_question: r.question.trim(),
+          prompt_answer: r.answer.trim(),
+          display_order: i,
+        })),
+      );
+      if (error) { setSaving(false); return toast.error(error.message); }
+    }
+    setSaving(false);
+    toast.success("Prompts updated");
+    onSaved();
+  }
+
+  return (
+    <div className="fixed inset-0 z-40 grid place-items-center bg-ink/60 p-4" onClick={onClose}>
+      <div onClick={(e) => e.stopPropagation()} className="max-h-[85vh] w-full max-w-lg overflow-y-auto rounded-2xl border-2 border-ink bg-cream p-6 shadow-brutal">
+        <div className="flex items-start justify-between">
+          <div>
+            <div className="text-xl font-black">Your prompts</div>
+            <div className="text-[11px] font-bold text-muted-text">Pick up to 3. Change them any time.</div>
+          </div>
+          <button onClick={onClose}><X className="h-5 w-5" /></button>
+        </div>
+
+        <div className="mt-4 space-y-4">
+          {rows.map((row, i) => (
+            <div key={i} className="rounded-xl border-2 border-ink bg-white p-3">
+              <div className="flex items-center justify-between">
+                <div className="text-[10px] font-black uppercase text-orange">Prompt {i + 1}</div>
+                {rows.length > 1 && (
+                  <button onClick={() => setRows((r) => r.filter((_, idx) => idx !== i))}
+                    className="inline-flex items-center gap-1 text-[10px] font-black text-red">
+                    <Trash2 className="h-3 w-3" /> Remove
+                  </button>
+                )}
+              </div>
+              <select value={row.question} onChange={(e) => update(i, { question: e.target.value })}
+                className="mt-2 w-full rounded-lg border-2 border-ink bg-white px-3 py-2 text-sm font-semibold">
+                <option value="">Choose a prompt…</option>
+                {PROMPT_GROUPS.map((g) => (
+                  <optgroup key={g.label} label={g.label}>
+                    {g.prompts.map((p) => <option key={p} value={p}>{p}</option>)}
+                  </optgroup>
+                ))}
+                {row.question && !PROMPT_GROUPS.some((g) => g.prompts.includes(row.question)) && (
+                  <option value={row.question}>{row.question}</option>
+                )}
+              </select>
+              <textarea rows={3} maxLength={300} value={row.answer} placeholder="Your answer…"
+                onChange={(e) => update(i, { answer: e.target.value })}
+                className="mt-2 w-full rounded-lg border-2 border-ink bg-white px-3 py-2 text-sm" />
+            </div>
+          ))}
+          {rows.length < 3 && (
+            <button onClick={() => setRows((r) => [...r, { question: "", answer: "" }])}
+              className="inline-flex items-center gap-1.5 rounded-lg border-2 border-ink bg-white px-3 py-2 text-xs font-black shadow-brutal-sm box-hover">
+              <Plus className="h-3.5 w-3.5" /> Add another prompt
+            </button>
+          )}
+        </div>
+
+        <button onClick={save} disabled={saving}
+          className="mt-5 flex w-full items-center justify-center gap-2 rounded-lg border-2 border-ink bg-orange py-2.5 text-sm font-black text-white shadow-brutal-sm disabled:opacity-50">
+          {saving ? <Loader2 className="h-4 w-4 animate-spin" /> : <Save className="h-4 w-4" />} Save prompts
         </button>
       </div>
     </div>
@@ -372,6 +676,18 @@ function Field({ label, v, onChange }: { label: string; v: string; onChange: (v:
       <label className="text-[11px] font-black uppercase text-muted-text">{label}</label>
       <input value={v} onChange={(e) => onChange(e.target.value)}
         className="mt-1 w-full rounded-lg border-2 border-ink bg-white px-3 py-2 text-sm" />
+    </div>
+  );
+}
+
+function Select({ label, v, onChange, opts }: { label: string; v: string; onChange: (v: string) => void; opts: [string, string][] }) {
+  return (
+    <div>
+      <label className="text-[11px] font-black uppercase text-muted-text">{label}</label>
+      <select value={v} onChange={(e) => onChange(e.target.value)}
+        className="mt-1 w-full rounded-lg border-2 border-ink bg-white px-2 py-2 text-xs font-semibold">
+        {opts.map(([val, lab]) => <option key={val} value={val}>{lab}</option>)}
+      </select>
     </div>
   );
 }
