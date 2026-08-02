@@ -142,6 +142,9 @@ function PostView() {
           </div>
           <h1 className="mt-3 text-2xl font-black tracking-tight">{post.title}</h1>
           <p className="mt-4 whitespace-pre-wrap text-sm leading-relaxed">{post.content}</p>
+          {post.image_url && (
+            <img src={post.image_url} alt="" className="mt-4 w-full rounded-xl border-2 border-ink object-cover" />
+          )}
           <div className="mt-5 flex flex-wrap items-center gap-2">
             <div className="inline-flex items-stretch overflow-hidden rounded-lg border-2 border-ink bg-white shadow-brutal-sm">
               <button onClick={() => vote(1)} aria-label="Upvote"
