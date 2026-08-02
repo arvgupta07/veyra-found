@@ -128,6 +128,21 @@ function Inbox() {
     return m;
   }, [myLabels]);
 
+  // Filter chips = built-in labels + every custom label the user has created.
+  const filterChips = useMemo(() => {
+    const counts = new Map<string, number>();
+    (myLabels ?? []).forEach((l) => {
+      counts.set(l.label, (counts.get(l.label) ?? 0) + 1);
+    });
+    const builtInNames = new Set(BUILT_IN_LABELS.map((l) => l.name));
+    const custom = [...counts.keys()].filter((n) => !builtInNames.has(n)).sort();
+    return [
+      ...BUILT_IN_LABELS.map((l) => ({ name: l.name, emoji: l.emoji, color: l.color, count: counts.get(l.name) ?? 0 })),
+      ...custom.map((n) => ({ name: n, emoji: "🏷️", color: labelStyle(n), count: counts.get(n) ?? 0 })),
+    ];
+  }, [myLabels]);
+
+
   async function addLabel(convId: string, name: string) {
     if (!me) return;
     const existing = (labelsByConv.get(convId) ?? []).find((l) => l.label === name);
