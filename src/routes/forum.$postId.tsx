@@ -247,6 +247,11 @@ function PostView() {
                           <span className="font-semibold text-foreground">{r.author?.profiles?.full_name ?? r.author?.seed_name}</span>
                         </div>
                         <p className="mt-1 whitespace-pre-wrap text-xs">{r.content}</p>
+                        {me?.id === r.author_id && (
+                          <button onClick={() => removeComment(r.id, false)} className="mt-1 inline-flex items-center gap-1 text-[10px] font-black text-red hover:underline">
+                            <Trash2 className="h-3 w-3" /> Delete
+                          </button>
+                        )}
                       </div>
                     ))}
                   </div>
