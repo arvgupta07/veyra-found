@@ -7,7 +7,9 @@ import { AppShell } from "@/components/AppShell";
 import { useRequireAuth } from "@/hooks/useRequireAuth";
 import { founderAvatar } from "@/lib/founder-types";
 import { Check, X, Loader2, MessageSquare, Tag, Plus, Pin, PinOff } from "lucide-react";
+import { useUnreadConversations } from "@/hooks/useLiveInbox";
 import { toast } from "sonner";
+
 
 export const Route = createFileRoute("/inbox/")({
   component: Inbox,
@@ -36,6 +38,8 @@ function Inbox() {
   const qc = useQueryClient();
   const [tab, setTab] = useState<"requests" | "sent" | "talking">("requests");
   const [labelFilter, setLabelFilter] = useState<string | null>(null);
+  const unread = useUnreadConversations();
+
 
   const { data: requests, refetch: refetchReq } = useQuery({
     queryKey: ["inbox-requests", me?.id],
@@ -178,20 +182,34 @@ function Inbox() {
     <AppShell>
       <div className="mx-auto max-w-3xl px-4 py-6 md:py-10">
         <h1 className="text-3xl font-black tracking-tight">Inbox</h1>
-        <div className="mt-6 flex gap-6 border-b-2 border-ink">
-          {(["requests", "sent", "talking"] as const).map((t) => (
-            <button key={t} onClick={() => setTab(t)}
-              className={`relative pb-3 text-sm font-black capitalize transition ${tab === t ? "text-orange" : "text-muted-text hover:text-ink"}`}>
-              {t} {t === "requests" && (requests?.length ?? 0) > 0 && (
-                <span className="ml-1 rounded-full bg-orange px-1.5 py-0.5 text-[10px] text-white">{requests!.length}</span>
-              )}
-              {t === "sent" && (sent?.length ?? 0) > 0 && (
-                <span className="ml-1 rounded-full bg-ink px-1.5 py-0.5 text-[10px] text-white">{sent!.length}</span>
-              )}
-              {tab === t && <span className="absolute inset-x-0 -bottom-[2px] h-1 bg-orange" />}
-            </button>
-          ))}
+        <div className="mt-6 flex gap-2 border-[3px] border-ink bg-white p-1.5 shadow-brutal-sm soft-corners">
+          {(["requests", "sent", "talking"] as const).map((t) => {
+            const count = t === "requests" ? (requests?.length ?? 0)
+              : t === "sent" ? (sent?.length ?? 0)
+              : (conversations?.length ?? 0);
+            const badgeCls = t === "requests" ? "bg-orange text-white"
+              : t === "sent" ? "bg-ink text-white"
+              : "bg-sage text-ink";
+            const activeTab = tab === t;
+            return (
+              <button key={t} onClick={() => setTab(t)}
+                className={`relative flex flex-1 items-center justify-center gap-2 px-3 py-2 text-xs font-black uppercase tracking-wider transition soft-corners ${
+                  activeTab ? "border-2 border-ink bg-cream text-ink shadow-brutal-sm bg-hatch" : "text-muted-text hover:text-ink"
+                }`}>
+                {t}
+                {count > 0 && (
+                  <span className={`grid h-5 min-w-5 place-items-center rounded-full border-2 border-ink px-1 text-[10px] font-black ${badgeCls}`}>
+                    {count}
+                  </span>
+                )}
+                {t === "talking" && unread.length > 0 && (
+                  <span className="absolute right-1 top-1 h-2.5 w-2.5 rounded-full border border-ink bg-red" />
+                )}
+              </button>
+            );
+          })}
         </div>
+
 
         {tab === "talking" && (
           <div className="mt-4 flex flex-wrap items-center gap-2">
@@ -309,20 +327,25 @@ function Inbox() {
             const lastMsg = (c.messages ?? []).sort((a: Record<string, unknown>, b: Record<string, unknown>) => String(b.created_at ?? "").localeCompare(String(a.created_at ?? "")))[0];
             const labels = labelsByConv.get(c.id) ?? [];
             const pinned = pinnedSet.has(c.id);
+            const isUnread = unread.includes(c.id);
             return (
-              <div key={c.id} className={`rounded-2xl border-2 border-ink p-4 shadow-brutal-sm ${pinned ? "bg-cream" : "bg-white"}`}>
+              <div key={c.id} className={`rounded-2xl border-2 border-ink p-4 shadow-brutal-sm ${isUnread ? "bg-cream ring-2 ring-red" : pinned ? "bg-cream" : "bg-white"}`}>
                 <div className="flex items-center gap-4">
                   <Link to="/inbox/$conversationId" params={{ conversationId: c.id }} className="flex flex-1 items-center gap-4 min-w-0">
-                    <img src={founderAvatar({ seed_avatar: other.seed_avatar, seed_name: other.seed_name, profile: other.profiles })}
-                      className="h-12 w-12 rounded-xl border-2 border-ink object-cover" alt="" />
+                    <span className="relative shrink-0">
+                      <img src={founderAvatar({ seed_avatar: other.seed_avatar, seed_name: other.seed_name, profile: other.profiles })}
+                        className="h-12 w-12 rounded-xl border-2 border-ink object-cover" alt="" />
+                      {isUnread && <span className="absolute -right-1 -top-1 h-3.5 w-3.5 rounded-full border-2 border-ink bg-red" />}
+                    </span>
                     <div className="min-w-0 flex-1">
                       <div className="flex items-center gap-2">
                         {pinned && <Pin className="h-3 w-3 fill-orange text-orange" />}
                         <div className="font-black truncate">{other.profiles?.full_name ?? other.seed_name}</div>
                         <div className="ml-auto text-[10px] font-black uppercase text-muted-text">{c.stage?.replace("_", " ")}</div>
                       </div>
-                      <div className="truncate text-xs text-muted-text">{lastMsg?.content ?? "Start the conversation →"}</div>
+                      <div className={`truncate text-xs ${isUnread ? "font-bold text-ink" : "text-muted-text"}`}>{lastMsg?.content ?? "Start the conversation →"}</div>
                     </div>
+
                     <MessageSquare className="h-4 w-4 text-muted-text" />
                   </Link>
                   <button onClick={() => togglePin(c.id)}
