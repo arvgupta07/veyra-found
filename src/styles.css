@@ -369,13 +369,6 @@
   }
   .shine:hover::after { transform: translateX(120%); }
 
-  /* Custom cursor — hide native cursor on interactive elements */
-  html.has-custom-cursor,
-  html.has-custom-cursor * { cursor: none !important; }
-  @media (pointer: coarse) {
-    html.has-custom-cursor, html.has-custom-cursor * { cursor: auto !important; }
-  }
-
   @media (prefers-reduced-motion: reduce) {
     .animate-page-in, .reveal { animation: none !important; opacity: 1 !important; transform: none !important; transition: none !important; }
     .tilt { transition: none !important; }
