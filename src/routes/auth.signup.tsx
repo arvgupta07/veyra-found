@@ -187,6 +187,13 @@ function Signup() {
             {loading && <Loader2 className="h-4 w-4 animate-spin" />} Create account
           </button>
         </form>
+        <div className="flex items-center gap-3">
+          <div className="h-[3px] flex-1 bg-ink/20" />
+          <span className="text-[10px] font-black uppercase tracking-wider text-ink/60">or</span>
+          <div className="h-[3px] flex-1 bg-ink/20" />
+        </div>
+        <GoogleButton label="Sign up with Google" />
+
         <div className="text-center text-sm text-ink/70">
           Already have an account?{" "}<Link to="/auth/login" className="font-black text-orange">Sign in</Link>
         </div>
