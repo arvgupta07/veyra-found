@@ -6,9 +6,20 @@ import { useMyFounder } from "@/hooks/useMyFounder";
 import { AppShell } from "@/components/AppShell";
 import { useRequireAuth } from "@/hooks/useRequireAuth";
 import { founderAvatar } from "@/lib/founder-types";
-import { deleteForumPost, deleteForumComment } from "@/lib/forum-actions";
-import { ArrowBigUp, ArrowBigDown, ArrowLeft, Loader2, Bookmark, MessageSquareText, Send, Trash2 } from "lucide-react";
+import {
+  deleteForumPost, deleteForumComment, updateForumPost, updateForumComment,
+  addForumCollaborator, removeForumCollaborator, visibleToViewer,
+} from "@/lib/forum-actions";
+import { ArrowBigUp, ArrowBigDown, ArrowLeft, Loader2, Bookmark, MessageSquareText, Send, Trash2, Pencil, Users, X, Save } from "lucide-react";
 import { toast } from "sonner";
+
+const CATEGORY_OPTIONS = [
+  ["idea_validation", "💡 Idea Validation"],
+  ["looking_for_cofounder", "🤝 Looking for Co-Founder"],
+  ["industry_talk", "🌏 Industry Talk"],
+  ["resources", "📚 Resources"],
+  ["success_stories", "🎉 Success Stories"],
+] as const;
 
 export const Route = createFileRoute("/forum/$postId")({
   component: PostView,
@@ -27,6 +38,10 @@ function PostView() {
   const [connectOpen, setConnectOpen] = useState(false);
   const [connectMsg, setConnectMsg] = useState("");
   const [connectSending, setConnectSending] = useState(false);
+  const [editOpen, setEditOpen] = useState(false);
+  const [collabOpen, setCollabOpen] = useState(false);
+  const [editingComment, setEditingComment] = useState<string | null>(null);
+  const [commentDraft, setCommentDraft] = useState("");
 
   const { data: post } = useQuery({
     queryKey: ["post", postId],
@@ -34,6 +49,16 @@ function PostView() {
       const { data } = await supabase.from("forum_posts")
         .select("*, author:founders!forum_posts_author_id_fkey(*, profiles(full_name))").eq("id", postId).maybeSingle();
       return data;
+    },
+  });
+
+  const { data: collaborators } = useQuery({
+    queryKey: ["collaborators", postId],
+    queryFn: async () => {
+      const { data } = await supabase.from("forum_collaborators")
+        .select("founder_id, founder:founders!forum_collaborators_founder_id_fkey(id, seed_name, seed_avatar, profiles(full_name))")
+        .eq("post_id", postId);
+      return (data ?? []) as { founder_id: string; founder: { id: string; seed_name: string | null; seed_avatar: string | null; profiles: { full_name: string | null } | null } | null }[];
     },
   });
 
@@ -46,6 +71,7 @@ function PostView() {
       return data ?? [];
     },
   });
+
 
   const { data: saved } = useQuery({
     queryKey: ["saved", postId, me?.id],
