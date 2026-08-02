@@ -22,7 +22,9 @@ function Discover() {
   const [skipped, setSkipped] = useState(0);
   const [openPrompt, setOpenPrompt] = useState<{ founderId: string; question: string } | null>(null);
 
-  const { data: founders, isLoading } = useQuery({
+  const connectedIds = useConnectedIds(me?.id);
+
+  const { data: allFounders, isLoading } = useQuery({
     queryKey: ["discover", me?.id],
     enabled: !!me?.id,
     queryFn: async () => {
@@ -32,6 +34,11 @@ function Discover() {
       return fs ?? [];
     },
   });
+
+  const founders = useMemo(
+    () => (allFounders ?? []).filter((f) => !connectedIds.has(f.id)),
+    [allFounders, connectedIds],
+  );
 
   const current = founders?.[index];
   const atEnd = !!founders && founders.length > 0 && index >= founders.length;
