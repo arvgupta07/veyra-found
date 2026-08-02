@@ -6,7 +6,8 @@ import { useMyFounder } from "@/hooks/useMyFounder";
 import { AppShell } from "@/components/AppShell";
 import { useRequireAuth } from "@/hooks/useRequireAuth";
 import { founderAvatar } from "@/lib/founder-types";
-import { ArrowBigUp, ArrowBigDown, MessageCircle, Plus, Loader2, X, MessageSquareText } from "lucide-react";
+import { uploadImage } from "@/lib/uploads";
+import { ArrowBigUp, ArrowBigDown, MessageCircle, Plus, Loader2, X, MessageSquareText, ImagePlus } from "lucide-react";
 import { toast } from "sonner";
 
 const CATEGORIES = [
@@ -105,6 +106,10 @@ function Forum() {
                 <Link to="/forum/$postId" params={{ postId: p.id }} className="mt-2 block">
                   <h2 className="text-lg font-black hover:text-orange">{p.title}</h2>
                   <p className="mt-1 line-clamp-2 text-sm text-muted-text">{p.content}</p>
+                  {p.image_url && (
+                    <img src={p.image_url} alt="" loading="lazy"
+                      className="mt-3 max-h-72 w-full rounded-xl border-2 border-ink object-cover" />
+                  )}
                 </Link>
                 <div className="mt-3 flex items-center gap-3 text-xs text-muted-text">
                   <div className="inline-flex items-stretch overflow-hidden rounded-lg border-2 border-ink bg-white shadow-brutal-sm">
