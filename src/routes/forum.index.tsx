@@ -95,7 +95,7 @@ function Forum() {
         </div>
 
         <div className="mt-6 space-y-3">
-          {posts?.map((p) => {
+          {posts?.map((p: any) => {
             const catLabel = CATEGORIES.find((c) => c.v === p.category)?.label ?? p.category;
             return (
               <article key={p.id} className="rounded-2xl border-2 border-ink bg-white p-5 shadow-brutal-sm box-hover">
