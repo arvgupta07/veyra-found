@@ -31,7 +31,7 @@ function Login() {
   return (
     <div className="relative min-h-screen overflow-hidden bg-surface">
       {/* Animated background layer */}
-      <div className="pointer-events-none fixed inset-0 -z-10 overflow-hidden">
+      <div className="pointer-events-none absolute inset-0 z-0 overflow-hidden">
         <div className="absolute inset-0 bg-grid opacity-[0.08]" />
 
         {/* Large outlined square */}
