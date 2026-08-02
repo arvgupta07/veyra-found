@@ -91,21 +91,37 @@ export function AppShell({ children }: { children: React.ReactNode }) {
         </div>
       </aside>
 
-      {/* Mobile top bar */}
-      <div className="fixed inset-x-0 top-0 z-30 flex items-center justify-between border-b-[3px] border-cream bg-ink px-4 py-2.5 md:hidden">
-        <Link to="/" className="flex items-center gap-2">
-          <div className="grid h-9 w-9 place-items-center border-2 border-cream bg-cream shadow-[2px_2px_0_0_var(--orange)]">
-            <VeyraMark size={22} />
+      {/* Compact top bar + tab strip (shown whenever the sidebar is hidden) */}
+      <div className="fixed inset-x-0 top-0 z-30 border-b-[3px] border-cream bg-ink md:hidden">
+        <div className="flex items-center justify-between px-4 py-2.5">
+          <Link to="/" className="flex items-center gap-2">
+            <div className="grid h-9 w-9 place-items-center border-2 border-cream bg-cream shadow-[2px_2px_0_0_var(--orange)]">
+              <VeyraMark size={22} />
+            </div>
+            <span className="text-lg font-black tracking-tight text-cream">Veyra Found</span>
+          </Link>
+          <div className="flex items-center gap-3">
+            <button onClick={toggle} aria-label="Toggle dark mode" className="grid h-8 w-8 place-items-center border-2 border-cream bg-cream text-ink">
+              {dark ? <Sun className="h-4 w-4" /> : <Moon className="h-4 w-4" />}
+            </button>
+            <button onClick={() => setConfirmSignOut(true)} className="border-2 border-cream bg-orange px-2 py-1 text-[10px] font-black uppercase text-white">Sign out</button>
           </div>
-          <span className="text-lg font-black tracking-tight text-cream">Veyra Found</span>
-        </Link>
-        <div className="flex items-center gap-3">
-          <button onClick={toggle} aria-label="Toggle dark mode" className="grid h-8 w-8 place-items-center border-2 border-cream bg-cream text-ink">
-            {dark ? <Sun className="h-4 w-4" /> : <Moon className="h-4 w-4" />}
-          </button>
-          <button onClick={() => setConfirmSignOut(true)} className="border-2 border-cream bg-orange px-2 py-1 text-[10px] font-black uppercase text-white">Sign out</button>
+        </div>
+        <div className="flex gap-1 overflow-x-auto border-t-2 border-cream/30 px-2 py-1.5">
+          {nav.map((n) => {
+            const active = pathname === n.to || (n.to !== "/" && pathname.startsWith(n.to));
+            const dot = n.to === "/inbox" && hasUnread;
+            return (
+              <Link key={n.to} to={n.to}
+                className={`relative flex shrink-0 items-center gap-1.5 border-2 px-2.5 py-1 text-[11px] font-black uppercase tracking-wider ${active ? "border-cream bg-orange text-white" : "border-cream/40 text-cream/70"}`}>
+                <n.icon className="h-3.5 w-3.5" /> {n.label}
+                {dot && <span className="ml-0.5 rounded-full bg-red px-1.5 text-[9px] font-black text-white">{unread.length}</span>}
+              </Link>
+            );
+          })}
         </div>
       </div>
+
 
 
       {/* Mobile bottom nav */}
