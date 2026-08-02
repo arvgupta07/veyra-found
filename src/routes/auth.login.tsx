@@ -2,11 +2,9 @@ import { createFileRoute, Link, useRouter } from "@tanstack/react-router";
 import { useState } from "react";
 import { Loader2 } from "lucide-react";
 import { toast } from "sonner";
-import { useServerFn } from "@tanstack/react-start";
 import { supabase } from "@/integrations/supabase/client";
 import { lovable } from "@/integrations/lovable";
 import { VeyraMark } from "@/components/VeyraLogo";
-import { claimDemoFounder } from "@/lib/demo.functions";
 
 export const Route = createFileRoute("/auth/login")({
   component: Login,
@@ -14,11 +12,9 @@ export const Route = createFileRoute("/auth/login")({
 
 function Login() {
   const router = useRouter();
-  const claimDemo = useServerFn(claimDemoFounder);
-  const [email, setEmail] = useState("demo@cofound.ai");
-  const [password, setPassword] = useState("demo1234");
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
-
 
   async function submit(e: React.FormEvent) {
     e.preventDefault();
@@ -30,41 +26,6 @@ function Login() {
     router.navigate({ to: "/discover" });
   }
 
-  async function demoSignIn(tier: "free" | "pro") {
-    setLoading(true);
-    const cfg = tier === "pro"
-      ? { email: "demo-pro@cofound.ai", password: "demo1234", name: "Priya Nair", founderId: "44444444-4444-4444-4444-444444444444", isPro: true }
-      : { email: "demo@cofound.ai",     password: "demo1234", name: "Arjun Sharma", founderId: "11111111-1111-1111-1111-111111111111", isPro: false };
-
-    let { error } = await supabase.auth.signInWithPassword({ email: cfg.email, password: cfg.password });
-    if (error) {
-      const { error: sErr } = await supabase.auth.signUp({
-        email: cfg.email, password: cfg.password,
-        options: { data: { full_name: cfg.name, role: "founder" } },
-      });
-      if (sErr && !sErr.message.includes("registered")) { setLoading(false); return toast.error(sErr.message); }
-      const login2 = await supabase.auth.signInWithPassword({ email: cfg.email, password: cfg.password });
-      error = login2.error;
-    }
-    if (error) { setLoading(false); return toast.error(error.message); }
-
-    const { data: userData } = await supabase.auth.getUser();
-    if (userData.user) {
-      // Claim the seeded demo founder through an authenticated server function
-      // so the privileged database routine isn't exposed to the browser.
-      try {
-        await claimDemo({ data: { founderId: cfg.founderId } });
-      } catch {
-        setLoading(false);
-        return toast.error("Could not set up the demo profile");
-      }
-
-      await supabase.from("profiles").update({ is_pro: cfg.isPro, full_name: cfg.name }).eq("id", userData.user.id);
-    }
-    setLoading(false);
-    toast.success(`Signed in as ${cfg.name} (${tier === "pro" ? "Pro" : "Free"} demo)`);
-    router.navigate({ to: "/discover" });
-  }
 
 
   return (
@@ -103,14 +64,8 @@ function Login() {
           <svg className="h-4 w-4" viewBox="0 0 48 48"><path fill="#EA4335" d="M24 9.5c3.5 0 6.6 1.2 9 3.5l6.7-6.7C35.6 2.2 30.2 0 24 0 14.6 0 6.4 5.4 2.4 13.3l7.8 6c1.9-5.7 7.3-9.8 13.8-9.8z"/><path fill="#4285F4" d="M46.5 24.5c0-1.6-.2-3.2-.4-4.7H24v9h12.7c-.6 3-2.3 5.5-4.8 7.2l7.5 5.8c4.4-4 7.1-9.9 7.1-17.3z"/><path fill="#FBBC05" d="M10.2 28.7c-.5-1.5-.8-3.1-.8-4.7s.3-3.2.8-4.7l-7.8-6C.9 16.5 0 20.2 0 24s.9 7.5 2.4 10.7l7.8-6z"/><path fill="#34A853" d="M24 48c6.5 0 11.9-2.2 15.9-5.9l-7.5-5.8c-2.1 1.4-4.7 2.2-8.4 2.2-6.5 0-12-4.1-13.8-9.8l-7.8 6C6.4 42.6 14.6 48 24 48z"/></svg>
           Continue with Google
         </button>
-        <div className="grid grid-cols-2 gap-2">
-          <button onClick={() => demoSignIn("free")} disabled={loading} className="rounded-lg border-2 border-ink bg-white py-2.5 text-sm font-black text-ink shadow-brutal-sm box-hover">
-            Demo · Free tier
-          </button>
-          <button onClick={() => demoSignIn("pro")} disabled={loading} className="rounded-lg border-2 border-ink bg-orange py-2.5 text-sm font-black text-ink shadow-brutal-sm box-hover">
-            Demo · Pro tier ✨
-          </button>
-        </div>
+
+
 
         <div className="text-center text-sm text-muted-text">
           New here?{" "}<Link to="/auth/signup" className="font-semibold text-indigo">Create an account</Link>
