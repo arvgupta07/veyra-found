@@ -164,7 +164,7 @@ function ConversationView() {
         {/* AI report intentionally removed */}
 
         {/* Messages */}
-        <div className="flex-1 overflow-y-auto bg-surface px-4 py-6" onClick={() => setActiveMsg(null)}>
+        <div className="page-paper flex-1 overflow-y-auto px-4 py-6" onClick={() => setActiveMsg(null)}>
           <div className="mx-auto max-w-2xl space-y-3">
             {(messages ?? []).map((m) => {
               const mine = m.sender_id === me.user_id || m.seed_sender_founder_id === me.id;
