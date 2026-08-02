@@ -127,15 +127,11 @@ function Landing() {
                 Find my co-founder <ArrowRight className="h-4 w-4" strokeWidth={3} />
               </Link>
               <Link to="/auth/login" className="inline-flex items-center gap-2 border-[3px] border-ink bg-cream px-6 py-3.5 text-sm font-black uppercase box-press">
-                One-click demo <Zap className="h-4 w-4" strokeWidth={3} />
+                Sign in <Zap className="h-4 w-4" strokeWidth={3} />
               </Link>
             </div>
 
-            <div className="mt-6 inline-flex items-center gap-2 border-2 border-dashed border-ink bg-cream/60 px-3 py-1.5 text-xs font-bold uppercase">
-              <span>Demo:</span>
-              <code className="bg-ink px-1.5 py-0.5 text-cream">demo@cofound.ai</code>
-              <code className="bg-ink px-1.5 py-0.5 text-cream">demo1234</code>
-            </div>
+
           </div>
 
           {/* Interactive profile box */}
