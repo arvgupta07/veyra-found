@@ -319,13 +319,15 @@
 
   /* Kill decorative animations on small screens where they cost the most */
   @media (max-width: 640px) {
-    .animate-float, .animate-wiggle { animation: none !important; }
+    .animate-float, .animate-wiggle, .animate-drift, .animate-drift-reverse, .animate-rotate-slow, .animate-pulse-slow {
+      animation: none !important;
+    }
     .bg-grid { display: none; }
   }
 
   /* Respect user preference */
   @media (prefers-reduced-motion: reduce) {
-    .animate-marquee, .animate-float, .animate-wiggle, .animate-blink, .animate-pop-in {
+    .animate-marquee, .animate-float, .animate-wiggle, .animate-blink, .animate-pop-in, .animate-drift, .animate-drift-reverse, .animate-rotate-slow, .animate-pulse-slow {
       animation: none !important;
     }
     .box-hover, .box-press { transition: none !important; }
