@@ -250,6 +250,43 @@
     50% { transform: translateY(-10px) rotate(2deg); }
   }
 
+  .animate-drift {
+    animation: drift 18s ease-in-out infinite;
+    will-change: transform;
+  }
+  @keyframes drift {
+    0%, 100% { transform: translate(0, 0) rotate(0deg); }
+    33% { transform: translate(30px, -40px) rotate(5deg); }
+    66% { transform: translate(-20px, 20px) rotate(-3deg); }
+  }
+
+  .animate-drift-reverse {
+    animation: driftReverse 22s ease-in-out infinite;
+    will-change: transform;
+  }
+  @keyframes driftReverse {
+    0%, 100% { transform: translate(0, 0) rotate(0deg); }
+    50% { transform: translate(-40px, -30px) rotate(-8deg); }
+  }
+
+  .animate-rotate-slow {
+    animation: rotateSlow 14s linear infinite;
+    will-change: transform;
+  }
+  @keyframes rotateSlow {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+  }
+
+  .animate-pulse-slow {
+    animation: pulseSlow 5s ease-in-out infinite;
+    will-change: opacity, transform;
+  }
+  @keyframes pulseSlow {
+    0%, 100% { opacity: 0.6; transform: scale(1); }
+    50% { opacity: 1; transform: scale(1.05); }
+  }
+
   .animate-wiggle { animation: wiggle 2.4s ease-in-out infinite; will-change: transform; }
   @keyframes wiggle {
     0%,100% { transform: rotate(-1.5deg); }
