@@ -1,11 +1,11 @@
 import logoAsset from "@/assets/veyra-logo.png.asset.json";
 
-// Veyra brand mark — official logo asset (two figures forming a V).
+// Veyra Found brand mark — official logo asset.
 export function VeyraMark({ size = 32, className = "" }: { size?: number; className?: string }) {
   return (
     <img
       src={logoAsset.url}
-      alt="Veyra"
+      alt="Veyra Found"
       width={size}
       height={size}
       className={className}
