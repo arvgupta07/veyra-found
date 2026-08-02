@@ -178,20 +178,34 @@ function Inbox() {
     <AppShell>
       <div className="mx-auto max-w-3xl px-4 py-6 md:py-10">
         <h1 className="text-3xl font-black tracking-tight">Inbox</h1>
-        <div className="mt-6 flex gap-6 border-b-2 border-ink">
-          {(["requests", "sent", "talking"] as const).map((t) => (
-            <button key={t} onClick={() => setTab(t)}
-              className={`relative pb-3 text-sm font-black capitalize transition ${tab === t ? "text-orange" : "text-muted-text hover:text-ink"}`}>
-              {t} {t === "requests" && (requests?.length ?? 0) > 0 && (
-                <span className="ml-1 rounded-full bg-orange px-1.5 py-0.5 text-[10px] text-white">{requests!.length}</span>
-              )}
-              {t === "sent" && (sent?.length ?? 0) > 0 && (
-                <span className="ml-1 rounded-full bg-ink px-1.5 py-0.5 text-[10px] text-white">{sent!.length}</span>
-              )}
-              {tab === t && <span className="absolute inset-x-0 -bottom-[2px] h-1 bg-orange" />}
-            </button>
-          ))}
+        <div className="mt-6 flex gap-2 border-[3px] border-ink bg-white p-1.5 shadow-brutal-sm soft-corners">
+          {(["requests", "sent", "talking"] as const).map((t) => {
+            const count = t === "requests" ? (requests?.length ?? 0)
+              : t === "sent" ? (sent?.length ?? 0)
+              : (conversations?.length ?? 0);
+            const badgeCls = t === "requests" ? "bg-orange text-white"
+              : t === "sent" ? "bg-ink text-white"
+              : "bg-sage text-ink";
+            const activeTab = tab === t;
+            return (
+              <button key={t} onClick={() => setTab(t)}
+                className={`relative flex flex-1 items-center justify-center gap-2 px-3 py-2 text-xs font-black uppercase tracking-wider transition soft-corners ${
+                  activeTab ? "border-2 border-ink bg-cream text-ink shadow-brutal-sm bg-hatch" : "text-muted-text hover:text-ink"
+                }`}>
+                {t}
+                {count > 0 && (
+                  <span className={`grid h-5 min-w-5 place-items-center rounded-full border-2 border-ink px-1 text-[10px] font-black ${badgeCls}`}>
+                    {count}
+                  </span>
+                )}
+                {t === "talking" && unread.length > 0 && (
+                  <span className="absolute right-1 top-1 h-2.5 w-2.5 rounded-full border border-ink bg-red" />
+                )}
+              </button>
+            );
+          })}
         </div>
+
 
         {tab === "talking" && (
           <div className="mt-4 flex flex-wrap items-center gap-2">
