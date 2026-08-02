@@ -58,7 +58,9 @@ function Inbox() {
     queryFn: async () => {
       const { data } = await supabase.from("connection_requests")
         .select("*, founder:founders!connection_requests_to_founder_id_fkey(*, profiles(full_name))")
-        .eq("from_founder_id", me!.id).order("created_at", { ascending: false });
+        .eq("from_founder_id", me!.id)
+        .neq("status", "accepted")
+        .order("created_at", { ascending: false });
       return data ?? [];
     },
   });
