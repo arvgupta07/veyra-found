@@ -1,4 +1,17 @@
-import { useEffect, useState } from "react";
+import { useEffect, useSyncExternalStore } from "react";
+
+const KEY = "veyra-theme";
+const listeners = new Set<() => void>();
+let dark = false;
+
+function emit() {
+  listeners.forEach((l) => l());
+}
+
+function applyTheme(next: boolean) {
+  if (typeof document === "undefined") return;
+  document.documentElement.classList.toggle("dark", next);
+}
 
 function armThemeTransition() {
   if (typeof document === "undefined") return;
@@ -7,22 +20,45 @@ function armThemeTransition() {
   window.setTimeout(() => root.classList.remove("theme-switching"), 400);
 }
 
+function subscribe(cb: () => void) {
+  listeners.add(cb);
+  return () => {
+    listeners.delete(cb);
+  };
+}
+
+/** Shared dark-mode store: one source of truth for every toggle in the UI. */
 export function useDarkMode() {
-  const [dark, setDark] = useState<boolean>(false);
+  const value = useSyncExternalStore(
+    subscribe,
+    () => dark,
+    () => false,
+  );
+
+  // Hydrate once from localStorage on the client.
   useEffect(() => {
-    const stored = typeof window !== "undefined" ? window.localStorage.getItem("veyra-theme") : null;
+    if (typeof window === "undefined") return;
+    const stored = window.localStorage.getItem(KEY);
     const isDark = stored === "dark";
-    setDark(isDark);
-    document.documentElement.classList.toggle("dark", isDark);
+    if (isDark !== dark) {
+      dark = isDark;
+      emit();
+    }
+    applyTheme(isDark);
   }, []);
+
   function toggle() {
-    setDark((prev) => {
-      const next = !prev;
-      armThemeTransition();
-      document.documentElement.classList.toggle("dark", next);
-      window.localStorage.setItem("veyra-theme", next ? "dark" : "light");
-      return next;
-    });
+    const next = !dark;
+    dark = next;
+    armThemeTransition();
+    applyTheme(next);
+    try {
+      window.localStorage.setItem(KEY, next ? "dark" : "light");
+    } catch {
+      /* ignore */
+    }
+    emit();
   }
-  return { dark, toggle };
+
+  return { dark: value, toggle };
 }

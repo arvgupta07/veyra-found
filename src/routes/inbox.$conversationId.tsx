@@ -17,6 +17,28 @@ export const Route = createFileRoute("/inbox/$conversationId")({
 
 const REACTIONS = ["👍", "❤️", "😂", "🎉", "🔥", "🤔"];
 
+function formatTime(iso: string) {
+  return new Date(iso).toLocaleTimeString([], { hour: "numeric", minute: "2-digit" });
+}
+
+function dayKey(iso: string) {
+  const d = new Date(iso);
+  return `${d.getFullYear()}-${d.getMonth()}-${d.getDate()}`;
+}
+
+function formatDay(iso: string) {
+  const d = new Date(iso);
+  const today = new Date();
+  const yesterday = new Date();
+  yesterday.setDate(today.getDate() - 1);
+  if (dayKey(iso) === dayKey(today.toISOString())) return "Today";
+  if (dayKey(iso) === dayKey(yesterday.toISOString())) return "Yesterday";
+  const sameYear = d.getFullYear() === today.getFullYear();
+  return d.toLocaleDateString([], sameYear
+    ? { weekday: "short", day: "numeric", month: "short" }
+    : { day: "numeric", month: "short", year: "numeric" });
+}
+
 type MessageRow = {
   id: string;
   conversation_id: string;
@@ -141,7 +163,7 @@ function ConversationView() {
 
   return (
     <AppShell>
-      <div className="mx-auto flex h-[calc(100vh-3.5rem)] max-w-5xl flex-col md:h-screen">
+      <div className="mx-auto flex h-[calc(100vh-6.5rem)] max-w-5xl flex-col md:h-screen">
         {/* Header */}
         <div className="flex items-center gap-3 border-b-2 border-ink bg-white px-4 py-3">
           <Link to="/inbox" className="text-muted-text hover:text-ink"><ArrowLeft className="h-5 w-5" /></Link>
@@ -166,14 +188,24 @@ function ConversationView() {
         {/* Messages */}
         <div className="page-paper flex-1 overflow-y-auto px-4 py-6" onClick={() => setActiveMsg(null)}>
           <div className="mx-auto max-w-2xl space-y-3">
-            {(messages ?? []).map((m) => {
+            {(messages ?? []).map((m, i) => {
+              const prev = (messages ?? [])[i - 1];
+              const showDay = !prev || dayKey(prev.created_at) !== dayKey(m.created_at);
               const mine = m.sender_id === me.user_id || m.seed_sender_founder_id === me.id;
               const deleted = !!m.deleted_at;
               const editing = editingId === m.id;
               const reactions = (m.reactions as Record<string, string[]> | null) ?? {};
               const isActive = activeMsg === m.id;
               return (
-                <div key={m.id} className={`flex ${mine ? "justify-end" : "justify-start"}`}>
+                <div key={m.id}>
+                  {showDay && (
+                    <div className="my-4 flex justify-center">
+                      <span className="border-2 border-ink bg-cream px-2.5 py-1 text-[10px] font-black uppercase tracking-wider text-ink soft-corners">
+                        {formatDay(m.created_at)}
+                      </span>
+                    </div>
+                  )}
+                  <div className={`flex ${mine ? "justify-end" : "justify-start"}`}>
                   <div className="relative max-w-[80%]">
                     <div
                       onClick={(e) => { e.stopPropagation(); if (!deleted && !editing) setActiveMsg(isActive ? null : m.id); }}
@@ -194,7 +226,10 @@ function ConversationView() {
                       ) : (
                         <>
                           <div>{m.content}</div>
-                          {m.edited_at && <div className="mt-0.5 text-[9px] font-bold opacity-70">edited</div>}
+                          <div className={`mt-1 flex items-center gap-1.5 text-[10px] font-bold ${mine ? "text-white/80" : "text-muted-text"}`}>
+                            <span>{formatTime(m.created_at)}</span>
+                            {m.edited_at && <span className="opacity-80">· edited</span>}
+                          </div>
                         </>
                       )}
                     </div>
@@ -227,6 +262,7 @@ function ConversationView() {
                         )}
                       </div>
                     )}
+                    </div>
                   </div>
                 </div>
               );
