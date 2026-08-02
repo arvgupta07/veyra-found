@@ -1,4 +1,4 @@
-import { createFileRoute, Link, useParams } from "@tanstack/react-router";
+import { createFileRoute, Link, useParams, useNavigate } from "@tanstack/react-router";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
@@ -6,7 +6,8 @@ import { useMyFounder } from "@/hooks/useMyFounder";
 import { AppShell } from "@/components/AppShell";
 import { useRequireAuth } from "@/hooks/useRequireAuth";
 import { founderAvatar } from "@/lib/founder-types";
-import { ArrowBigUp, ArrowBigDown, ArrowLeft, Loader2, Bookmark, MessageSquareText, Send } from "lucide-react";
+import { deleteForumPost, deleteForumComment } from "@/lib/forum-actions";
+import { ArrowBigUp, ArrowBigDown, ArrowLeft, Loader2, Bookmark, MessageSquareText, Send, Trash2 } from "lucide-react";
 import { toast } from "sonner";
 
 export const Route = createFileRoute("/forum/$postId")({
@@ -18,6 +19,7 @@ function PostView() {
   const { ready } = useRequireAuth({ requireOnboarded: true });
   const { data: me } = useMyFounder();
   const qc = useQueryClient();
+  const navigate = useNavigate();
   const [reply, setReply] = useState("");
   const [saving, setSaving] = useState(false);
   const [replyingTo, setReplyingTo] = useState<string | null>(null);
@@ -103,6 +105,17 @@ function PostView() {
     qc.invalidateQueries({ queryKey: ["comments", postId] });
   }
 
+  async function removeComment(commentId: string, hasReplies: boolean) {
+    if (!confirm(hasReplies ? "Delete this comment and its replies?" : "Delete this comment?")) return;
+    try {
+      await deleteForumComment(commentId);
+      toast.success("Comment deleted");
+      qc.invalidateQueries({ queryKey: ["comments", postId] });
+    } catch (err) {
+      toast.error(err instanceof Error ? err.message : "Delete failed");
+    }
+  }
+
   async function sendConnect() {
     if (!me || !post?.author_id || connectMsg.trim().length < 20) return toast.error("Add 20+ characters");
     setConnectSending(true);
@@ -160,6 +173,22 @@ function PostView() {
             <button onClick={toggleSave} className={`inline-flex items-center gap-1 rounded-md border-2 border-ink px-2 py-1 text-xs font-black box-hover ${saved ? "bg-orange text-white" : "bg-white"}`}>
               <Bookmark className="h-3 w-3" /> {saved ? "Saved" : "Save"}
             </button>
+            {me?.id === post.author_id && (
+              <button
+                onClick={async () => {
+                  if (!confirm("Delete this post? This also removes its replies and votes.")) return;
+                  try {
+                    await deleteForumPost(postId);
+                    toast.success("Post deleted");
+                    navigate({ to: "/forum" });
+                  } catch (err) {
+                    toast.error(err instanceof Error ? err.message : "Delete failed");
+                  }
+                }}
+                className="inline-flex items-center gap-1 rounded-md border-2 border-ink bg-red px-2 py-1 text-xs font-black text-white shadow-brutal-sm box-hover">
+                <Trash2 className="h-3 w-3" /> Delete post
+              </button>
+            )}
             {isLFC && me?.id !== post.author_id && (
               <button onClick={() => setConnectOpen(true)} className="ml-auto inline-flex items-center gap-1.5 rounded-md border-2 border-ink bg-sage px-3 py-1.5 text-xs font-black text-ink shadow-brutal-sm box-hover">
                 <MessageSquareText className="h-3 w-3" /> Interested in connecting?
@@ -193,9 +222,16 @@ function PostView() {
                   <span className="font-semibold text-foreground">{c.author?.profiles?.full_name ?? c.author?.seed_name}</span>
                 </div>
                 <p className="mt-2 whitespace-pre-wrap text-sm">{c.content}</p>
-                <button onClick={() => setReplyingTo(replyingTo === c.id ? null : c.id)} className="mt-2 text-[11px] font-black text-orange hover:underline">
-                  {replyingTo === c.id ? "Cancel" : "Reply"}
-                </button>
+                <div className="mt-2 flex items-center gap-3">
+                  <button onClick={() => setReplyingTo(replyingTo === c.id ? null : c.id)} className="text-[11px] font-black text-orange hover:underline">
+                    {replyingTo === c.id ? "Cancel" : "Reply"}
+                  </button>
+                  {me?.id === c.author_id && (
+                    <button onClick={() => removeComment(c.id, true)} className="inline-flex items-center gap-1 text-[11px] font-black text-red hover:underline">
+                      <Trash2 className="h-3 w-3" /> Delete
+                    </button>
+                  )}
+                </div>
                 {replyingTo === c.id && (
                   <div className="mt-2">
                     <textarea rows={2} value={replyText} onChange={(e) => setReplyText(e.target.value)} placeholder="Your reply…" className="w-full rounded-lg border-2 border-ink bg-cream px-3 py-2 text-sm" />
@@ -211,6 +247,11 @@ function PostView() {
                           <span className="font-semibold text-foreground">{r.author?.profiles?.full_name ?? r.author?.seed_name}</span>
                         </div>
                         <p className="mt-1 whitespace-pre-wrap text-xs">{r.content}</p>
+                        {me?.id === r.author_id && (
+                          <button onClick={() => removeComment(r.id, false)} className="mt-1 inline-flex items-center gap-1 text-[10px] font-black text-red hover:underline">
+                            <Trash2 className="h-3 w-3" /> Delete
+                          </button>
+                        )}
                       </div>
                     ))}
                   </div>
