@@ -311,6 +311,44 @@
     opacity: 0.06;
   }
 
+  /* Subtle dotted paper — used as the ambient background inside the app */
+  .bg-dots {
+    background-image: radial-gradient(
+      color-mix(in oklab, var(--ink) 26%, transparent) 1.4px,
+      transparent 1.4px
+    );
+    background-size: 18px 18px;
+    background-position: 0 0;
+  }
+
+  /* Dots + a soft warm wash, for full page backgrounds */
+  .page-paper {
+    position: relative;
+    background-color: var(--surface);
+    background-image:
+      radial-gradient(color-mix(in oklab, var(--ink) 22%, transparent) 1.4px, transparent 1.4px),
+      radial-gradient(900px 420px at 12% -5%, color-mix(in oklab, var(--orange) 12%, transparent), transparent 60%),
+      radial-gradient(760px 400px at 92% 8%, color-mix(in oklab, var(--sage) 26%, transparent), transparent 62%);
+    background-size: 18px 18px, auto, auto;
+    background-attachment: local, fixed, fixed;
+  }
+  .dark .page-paper {
+    background-image:
+      radial-gradient(color-mix(in oklab, var(--ink) 16%, transparent) 1.4px, transparent 1.4px),
+      radial-gradient(900px 420px at 12% -5%, color-mix(in oklab, var(--orange) 10%, transparent), transparent 60%),
+      radial-gradient(760px 400px at 92% 8%, color-mix(in oklab, var(--sage) 14%, transparent), transparent 62%);
+  }
+
+  /* Diagonal hatch for tab strips / panel headers */
+  .bg-hatch {
+    background-image: repeating-linear-gradient(
+      45deg,
+      color-mix(in oklab, var(--ink) 12%, transparent) 0 2px,
+      transparent 2px 8px
+    );
+  }
+
+
   /* Defer offscreen paint work — big win on long landing pages */
   .cv-auto {
     content-visibility: auto;
