@@ -1,4 +1,4 @@
-import { createFileRoute, Link, useParams } from "@tanstack/react-router";
+import { createFileRoute, Link, useParams, useNavigate } from "@tanstack/react-router";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
@@ -6,7 +6,8 @@ import { useMyFounder } from "@/hooks/useMyFounder";
 import { AppShell } from "@/components/AppShell";
 import { useRequireAuth } from "@/hooks/useRequireAuth";
 import { founderAvatar } from "@/lib/founder-types";
-import { ArrowBigUp, ArrowBigDown, ArrowLeft, Loader2, Bookmark, MessageSquareText, Send } from "lucide-react";
+import { deleteForumPost, deleteForumComment } from "@/lib/forum-actions";
+import { ArrowBigUp, ArrowBigDown, ArrowLeft, Loader2, Bookmark, MessageSquareText, Send, Trash2 } from "lucide-react";
 import { toast } from "sonner";
 
 export const Route = createFileRoute("/forum/$postId")({
