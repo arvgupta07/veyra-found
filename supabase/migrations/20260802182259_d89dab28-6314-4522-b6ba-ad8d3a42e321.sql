@@ -1,0 +1,1 @@
+REVOKE ALL ON FUNCTION public.forum_spam_guard() FROM PUBLIC, anon, authenticated;
