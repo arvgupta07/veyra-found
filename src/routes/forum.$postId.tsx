@@ -211,9 +211,16 @@ function PostView() {
                   <span className="font-semibold text-foreground">{c.author?.profiles?.full_name ?? c.author?.seed_name}</span>
                 </div>
                 <p className="mt-2 whitespace-pre-wrap text-sm">{c.content}</p>
-                <button onClick={() => setReplyingTo(replyingTo === c.id ? null : c.id)} className="mt-2 text-[11px] font-black text-orange hover:underline">
-                  {replyingTo === c.id ? "Cancel" : "Reply"}
-                </button>
+                <div className="mt-2 flex items-center gap-3">
+                  <button onClick={() => setReplyingTo(replyingTo === c.id ? null : c.id)} className="text-[11px] font-black text-orange hover:underline">
+                    {replyingTo === c.id ? "Cancel" : "Reply"}
+                  </button>
+                  {me?.id === c.author_id && (
+                    <button onClick={() => removeComment(c.id, true)} className="inline-flex items-center gap-1 text-[11px] font-black text-red hover:underline">
+                      <Trash2 className="h-3 w-3" /> Delete
+                    </button>
+                  )}
+                </div>
                 {replyingTo === c.id && (
                   <div className="mt-2">
                     <textarea rows={2} value={replyText} onChange={(e) => setReplyText(e.target.value)} placeholder="Your reply…" className="w-full rounded-lg border-2 border-ink bg-cream px-3 py-2 text-sm" />
