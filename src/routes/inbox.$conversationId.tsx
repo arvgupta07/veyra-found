@@ -40,6 +40,7 @@ function ConversationView() {
 
   const { data: convo } = useQuery({
     queryKey: ["convo", conversationId],
+    staleTime: 5 * 60_000,
     queryFn: async () => {
       const { data } = await supabase.from("conversations")
         .select("*, a:founders!conversations_founder_a_id_fkey(*, profiles(full_name)), b:founders!conversations_founder_b_id_fkey(*, profiles(full_name))")
@@ -50,22 +51,47 @@ function ConversationView() {
 
   const { data: messages } = useQuery({
     queryKey: ["messages", conversationId],
+    staleTime: 60_000,
     queryFn: async () => {
       const { data } = await supabase.from("messages")
-        .select("*").eq("conversation_id", conversationId).order("created_at", { ascending: true });
+        .select("id,conversation_id,sender_id,seed_sender_founder_id,content,created_at,edited_at,deleted_at,reactions")
+        .eq("conversation_id", conversationId).order("created_at", { ascending: true }).limit(200);
       return (data ?? []) as unknown as MessageRow[];
     },
   });
 
+  // Opening the chat clears its unread marker.
+  useEffect(() => { clearUnread(conversationId); }, [conversationId, messages?.length]);
+
   useEffect(() => {
     const ch = supabase.channel(`msgs-${conversationId}`)
       .on("postgres_changes", { event: "*", schema: "public", table: "messages", filter: `conversation_id=eq.${conversationId}` },
-        () => qc.invalidateQueries({ queryKey: ["messages", conversationId] }))
+        (payload) => {
+          // Patch the cache directly — far cheaper than refetching the thread.
+          qc.setQueryData<MessageRow[]>(["messages", conversationId], (prev) => {
+            const list = prev ?? [];
+            if (payload.eventType === "INSERT") {
+              const row = payload.new as unknown as MessageRow;
+              if (list.some((m) => m.id === row.id)) return list;
+              return [...list, row];
+            }
+            if (payload.eventType === "UPDATE") {
+              const row = payload.new as unknown as MessageRow;
+              return list.map((m) => (m.id === row.id ? { ...m, ...row } : m));
+            }
+            if (payload.eventType === "DELETE") {
+              const oldRow = payload.old as { id?: string };
+              return list.filter((m) => m.id !== oldRow.id);
+            }
+            return list;
+          });
+        })
       .subscribe();
     return () => { supabase.removeChannel(ch); };
   }, [conversationId, qc]);
 
-  useEffect(() => { bottomRef.current?.scrollIntoView({ behavior: "smooth" }); }, [messages]);
+  useEffect(() => { bottomRef.current?.scrollIntoView({ behavior: "auto" }); }, [messages]);
+
 
   async function send() {
     if (!text.trim() || !me) return;
