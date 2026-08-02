@@ -328,11 +328,48 @@ export type Database = {
           },
         ]
       }
+      forum_collaborators: {
+        Row: {
+          created_at: string
+          founder_id: string
+          id: string
+          post_id: string
+        }
+        Insert: {
+          created_at?: string
+          founder_id: string
+          id?: string
+          post_id: string
+        }
+        Update: {
+          created_at?: string
+          founder_id?: string
+          id?: string
+          post_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "forum_collaborators_founder_id_fkey"
+            columns: ["founder_id"]
+            isOneToOne: false
+            referencedRelation: "founders"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "forum_collaborators_post_id_fkey"
+            columns: ["post_id"]
+            isOneToOne: false
+            referencedRelation: "forum_posts"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       forum_comments: {
         Row: {
           author_id: string
           content: string
           created_at: string
+          edited_at: string | null
           id: string
           parent_comment_id: string | null
           post_id: string
@@ -342,6 +379,7 @@ export type Database = {
           author_id: string
           content: string
           created_at?: string
+          edited_at?: string | null
           id?: string
           parent_comment_id?: string | null
           post_id: string
@@ -351,6 +389,7 @@ export type Database = {
           author_id?: string
           content?: string
           created_at?: string
+          edited_at?: string | null
           id?: string
           parent_comment_id?: string | null
           post_id?: string
@@ -386,6 +425,8 @@ export type Database = {
           category: Database["public"]["Enums"]["forum_category"] | null
           content: string
           created_at: string
+          cross_categories: Database["public"]["Enums"]["forum_category"][]
+          edited_at: string | null
           id: string
           image_url: string | null
           industry_tag: string | null
@@ -400,6 +441,8 @@ export type Database = {
           category?: Database["public"]["Enums"]["forum_category"] | null
           content: string
           created_at?: string
+          cross_categories?: Database["public"]["Enums"]["forum_category"][]
+          edited_at?: string | null
           id?: string
           image_url?: string | null
           industry_tag?: string | null
@@ -414,6 +457,8 @@ export type Database = {
           category?: Database["public"]["Enums"]["forum_category"] | null
           content?: string
           created_at?: string
+          cross_categories?: Database["public"]["Enums"]["forum_category"][]
+          edited_at?: string | null
           id?: string
           image_url?: string | null
           industry_tag?: string | null
@@ -533,6 +578,7 @@ export type Database = {
           aadhaar_verified: boolean | null
           active_status: Database["public"]["Enums"]["founder_active"] | null
           age: number | null
+          assessment_public: boolean
           background: Database["public"]["Enums"]["founder_background"] | null
           bio: string | null
           commitment: Database["public"]["Enums"]["founder_commitment"] | null
@@ -557,7 +603,9 @@ export type Database = {
           remote_pref: Database["public"]["Enums"]["remote_pref"] | null
           seed_avatar: string | null
           seed_name: string | null
+          shadow_banned: boolean
           skills: string[] | null
+          spam_strikes: number
           trust_tier: Database["public"]["Enums"]["trust_tier"] | null
           user_id: string | null
           video_intro_url: string | null
@@ -568,6 +616,7 @@ export type Database = {
           aadhaar_verified?: boolean | null
           active_status?: Database["public"]["Enums"]["founder_active"] | null
           age?: number | null
+          assessment_public?: boolean
           background?: Database["public"]["Enums"]["founder_background"] | null
           bio?: string | null
           commitment?: Database["public"]["Enums"]["founder_commitment"] | null
@@ -592,7 +641,9 @@ export type Database = {
           remote_pref?: Database["public"]["Enums"]["remote_pref"] | null
           seed_avatar?: string | null
           seed_name?: string | null
+          shadow_banned?: boolean
           skills?: string[] | null
+          spam_strikes?: number
           trust_tier?: Database["public"]["Enums"]["trust_tier"] | null
           user_id?: string | null
           video_intro_url?: string | null
@@ -603,6 +654,7 @@ export type Database = {
           aadhaar_verified?: boolean | null
           active_status?: Database["public"]["Enums"]["founder_active"] | null
           age?: number | null
+          assessment_public?: boolean
           background?: Database["public"]["Enums"]["founder_background"] | null
           bio?: string | null
           commitment?: Database["public"]["Enums"]["founder_commitment"] | null
@@ -627,7 +679,9 @@ export type Database = {
           remote_pref?: Database["public"]["Enums"]["remote_pref"] | null
           seed_avatar?: string | null
           seed_name?: string | null
+          shadow_banned?: boolean
           skills?: string[] | null
+          spam_strikes?: number
           trust_tier?: Database["public"]["Enums"]["trust_tier"] | null
           user_id?: string | null
           video_intro_url?: string | null
