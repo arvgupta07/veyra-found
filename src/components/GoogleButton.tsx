@@ -1,5 +1,4 @@
 import { toast } from "sonner";
-import { lovable } from "@/integrations/lovable";
 import { supabase } from "@/integrations/supabase/client";
 import { useRouter } from "@tanstack/react-router";
 import { useState } from "react";
@@ -11,19 +10,19 @@ export function GoogleButton({ label = "Continue with Google" }: { label?: strin
 
   async function onClick() {
     setBusy(true);
-    const result = await lovable.auth.signInWithOAuth("google", {
-      // must be a public, same-origin URL — never a protected route
-      redirect_uri: `${window.location.origin}/auth/callback`,
+    const { error } = await supabase.auth.signInWithOAuth({
+      provider: "google",
+      options: {
+        redirectTo: `${window.location.origin}/auth/callback`,
+      },
     });
-    if (result.error) {
+
+    if (error) {
       setBusy(false);
-      toast.error(result.error.message ?? "Google sign-in failed");
+      toast.error(error.message ?? "Google sign-in failed");
       return;
     }
-    if (result.redirected) return; // browser is navigating to Google
-    const { data } = await supabase.auth.getSession();
-    setBusy(false);
-    if (data.session) router.navigate({ to: "/discover" });
+    // Browser is redirecting to Google OAuth
   }
 
   return (

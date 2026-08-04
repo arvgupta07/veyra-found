@@ -1,12 +1,12 @@
-# CoFound India
+# Veyra Found
 
-Build me a full-stack web app called CoFound AI — India's co-founder matching platform. This is a Hinge-style (NOT Tinder) professional matching platform where Indian founders find co-founders. Use React + Supabase + Tailwind CSS + shadcn/ui. Below is the complete specification. Build everything exactly as described.
+Build me a full-stack web app called Veyra Found — India's co-founder matching platform. This is a Hinge-style (NOT Tinder) professional matching platform where Indian founders find co-founders. Use React + Supabase + Tailwind CSS + shadcn/ui. Below is the complete specification. Build everything exactly as described.
 
 ---
 
 ## OVERVIEW
 
-CoFound AI has two core spaces:
+Veyra Found has two core spaces:
 1. A co-founder matching platform — Hinge-style browsing, connection requests, inbox with DM organisation
 2. A community forum — where founders post ideas, get feedback, and discuss
 

@@ -2,28 +2,26 @@ import { useState } from "react";
 import { toast } from "sonner";
 import { Loader2, Wand2, Send } from "lucide-react";
 import { useRouter } from "@tanstack/react-router";
-import { lovable } from "@/integrations/lovable";
 import { supabase } from "@/integrations/supabase/client";
 
-/** Sign in with Apple (managed by Lovable Cloud). */
+/** Sign in with Apple. */
 export function AppleButton({ label = "Continue with Apple" }: { label?: string }) {
   const router = useRouter();
   const [busy, setBusy] = useState(false);
 
   async function onClick() {
     setBusy(true);
-    const result = await lovable.auth.signInWithOAuth("apple", {
-      redirect_uri: `${window.location.origin}/auth/callback`,
+    const { error } = await supabase.auth.signInWithOAuth({
+      provider: "apple",
+      options: {
+        redirectTo: `${window.location.origin}/auth/callback`,
+      },
     });
-    if (result.error) {
+    if (error) {
       setBusy(false);
-      toast.error(result.error.message ?? "Apple sign-in failed");
+      toast.error(error.message ?? "Apple sign-in failed");
       return;
     }
-    if (result.redirected) return;
-    const { data } = await supabase.auth.getSession();
-    setBusy(false);
-    if (data.session) router.navigate({ to: "/discover" });
   }
 
   return (
