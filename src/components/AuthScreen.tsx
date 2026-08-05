@@ -51,11 +51,22 @@ export function AuthScreen({
 
           <div className="space-y-3">
             <GoogleButton label={googleLabel} />
+            <div className="flex items-center gap-3">
+              <div className="h-[3px] flex-1 bg-ink/20" />
+              <span className="text-[10px] font-black uppercase tracking-wider text-ink/60">or use email</span>
+              <div className="h-[3px] flex-1 bg-ink/20" />
+            </div>
+            <EmailAuthBox mode={mode} />
           </div>
 
           <p className="text-center text-xs font-bold text-muted-text">
-            One tap with Google — no passwords, no codes, no email waiting.
+            {mode === "signup" ? (
+              <>Already have an account? <Link to="/auth/login" className="underline">Sign in</Link></>
+            ) : (
+              <>New here? <Link to="/auth/signup" className="underline">Create an account</Link></>
+            )}
           </p>
+
 
         </div>
       </div>
