@@ -86,6 +86,10 @@ function RootShell({ children }: { children: ReactNode }) {
 function RootComponent() {
   const { queryClient } = Route.useRouteContext();
   const router = useRouter();
+  
+  // Capture hash before Supabase auth strips it from the URL
+  const [initialHash] = useState(() => typeof window !== "undefined" ? window.location.hash : "");
+
   useEffect(() => {
     const { data: sub } = supabase.auth.onAuthStateChange((event) => {
       if (event !== "SIGNED_IN" && event !== "SIGNED_OUT" && event !== "USER_UPDATED") return;
@@ -95,14 +99,13 @@ function RootComponent() {
       }
       if (event === "SIGNED_IN") {
         const path = window.location.pathname;
-        const hash = window.location.hash;
-        if ((path === "/" && hash.includes("access_token")) || path.startsWith("/auth/")) {
+        if ((path === "/" && initialHash.includes("access_token")) || path.startsWith("/auth/")) {
           router.navigate({ to: "/discover" });
         }
       }
     });
     return () => sub.subscription.unsubscribe();
-  }, [router, queryClient]);
+  }, [router, queryClient, initialHash]);
 
   const pathname = useRouterState({ select: (s) => s.location.pathname });
   return (
