@@ -3,6 +3,7 @@ import { toast } from "sonner";
 import { Loader2, Wand2, Send } from "lucide-react";
 import { useRouter } from "@tanstack/react-router";
 import { supabase } from "@/integrations/supabase/client";
+import { lovable } from "@/integrations/lovable/index";
 
 /** Sign in with Apple. */
 export function AppleButton({ label = "Continue with Apple" }: { label?: string }) {
@@ -11,18 +12,18 @@ export function AppleButton({ label = "Continue with Apple" }: { label?: string 
 
   async function onClick() {
     setBusy(true);
-    const { error } = await supabase.auth.signInWithOAuth({
-      provider: "apple",
-      options: {
-        redirectTo: `${window.location.origin}/auth/callback`,
-      },
+    const result = await lovable.auth.signInWithOAuth("apple", {
+      redirect_uri: `${window.location.origin}/auth/callback`,
     });
-    if (error) {
+    if (result.error) {
       setBusy(false);
-      toast.error(error.message ?? "Apple sign-in failed");
+      toast.error(result.error.message ?? "Apple sign-in failed");
       return;
     }
+    if (result.redirected) return;
+    router.navigate({ to: "/discover" });
   }
+
 
   return (
     <button
