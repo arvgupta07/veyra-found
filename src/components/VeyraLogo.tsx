@@ -4,7 +4,7 @@ import logoAsset from "@/assets/veyra-logo.png.asset.json";
 export function VeyraMark({ size = 32, className = "" }: { size?: number; className?: string }) {
   return (
     <img
-      src={logoAsset.url}
+      src="/favicon.png"
       alt="Veyra Found"
       width={size}
       height={size}
