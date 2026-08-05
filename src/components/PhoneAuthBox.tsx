@@ -102,9 +102,6 @@ export function PhoneAuthBox() {
       >
         {busy ? <Loader2 className="h-4 w-4 animate-spin" /> : <Phone className="h-4 w-4" />} Send code
       </button>
-      <p className="text-[10px] font-bold uppercase tracking-wider text-ink/50 dark:text-cream/50">
-        Standard SMS rates may apply.
-      </p>
     </form>
   );
 }
