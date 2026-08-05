@@ -1,7 +1,6 @@
 import { Link } from "@tanstack/react-router";
 import { VeyraMark } from "@/components/VeyraLogo";
 import { GoogleButton } from "@/components/GoogleButton";
-import { PhoneAuthBox } from "@/components/PhoneAuthBox";
 
 /** Shared Google + phone auth screen (no email, no passwords). */
 export function AuthScreen({
