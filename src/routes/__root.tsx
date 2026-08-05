@@ -95,7 +95,8 @@ function RootComponent() {
       }
       if (event === "SIGNED_IN") {
         const path = window.location.pathname;
-        if (path === "/" || path.startsWith("/auth/")) {
+        const hash = window.location.hash;
+        if ((path === "/" && hash.includes("access_token")) || path.startsWith("/auth/")) {
           router.navigate({ to: "/discover" });
         }
       }
