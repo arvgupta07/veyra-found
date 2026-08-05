@@ -22,7 +22,6 @@ import { Route as ProfileFounderIdRouteImport } from './routes/profile.$founderI
 import { Route as InboxConversationIdRouteImport } from './routes/inbox.$conversationId'
 import { Route as ForumPostIdRouteImport } from './routes/forum.$postId'
 import { Route as AuthSignupRouteImport } from './routes/auth.signup'
-import { Route as AuthResetPasswordRouteImport } from './routes/auth.reset-password'
 import { Route as AuthLoginRouteImport } from './routes/auth.login'
 import { Route as AuthCallbackRouteImport } from './routes/auth.callback'
 
@@ -91,11 +90,6 @@ const AuthSignupRoute = AuthSignupRouteImport.update({
   path: '/auth/signup',
   getParentRoute: () => rootRouteImport,
 } as any)
-const AuthResetPasswordRoute = AuthResetPasswordRouteImport.update({
-  id: '/auth/reset-password',
-  path: '/auth/reset-password',
-  getParentRoute: () => rootRouteImport,
-} as any)
 const AuthLoginRoute = AuthLoginRouteImport.update({
   id: '/auth/login',
   path: '/auth/login',
@@ -116,7 +110,6 @@ export interface FileRoutesByFullPath {
   '/onboarding': typeof OnboardingRoute
   '/auth/callback': typeof AuthCallbackRoute
   '/auth/login': typeof AuthLoginRoute
-  '/auth/reset-password': typeof AuthResetPasswordRoute
   '/auth/signup': typeof AuthSignupRoute
   '/forum/$postId': typeof ForumPostIdRoute
   '/inbox/$conversationId': typeof InboxConversationIdRoute
@@ -134,7 +127,6 @@ export interface FileRoutesByTo {
   '/onboarding': typeof OnboardingRoute
   '/auth/callback': typeof AuthCallbackRoute
   '/auth/login': typeof AuthLoginRoute
-  '/auth/reset-password': typeof AuthResetPasswordRoute
   '/auth/signup': typeof AuthSignupRoute
   '/forum/$postId': typeof ForumPostIdRoute
   '/inbox/$conversationId': typeof InboxConversationIdRoute
@@ -153,7 +145,6 @@ export interface FileRoutesById {
   '/onboarding': typeof OnboardingRoute
   '/auth/callback': typeof AuthCallbackRoute
   '/auth/login': typeof AuthLoginRoute
-  '/auth/reset-password': typeof AuthResetPasswordRoute
   '/auth/signup': typeof AuthSignupRoute
   '/forum/$postId': typeof ForumPostIdRoute
   '/inbox/$conversationId': typeof InboxConversationIdRoute
@@ -173,7 +164,6 @@ export interface FileRouteTypes {
     | '/onboarding'
     | '/auth/callback'
     | '/auth/login'
-    | '/auth/reset-password'
     | '/auth/signup'
     | '/forum/$postId'
     | '/inbox/$conversationId'
@@ -191,7 +181,6 @@ export interface FileRouteTypes {
     | '/onboarding'
     | '/auth/callback'
     | '/auth/login'
-    | '/auth/reset-password'
     | '/auth/signup'
     | '/forum/$postId'
     | '/inbox/$conversationId'
@@ -209,7 +198,6 @@ export interface FileRouteTypes {
     | '/onboarding'
     | '/auth/callback'
     | '/auth/login'
-    | '/auth/reset-password'
     | '/auth/signup'
     | '/forum/$postId'
     | '/inbox/$conversationId'
@@ -228,7 +216,6 @@ export interface RootRouteChildren {
   OnboardingRoute: typeof OnboardingRoute
   AuthCallbackRoute: typeof AuthCallbackRoute
   AuthLoginRoute: typeof AuthLoginRoute
-  AuthResetPasswordRoute: typeof AuthResetPasswordRoute
   AuthSignupRoute: typeof AuthSignupRoute
   ForumPostIdRoute: typeof ForumPostIdRoute
   InboxConversationIdRoute: typeof InboxConversationIdRoute
@@ -331,13 +318,6 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthSignupRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/auth/reset-password': {
-      id: '/auth/reset-password'
-      path: '/auth/reset-password'
-      fullPath: '/auth/reset-password'
-      preLoaderRoute: typeof AuthResetPasswordRouteImport
-      parentRoute: typeof rootRouteImport
-    }
     '/auth/login': {
       id: '/auth/login'
       path: '/auth/login'
@@ -364,7 +344,6 @@ const rootRouteChildren: RootRouteChildren = {
   OnboardingRoute: OnboardingRoute,
   AuthCallbackRoute: AuthCallbackRoute,
   AuthLoginRoute: AuthLoginRoute,
-  AuthResetPasswordRoute: AuthResetPasswordRoute,
   AuthSignupRoute: AuthSignupRoute,
   ForumPostIdRoute: ForumPostIdRoute,
   InboxConversationIdRoute: InboxConversationIdRoute,
