@@ -1,16 +1,19 @@
 import { Link } from "@tanstack/react-router";
 import { VeyraMark } from "@/components/VeyraLogo";
 import { GoogleButton } from "@/components/GoogleButton";
+import { EmailAuthBox } from "@/components/EmailAuthBox";
 
-/** Shared Google + phone auth screen (no email, no passwords). */
+/** Shared Google + email auth screen. */
 export function AuthScreen({
   title,
   subtitle,
   googleLabel,
+  mode,
 }: {
   title: string;
   subtitle: string;
   googleLabel?: string;
+  mode: "login" | "signup";
 }) {
   return (
     <div className="relative min-h-screen overflow-hidden bg-surface">
