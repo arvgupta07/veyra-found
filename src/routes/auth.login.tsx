@@ -18,8 +18,9 @@ export const Route = createFileRoute("/auth/login")({
 function Login() {
   return (
     <AuthScreen
+      mode="login"
       title="Welcome back"
-      subtitle="Sign in with Google or your phone number to find your co-founder."
+      subtitle="Sign in with Google or your email to find your co-founder."
       googleLabel="Continue with Google"
     />
   );
