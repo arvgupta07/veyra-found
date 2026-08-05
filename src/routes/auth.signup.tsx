@@ -18,8 +18,9 @@ export const Route = createFileRoute("/auth/signup")({
 function Signup() {
   return (
     <AuthScreen
+      mode="signup"
       title="Join Veyra Found"
-      subtitle="Get started in seconds — Google or phone number, then set up your profile."
+      subtitle="Get started in seconds — Google or email, then set up your profile."
       googleLabel="Sign up with Google"
     />
   );
