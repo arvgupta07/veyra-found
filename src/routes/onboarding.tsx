@@ -407,6 +407,14 @@ function Onboarding() {
           </div>
         )}
       </div>
+
+      <button
+        type="button"
+        onClick={handleCancel}
+        className="fixed bottom-4 left-4 z-30 inline-flex items-center gap-1.5 rounded-lg border-2 border-ink bg-white px-4 py-2 text-xs font-black shadow-brutal hover:bg-red/10 hover:text-red transition-colors"
+      >
+        <X className="h-4 w-4" /> Cancel sign-in
+      </button>
     </div>
   );
 }
