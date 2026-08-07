@@ -59,6 +59,11 @@ function Onboarding() {
   const progress = ((step - 1) / 4) * 100;
   const canNextP = selectedPrompts.length === 4 && selectedPrompts.every((p) => p.a.trim().length > 0);
 
+  async function handleCancel() {
+    await supabase.auth.signOut();
+    router.navigate({ to: "/auth/login" });
+  }
+
   async function saveStep1() {
     if (!session) return;
     setSaving(true);
