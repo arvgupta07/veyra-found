@@ -1,7 +1,7 @@
 import { createFileRoute, useRouter } from "@tanstack/react-router";
 import { useEffect, useMemo, useState } from "react";
 import { toast } from "sonner";
-import { Loader2, ChevronRight, Rocket, Briefcase, Palette, Wrench } from "lucide-react";
+import { Loader2, ChevronRight, Rocket, Briefcase, Palette, Wrench, X } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useSession } from "@/hooks/useSession";
 import { useMyFounder, useMyProfile } from "@/hooks/useMyFounder";
@@ -58,6 +58,11 @@ function Onboarding() {
 
   const progress = ((step - 1) / 4) * 100;
   const canNextP = selectedPrompts.length === 4 && selectedPrompts.every((p) => p.a.trim().length > 0);
+
+  async function handleCancel() {
+    await supabase.auth.signOut();
+    router.navigate({ to: "/auth/login" });
+  }
 
   async function saveStep1() {
     if (!session) return;
@@ -161,6 +166,15 @@ function Onboarding() {
         <div className="mx-auto max-w-3xl px-6 py-4">
           <div className="mb-2 flex items-center justify-between">
             <div className="text-sm font-semibold">Step {step} of 4</div>
+            <button
+              type="button"
+              onClick={handleCancel}
+              className="inline-flex items-center gap-1 rounded-md border-2 border-ink px-2.5 py-1 text-xs font-black hover:bg-red/10 hover:text-red transition-colors"
+            >
+              <X className="h-3.5 w-3.5" /> Cancel
+            </button>
+          </div>
+          <div className="mb-2 flex items-center justify-between">
             <div className="text-xs text-muted-text">{["Basic profile","Work & idea","Prompts","Compatibility"][step-1]}</div>
           </div>
           <div className="h-1.5 overflow-hidden rounded-full bg-surface-2">
