@@ -2,7 +2,7 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import {
   Sparkles, ShieldCheck, ArrowRight, CheckCircle2, BarChart3, MessagesSquare,
-  Zap, Users, Rocket, Star, MoveUpRight,
+  Zap, Users, Rocket, Star, MoveUpRight, Linkedin,
 } from "lucide-react";
 import { VeyraMark } from "@/components/VeyraLogo";
 
