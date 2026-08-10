@@ -330,8 +330,18 @@ function Landing() {
       </section>
 
       <footer className="bg-ink py-8 text-center text-xs font-black uppercase tracking-widest text-cream/70">
-        © 2026 Veyra Found · Built for founders in India
+        <a
+          href="https://www.linkedin.com/company/veyra-found"
+          target="_blank"
+          rel="noreferrer"
+          aria-label="Veyra Found on LinkedIn"
+          className="mb-5 inline-flex items-center gap-2 border-[3px] border-cream bg-ink px-4 py-2 text-cream transition-transform hover:-translate-y-0.5 hover:bg-cream hover:text-ink box-press"
+        >
+          <Linkedin className="h-4 w-4" strokeWidth={3} /> Follow on LinkedIn
+        </a>
+        <p>© 2026 Veyra Found · Built for founders in India</p>
       </footer>
+
     </div>
   );
 }
