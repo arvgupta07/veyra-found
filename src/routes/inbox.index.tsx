@@ -14,6 +14,17 @@ import { toast } from "sonner";
 
 export const Route = createFileRoute("/inbox/")({
   component: Inbox,
+  head: () => ({
+    meta: [
+      { title: "Inbox & Requests — Veyra Found" },
+      { name: "description", content: "Manage co-founder conversations, sent and received requests, labels and pinned chats in your Veyra Found inbox." },
+      { property: "og:title", content: "Inbox & Requests — Veyra Found" },
+      { property: "og:description", content: "Conversations, sent and received co-founder requests, labels and pinned chats." },
+      { property: "og:url", content: "https://veyrafound.in/inbox" },
+      { name: "robots", content: "noindex" },
+    ],
+    links: [{ rel: "canonical", href: "https://veyrafound.in/inbox" }],
+  }),
 });
 
 // Built-in labels per spec

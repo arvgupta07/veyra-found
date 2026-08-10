@@ -172,7 +172,7 @@ function FounderProfile() {
             </div>
 
             <div>
-              <div className="text-xs font-black uppercase tracking-wider text-muted-text">Skills</div>
+              <h2 className="text-xs font-black uppercase tracking-wider text-muted-text">Skills</h2>
               <div className="mt-2 flex flex-wrap gap-1.5">
                 {(data.skills ?? []).map((s: string) => <SkillTag key={s}>{s}</SkillTag>)}
               </div>
@@ -180,7 +180,7 @@ function FounderProfile() {
 
             {prompts.length > 0 ? (
               <div>
-                <div className="text-xs font-black uppercase tracking-wider text-muted-text">Prompts</div>
+                <h2 className="text-xs font-black uppercase tracking-wider text-muted-text">Prompts</h2>
                 <div className="mt-2 space-y-2">
                   {prompts.map((p: { prompt_question: string; prompt_answer: string }) => (
                     <div key={p.prompt_question} className="rounded-xl border-2 border-ink bg-cream p-3">
@@ -192,7 +192,7 @@ function FounderProfile() {
               </div>
             ) : (
               <div>
-                <div className="text-xs font-black uppercase tracking-wider text-muted-text">Prompts</div>
+                <h2 className="text-xs font-black uppercase tracking-wider text-muted-text">Prompts</h2>
                 <div className="mt-2 rounded-xl border-2 border-ink/40 bg-cream p-3 text-sm font-bold text-muted-text">
                   No prompts added yet
                 </div>
@@ -206,7 +206,7 @@ function FounderProfile() {
             )}
             {dims.length > 0 && (
               <div>
-                <div className="text-xs font-black uppercase tracking-wider text-muted-text">Personality dimensions</div>
+                <h2 className="text-xs font-black uppercase tracking-wider text-muted-text">Personality dimensions</h2>
                 <div className="mt-3 grid gap-2">
                   {dims.map(([label, v]) => (
                     <div key={label}>

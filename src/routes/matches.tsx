@@ -13,6 +13,16 @@ import { Lock, Sparkles, MapPin } from "lucide-react";
 
 export const Route = createFileRoute("/matches")({
   component: MatchesPage,
+  head: () => ({
+    meta: [
+      { title: "Your Co-Founder Matches — Veyra Found" },
+      { name: "description", content: "See the founders who accepted your request, review compatibility scores and start the conversation that turns a match into a co-founder." },
+      { property: "og:title", content: "Your Co-Founder Matches — Veyra Found" },
+      { property: "og:description", content: "Mutual matches with compatibility scores, ready to message on Veyra Found." },
+      { property: "og:url", content: "https://veyrafound.in/matches" },
+    ],
+    links: [{ rel: "canonical", href: "https://veyrafound.in/matches" }],
+  }),
 });
 
 const FREE_LIMIT = 2;
