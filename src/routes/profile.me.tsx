@@ -322,7 +322,7 @@ function MyProfile() {
 type EditForm = {
   full_name: string; headline: string; bio: string; location: string; age: number;
   years_experience: number; education: string; skills: string[]; industry_focus: string[];
-  looking_for: string[]; linkedin_url: string; github_url: string;
+  looking_for: string[]; linkedin_url: string; github_url: string; links: ProfileLink[];
   commitment: string; remote_pref: string; active_status: string;
   has_idea: boolean; idea_description: string; idea_industry: string; idea_stage: string;
   seed_avatar: string;
