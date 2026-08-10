@@ -8,6 +8,26 @@ import { VeyraMark } from "@/components/VeyraLogo";
 
 export const Route = createFileRoute("/")({
   component: Landing,
+  head: () => ({
+    meta: [
+      { title: "Veyra Found — Find Your Startup Co-Founder in India" },
+      { name: "description", content: "Veyra Found matches Indian founders with compatible co-founders using verified profiles, personality science and structured intros — not endless swiping." },
+      { property: "og:title", content: "Veyra Found — Find Your Startup Co-Founder in India" },
+      { property: "og:description", content: "Match with verified Indian founders using compatibility science and structured intros — from first message to confirmed co-founder." },
+      { property: "og:url", content: "https://veyrafound.in/" },
+    ],
+    links: [{ rel: "canonical", href: "https://veyrafound.in/" }],
+    scripts: [{
+      type: "application/ld+json",
+      children: JSON.stringify({
+        "@context": "https://schema.org",
+        "@graph": [
+          { "@type": "Organization", name: "Veyra Found", url: "https://veyrafound.in/", description: "India's co-founder matching platform." },
+          { "@type": "WebSite", name: "Veyra Found", url: "https://veyrafound.in/" },
+        ],
+      }),
+    }],
+  }),
 });
 
 const PROMPTS = [
