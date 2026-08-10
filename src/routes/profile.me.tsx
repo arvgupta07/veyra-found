@@ -157,6 +157,8 @@ function MyProfile() {
               looking_for: me.looking_for ?? [],
               linkedin_url: me.linkedin_url ?? "",
               github_url: me.github_url ?? "",
+              links: parseLinks(me.links),
+
               commitment: me.commitment ?? "full_time",
               remote_pref: me.remote_pref ?? "hybrid",
               active_status: me.active_status ?? "active",
