@@ -1,19 +1,23 @@
-import logoAsset from "@/assets/veyra-logo.png.asset.json";
+import { VEYRA_MARK_SRC } from "@/assets/veyra-mark";
 
-// Veyra Found brand mark — official logo asset.
+// Veyra Found brand mark — inlined asset, paints on first frame (no network fetch, no flicker).
 export function VeyraMark({ size = 32, className = "" }: { size?: number; className?: string }) {
   return (
     <img
-      src="/favicon.png"
+      src={VEYRA_MARK_SRC}
       alt="Veyra Found"
       width={size}
       height={size}
+      loading="eager"
+      decoding="sync"
+      fetchPriority="high"
       className={className}
       style={{ width: size, height: size, objectFit: "contain", display: "block" }}
       draggable={false}
     />
   );
 }
+
 
 export function VeyraWordmark({ className = "" }: { className?: string }) {
   return (
