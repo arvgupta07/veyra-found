@@ -15,6 +15,27 @@ import { toast } from "sonner";
 
 export const Route = createFileRoute("/profile/$founderId")({
   component: FounderProfile,
+  head: ({ params }) => ({
+    meta: [
+      { title: "Founder Profile — Veyra Found" },
+      { name: "description", content: "See this founder's idea, skills, experience and prompt answers on Veyra Found, then send a structured co-founder request." },
+      { property: "og:title", content: "Founder Profile — Veyra Found" },
+      { property: "og:description", content: "Idea, skills, experience and prompt answers of a verified founder on Veyra Found." },
+      { property: "og:type", content: "profile" },
+      { property: "og:url", content: `https://veyrafound.in/profile/${params.founderId}` },
+    ],
+    links: [{ rel: "canonical", href: `https://veyrafound.in/profile/${params.founderId}` }],
+    scripts: [{
+      type: "application/ld+json",
+      children: JSON.stringify({
+        "@context": "https://schema.org",
+        "@type": "ProfilePage",
+        name: "Founder Profile — Veyra Found",
+        url: `https://veyrafound.in/profile/${params.founderId}`,
+        mainEntity: { "@type": "Person", name: "Veyra Found founder" },
+      }),
+    }],
+  }),
 });
 
 function FounderProfile() {

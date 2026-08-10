@@ -23,6 +23,28 @@ const CATEGORY_OPTIONS = [
 
 export const Route = createFileRoute("/forum/$postId")({
   component: PostView,
+  head: ({ params }) => ({
+    meta: [
+      { title: "Forum Discussion — Veyra Found" },
+      { name: "description", content: "Read this founder discussion on Veyra Found: the full post, upvotes and replies from Indian founders building companies." },
+      { property: "og:title", content: "Forum Discussion — Veyra Found" },
+      { property: "og:description", content: "The full post and replies from Indian founders in the Veyra Found community." },
+      { property: "og:type", content: "article" },
+      { property: "og:url", content: `https://veyrafound.in/forum/${params.postId}` },
+    ],
+    links: [{ rel: "canonical", href: `https://veyrafound.in/forum/${params.postId}` }],
+    scripts: [{
+      type: "application/ld+json",
+      children: JSON.stringify({
+        "@context": "https://schema.org",
+        "@type": "DiscussionForumPosting",
+        headline: "Forum Discussion — Veyra Found",
+        url: `https://veyrafound.in/forum/${params.postId}`,
+        author: { "@type": "Organization", name: "Veyra Found" },
+        isPartOf: { "@type": "WebSite", name: "Veyra Found", url: "https://veyrafound.in/" },
+      }),
+    }],
+  }),
 });
 
 function PostView() {
