@@ -1,0 +1,1 @@
+ALTER TABLE public.founders ADD COLUMN IF NOT EXISTS links jsonb NOT NULL DEFAULT '[]'::jsonb;

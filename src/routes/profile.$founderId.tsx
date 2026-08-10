@@ -7,7 +7,10 @@ import { AppShell } from "@/components/AppShell";
 import { useRequireAuth } from "@/hooks/useRequireAuth";
 import { SkillTag, TierBadge, VerifiedBadges } from "@/components/FounderBits";
 import { founderAvatar } from "@/lib/founder-types";
-import { ArrowLeft, MapPin, Briefcase, Loader2, Send, X, Ban, ShieldCheck, Linkedin, Github, EyeOff } from "lucide-react";
+import { ProfileLinkChips } from "@/components/ProfileLinkChips";
+import { parseLinks } from "@/lib/profile-links";
+import { ArrowLeft, MapPin, Briefcase, Loader2, Send, X, Ban, ShieldCheck, EyeOff } from "lucide-react";
+
 import { toast } from "sonner";
 
 export const Route = createFileRoute("/profile/$founderId")({
@@ -142,22 +145,9 @@ function FounderProfile() {
             <div className="rounded-2xl border-2 border-ink bg-cream p-5 shadow-brutal-sm">
               <div className="text-sm">{data.bio}</div>
               <div className="mt-3"><VerifiedBadges f={data as never} /></div>
-              {(data.linkedin_url || data.github_url) && (
-                <div className="mt-3 flex flex-wrap gap-2">
-                  {data.linkedin_url && (
-                    <a href={data.linkedin_url} target="_blank" rel="noreferrer noopener"
-                      className="inline-flex items-center gap-1.5 rounded-md border-2 border-ink bg-white px-2 py-1 text-[11px] font-black box-hover">
-                      <Linkedin className="h-3 w-3" /> LinkedIn
-                    </a>
-                  )}
-                  {data.github_url && (
-                    <a href={data.github_url} target="_blank" rel="noreferrer noopener"
-                      className="inline-flex items-center gap-1.5 rounded-md border-2 border-ink bg-white px-2 py-1 text-[11px] font-black box-hover">
-                      <Github className="h-3 w-3" /> GitHub
-                    </a>
-                  )}
-                </div>
-              )}
+              <ProfileLinkChips className="mt-3" linkedin={data.linkedin_url} github={data.github_url}
+                links={parseLinks((data as { links?: unknown }).links)} name={name} />
+
             </div>
 
             <div>

@@ -9,7 +9,10 @@ import { useRequireAuth } from "@/hooks/useRequireAuth";
 import { SkillTag, TierBadge, VerifiedBadges } from "@/components/FounderBits";
 import { founderAvatar, SKILLS_LIST, AVATAR_PRESETS, PROMPT_GROUPS, LOOKING_FOR_OPTIONS, INDUSTRIES } from "@/lib/founder-types";
 import { uploadImage } from "@/lib/uploads";
-import { MapPin, Briefcase, Pencil, X, Loader2, Save, LogOut, Trash2, ImagePlus, Linkedin, Github, Eye, EyeOff, Plus, MessageSquareQuote } from "lucide-react";
+import { ProfileLinkChips } from "@/components/ProfileLinkChips";
+import { LINK_TYPES, parseLinks, type ProfileLink, type ProfileLinkType } from "@/lib/profile-links";
+import { MapPin, Briefcase, Pencil, X, Loader2, Save, LogOut, Trash2, ImagePlus, Linkedin, Github, Eye, EyeOff, Plus, MessageSquareQuote, Trash } from "lucide-react";
+
 
 export const Route = createFileRoute("/profile/me")({
   component: MyProfile,
@@ -154,6 +157,8 @@ function MyProfile() {
               looking_for: me.looking_for ?? [],
               linkedin_url: me.linkedin_url ?? "",
               github_url: me.github_url ?? "",
+              links: parseLinks(me.links),
+
               commitment: me.commitment ?? "full_time",
               remote_pref: me.remote_pref ?? "hybrid",
               active_status: me.active_status ?? "active",
@@ -207,22 +212,8 @@ function MyProfile() {
             <div className="rounded-2xl bg-white p-5 shadow-card">
               <div className="text-sm">{me.bio}</div>
               <div className="mt-3"><VerifiedBadges f={me} /></div>
-              {(me.linkedin_url || me.github_url) && (
-                <div className="mt-3 flex flex-wrap gap-2">
-                  {me.linkedin_url && (
-                    <a href={me.linkedin_url} target="_blank" rel="noreferrer noopener"
-                      className="inline-flex items-center gap-1.5 rounded-md border-2 border-ink bg-white px-2 py-1 text-[11px] font-black box-hover">
-                      <Linkedin className="h-3 w-3" /> LinkedIn
-                    </a>
-                  )}
-                  {me.github_url && (
-                    <a href={me.github_url} target="_blank" rel="noreferrer noopener"
-                      className="inline-flex items-center gap-1.5 rounded-md border-2 border-ink bg-white px-2 py-1 text-[11px] font-black box-hover">
-                      <Github className="h-3 w-3" /> GitHub
-                    </a>
-                  )}
-                </div>
-              )}
+              <ProfileLinkChips className="mt-3" linkedin={me.linkedin_url} github={me.github_url} links={parseLinks(me.links)} name={name} />
+
             </div>
 
             <div>
@@ -331,7 +322,7 @@ function MyProfile() {
 type EditForm = {
   full_name: string; headline: string; bio: string; location: string; age: number;
   years_experience: number; education: string; skills: string[]; industry_focus: string[];
-  looking_for: string[]; linkedin_url: string; github_url: string;
+  looking_for: string[]; linkedin_url: string; github_url: string; links: ProfileLink[];
   commitment: string; remote_pref: string; active_status: string;
   has_idea: boolean; idea_description: string; idea_industry: string; idea_stage: string;
   seed_avatar: string;
@@ -370,9 +361,13 @@ function EditPanel({ initial, founderId, userId, onClose, onSaved }: {
         age: form.age > 0 ? form.age : null,
         linkedin_url: linkedin || null,
         github_url: github || null,
+        links: form.links
+          .map((l) => ({ type: l.type, value: l.value.trim(), ...(l.label?.trim() ? { label: l.label.trim() } : {}) }))
+          .filter((l) => l.value.length > 0),
         // A linked profile counts as verified for badge purposes.
         linkedin_verified: !!linkedin,
         github_verified: !!github,
+
         commitment: form.commitment as never,
         remote_pref: form.remote_pref as never,
         active_status: form.active_status as never,
@@ -488,7 +483,56 @@ function EditPanel({ initial, founderId, userId, onClose, onSaved }: {
                   className="mt-1 w-full rounded-lg border-2 border-ink bg-white px-3 py-2 text-sm" />
               </div>
             </div>
+
+            <div className="mt-3 border-t-2 border-dashed border-ink/30 pt-3">
+              <div className="text-[10px] font-black uppercase text-muted-text">More links · email, WhatsApp, X, Calendly…</div>
+              <div className="mt-2 space-y-2">
+                {form.links.map((l, i) => {
+                  const meta = LINK_TYPES.find((t) => t.type === l.type);
+                  return (
+                    <div key={i} className="rounded-lg border-2 border-ink bg-cream p-2">
+                      <div className="flex items-center gap-2">
+                        <select value={l.type}
+                          onChange={(e) => setForm((f) => ({
+                            ...f,
+                            links: f.links.map((x, j) => j === i ? { ...x, type: e.target.value as ProfileLinkType } : x),
+                          }))}
+                          className="rounded-md border-2 border-ink bg-white px-2 py-1 text-xs font-black">
+                          {LINK_TYPES.map((t) => <option key={t.type} value={t.type}>{t.label}</option>)}
+                        </select>
+                        <input value={l.value} placeholder={meta?.placeholder ?? "https://..."}
+                          onChange={(e) => setForm((f) => ({
+                            ...f,
+                            links: f.links.map((x, j) => j === i ? { ...x, value: e.target.value } : x),
+                          }))}
+                          className="min-w-0 flex-1 rounded-md border-2 border-ink bg-white px-2 py-1 text-sm" />
+                        <button type="button" title="Remove link"
+                          onClick={() => setForm((f) => ({ ...f, links: f.links.filter((_, j) => j !== i) }))}
+                          className="rounded-md border-2 border-ink bg-red px-1.5 py-1 text-white shadow-brutal-sm">
+                          <Trash className="h-3.5 w-3.5" />
+                        </button>
+                      </div>
+                      <input value={l.label ?? ""} placeholder="Custom label (optional)"
+                        onChange={(e) => setForm((f) => ({
+                          ...f,
+                          links: f.links.map((x, j) => j === i ? { ...x, label: e.target.value } : x),
+                        }))}
+                        className="mt-2 w-full rounded-md border-2 border-ink bg-white px-2 py-1 text-xs" />
+                      {meta && <div className="mt-1 text-[10px] font-bold text-muted-text">{meta.hint}</div>}
+                    </div>
+                  );
+                })}
+              </div>
+              {form.links.length < 12 && (
+                <button type="button"
+                  onClick={() => setForm((f) => ({ ...f, links: [...f.links, { type: "email", value: "" }] }))}
+                  className="mt-2 inline-flex items-center gap-1 rounded-md border-2 border-ink bg-sage px-2 py-1 text-[11px] font-black shadow-brutal-sm box-hover">
+                  <Plus className="h-3 w-3" /> Add link
+                </button>
+              )}
+            </div>
           </div>
+
 
           {/* Preferences */}
           <div className="grid grid-cols-3 gap-3">

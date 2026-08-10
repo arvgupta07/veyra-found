@@ -35,6 +35,8 @@ export type Founder = {
   shadow_banned?: boolean;
   spam_strikes?: number;
   assessment_public?: boolean;
+  links?: unknown;
+
 };
 
 export type Prompt = {
