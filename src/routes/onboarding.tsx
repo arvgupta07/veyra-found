@@ -9,6 +9,17 @@ import { PROMPT_GROUPS, SKILLS_LIST, INDUSTRIES, ASSESSMENT_QUESTIONS, LOOKING_F
 
 export const Route = createFileRoute("/onboarding")({
   component: Onboarding,
+  head: () => ({
+    meta: [
+      { title: "Build Your Founder Profile — Veyra Found" },
+      { name: "description", content: "Set up your Veyra Found profile in four steps: your role, skills, what you want in a co-founder, and a short personality assessment." },
+      { property: "og:title", content: "Build Your Founder Profile — Veyra Found" },
+      { property: "og:description", content: "Four steps: role, skills, co-founder preferences and a short personality assessment." },
+      { property: "og:url", content: "https://veyrafound.in/onboarding" },
+      { name: "robots", content: "noindex" },
+    ],
+    links: [{ rel: "canonical", href: "https://veyrafound.in/onboarding" }],
+  }),
 });
 
 type Step = 1 | 2 | 3 | 4;

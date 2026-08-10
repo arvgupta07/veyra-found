@@ -238,7 +238,7 @@ function FounderCard({
 
         {founder.has_idea && founder.idea_description && (
           <div className="rounded-xl border-2 border-ink bg-sage p-4">
-            <div className="text-[10px] font-black uppercase tracking-wider text-ink">The idea</div>
+            <h2 className="text-[10px] font-black uppercase tracking-wider text-ink">The idea</h2>
             <div className="mt-1 text-sm font-semibold text-ink">{founder.idea_description}</div>
             {founder.idea_industry && <div className="mt-1 text-xs text-ink/70">{founder.idea_industry}</div>}
           </div>
