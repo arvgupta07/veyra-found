@@ -597,6 +597,7 @@ export type Database = {
           industry_focus: string[] | null
           linkedin_url: string | null
           linkedin_verified: boolean | null
+          links: Json
           location: string | null
           looking_for: string[]
           profile_complete: boolean | null
@@ -635,6 +636,7 @@ export type Database = {
           industry_focus?: string[] | null
           linkedin_url?: string | null
           linkedin_verified?: boolean | null
+          links?: Json
           location?: string | null
           looking_for?: string[]
           profile_complete?: boolean | null
@@ -673,6 +675,7 @@ export type Database = {
           industry_focus?: string[] | null
           linkedin_url?: string | null
           linkedin_verified?: boolean | null
+          links?: Json
           location?: string | null
           looking_for?: string[]
           profile_complete?: boolean | null
