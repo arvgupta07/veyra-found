@@ -21,6 +21,16 @@ const CATEGORIES = [
 
 export const Route = createFileRoute("/forum/")({
   component: Forum,
+  head: () => ({
+    meta: [
+      { title: "Founder Forum — Veyra Found" },
+      { name: "description", content: "Validate ideas, find co-founders and swap resources with Indian founders in the Veyra Found community forum." },
+      { property: "og:title", content: "Founder Forum — Veyra Found" },
+      { property: "og:description", content: "Idea validation, co-founder calls and resources, discussed by Indian founders." },
+      { property: "og:url", content: "https://veyrafound.in/forum" },
+    ],
+    links: [{ rel: "canonical", href: "https://veyrafound.in/forum" }],
+  }),
 });
 
 function Forum() {
@@ -207,7 +217,7 @@ function ComposeModal({ onClose, founderId }: { onClose: (postedCategory?: strin
       <div onClick={(e) => e.stopPropagation()} className="max-h-[88vh] w-full max-w-lg overflow-y-auto rounded-2xl border-2 border-ink bg-cream p-6 shadow-brutal">
         <div className="flex items-start justify-between">
           <div className="text-xl font-black">New post</div>
-          <button onClick={() => onClose()}><X className="h-5 w-5" /></button>
+          <button onClick={() => onClose()} aria-label="Close"><X className="h-5 w-5" /></button>
         </div>
         <div className="mt-4 space-y-3">
           <select value={category} onChange={(e) => setCategory(e.target.value)} className="w-full rounded-lg border-2 border-ink bg-white px-3 py-2 text-sm font-semibold">
@@ -219,7 +229,7 @@ function ComposeModal({ onClose, founderId }: { onClose: (postedCategory?: strin
           {imageUrl ? (
             <div className="relative">
               <img src={imageUrl} alt="" className="max-h-60 w-full rounded-xl border-2 border-ink object-cover" />
-              <button type="button" onClick={() => setImageUrl(null)}
+              <button type="button" aria-label="Remove image" onClick={() => setImageUrl(null)}
                 className="absolute right-2 top-2 rounded-md border-2 border-ink bg-white p-1 shadow-brutal-sm">
                 <X className="h-3.5 w-3.5" />
               </button>

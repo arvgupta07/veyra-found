@@ -13,6 +13,16 @@ import { useConnectedIds } from "@/hooks/useConnectedIds";
 
 export const Route = createFileRoute("/discover")({
   component: Discover,
+  head: () => ({
+    meta: [
+      { title: "Discover Co-Founders — Veyra Found" },
+      { name: "description", content: "Browse one verified Indian founder at a time: their idea, skills, prompts and compatibility signals, then reply to the prompt that resonates." },
+      { property: "og:title", content: "Discover Co-Founders — Veyra Found" },
+      { property: "og:description", content: "Meet verified Indian founders one profile at a time and reply to the prompt that resonates." },
+      { property: "og:url", content: "https://veyrafound.in/discover" },
+    ],
+    links: [{ rel: "canonical", href: "https://veyrafound.in/discover" }],
+  }),
 });
 
 function Discover() {
@@ -406,7 +416,7 @@ function ConnectModal({ founder, myFounderId, onClose }: { founder: any; myFound
             <div className="text-[10px] font-black uppercase tracking-[0.2em] text-orange">Send request</div>
             <div className="mt-1 text-2xl font-black tracking-tight">Connect with {name}</div>
           </div>
-          <button onClick={onClose} className="grid h-8 w-8 place-items-center border-2 border-ink bg-cream box-hover"><X className="h-4 w-4" /></button>
+          <button onClick={onClose} aria-label="Close" className="grid h-8 w-8 place-items-center border-2 border-ink bg-cream box-hover"><X className="h-4 w-4" /></button>
         </div>
         <div className="mt-5">
           <div className="text-[10px] font-black uppercase tracking-wider text-muted-text">Reacting to</div>

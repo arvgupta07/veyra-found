@@ -23,6 +23,28 @@ const CATEGORY_OPTIONS = [
 
 export const Route = createFileRoute("/forum/$postId")({
   component: PostView,
+  head: ({ params }) => ({
+    meta: [
+      { title: "Forum Discussion — Veyra Found" },
+      { name: "description", content: "Read this founder discussion on Veyra Found: the full post, upvotes and replies from Indian founders building companies." },
+      { property: "og:title", content: "Forum Discussion — Veyra Found" },
+      { property: "og:description", content: "The full post and replies from Indian founders in the Veyra Found community." },
+      { property: "og:type", content: "article" },
+      { property: "og:url", content: `https://veyrafound.in/forum/${params.postId}` },
+    ],
+    links: [{ rel: "canonical", href: `https://veyrafound.in/forum/${params.postId}` }],
+    scripts: [{
+      type: "application/ld+json",
+      children: JSON.stringify({
+        "@context": "https://schema.org",
+        "@type": "DiscussionForumPosting",
+        headline: "Forum Discussion — Veyra Found",
+        url: `https://veyrafound.in/forum/${params.postId}`,
+        author: { "@type": "Organization", name: "Veyra Found" },
+        isPartOf: { "@type": "WebSite", name: "Veyra Found", url: "https://veyrafound.in/" },
+      }),
+    }],
+  }),
 });
 
 function PostView() {
@@ -465,7 +487,7 @@ function EditPostPanel({ post, onClose, onSaved }: { post: PostLike; onClose: ()
       <div onClick={(e) => e.stopPropagation()} className="max-h-[88vh] w-full max-w-lg overflow-y-auto rounded-2xl border-2 border-ink bg-cream p-6 shadow-brutal">
         <div className="flex items-start justify-between">
           <div className="text-xl font-black">Edit post</div>
-          <button onClick={onClose}><X className="h-5 w-5" /></button>
+          <button onClick={onClose} aria-label="Close"><X className="h-5 w-5" /></button>
         </div>
         <div className="mt-4 space-y-3">
           <select value={category} onChange={(e) => setCategory(e.target.value)}
@@ -555,7 +577,7 @@ function CollabPanel({ postId, myFounderId, current, onClose, onChanged }: {
             <div className="text-xl font-black">Collaborators</div>
             <div className="text-[11px] font-bold text-muted-text">Co-authors can edit this post too.</div>
           </div>
-          <button onClick={onClose}><X className="h-5 w-5" /></button>
+          <button onClick={onClose} aria-label="Close"><X className="h-5 w-5" /></button>
         </div>
 
         <div className="mt-4 space-y-2">

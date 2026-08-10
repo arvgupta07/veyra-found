@@ -15,6 +15,27 @@ import { toast } from "sonner";
 
 export const Route = createFileRoute("/profile/$founderId")({
   component: FounderProfile,
+  head: ({ params }) => ({
+    meta: [
+      { title: "Founder Profile — Veyra Found" },
+      { name: "description", content: "See this founder's idea, skills, experience and prompt answers on Veyra Found, then send a structured co-founder request." },
+      { property: "og:title", content: "Founder Profile — Veyra Found" },
+      { property: "og:description", content: "Idea, skills, experience and prompt answers of a verified founder on Veyra Found." },
+      { property: "og:type", content: "profile" },
+      { property: "og:url", content: `https://veyrafound.in/profile/${params.founderId}` },
+    ],
+    links: [{ rel: "canonical", href: `https://veyrafound.in/profile/${params.founderId}` }],
+    scripts: [{
+      type: "application/ld+json",
+      children: JSON.stringify({
+        "@context": "https://schema.org",
+        "@type": "ProfilePage",
+        name: "Founder Profile — Veyra Found",
+        url: `https://veyrafound.in/profile/${params.founderId}`,
+        mainEntity: { "@type": "Person", name: "Veyra Found founder" },
+      }),
+    }],
+  }),
 });
 
 function FounderProfile() {
@@ -102,7 +123,7 @@ function FounderProfile() {
               <img src={founderAvatar({ seed_avatar: data.seed_avatar, seed_name: data.seed_name, profile: data.profiles })}
                 className="h-20 w-20 rounded-2xl border-2 border-ink object-cover shadow-brutal-sm" alt="" />
               <div className="flex-1">
-                <div className="text-2xl font-black text-ink">{name}</div>
+                <h1 className="text-2xl font-black text-ink">{name}</h1>
                 <div className="mt-1 text-sm font-semibold text-ink/80">{data.headline}</div>
                 <div className="mt-2 flex flex-wrap items-center gap-3 text-xs text-ink/70">
                   <span className="inline-flex items-center gap-1"><MapPin className="h-3 w-3" /> {data.location}</span>
@@ -251,7 +272,7 @@ function ConnectModal({ founder, myFounderId, onClose }: {
             <div className="text-[10px] font-black uppercase tracking-wider text-orange">Send request</div>
             <div className="mt-1 text-xl font-black">Connect with {name}</div>
           </div>
-          <button onClick={onClose}><X className="h-5 w-5" /></button>
+          <button onClick={onClose} aria-label="Close"><X className="h-5 w-5" /></button>
         </div>
         {prompts.length > 0 && (
           <div className="mt-5">
