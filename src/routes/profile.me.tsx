@@ -207,22 +207,8 @@ function MyProfile() {
             <div className="rounded-2xl bg-white p-5 shadow-card">
               <div className="text-sm">{me.bio}</div>
               <div className="mt-3"><VerifiedBadges f={me} /></div>
-              {(me.linkedin_url || me.github_url) && (
-                <div className="mt-3 flex flex-wrap gap-2">
-                  {me.linkedin_url && (
-                    <a href={me.linkedin_url} target="_blank" rel="noreferrer noopener"
-                      className="inline-flex items-center gap-1.5 rounded-md border-2 border-ink bg-white px-2 py-1 text-[11px] font-black box-hover">
-                      <Linkedin className="h-3 w-3" /> LinkedIn
-                    </a>
-                  )}
-                  {me.github_url && (
-                    <a href={me.github_url} target="_blank" rel="noreferrer noopener"
-                      className="inline-flex items-center gap-1.5 rounded-md border-2 border-ink bg-white px-2 py-1 text-[11px] font-black box-hover">
-                      <Github className="h-3 w-3" /> GitHub
-                    </a>
-                  )}
-                </div>
-              )}
+              <ProfileLinkChips className="mt-3" linkedin={me.linkedin_url} github={me.github_url} links={parseLinks(me.links)} name={name} />
+
             </div>
 
             <div>
