@@ -361,9 +361,13 @@ function EditPanel({ initial, founderId, userId, onClose, onSaved }: {
         age: form.age > 0 ? form.age : null,
         linkedin_url: linkedin || null,
         github_url: github || null,
+        links: form.links
+          .map((l) => ({ type: l.type, value: l.value.trim(), ...(l.label?.trim() ? { label: l.label.trim() } : {}) }))
+          .filter((l) => l.value.length > 0),
         // A linked profile counts as verified for badge purposes.
         linkedin_verified: !!linkedin,
         github_verified: !!github,
+
         commitment: form.commitment as never,
         remote_pref: form.remote_pref as never,
         active_status: form.active_status as never,
