@@ -7,7 +7,10 @@ import { AppShell } from "@/components/AppShell";
 import { useRequireAuth } from "@/hooks/useRequireAuth";
 import { SkillTag, TierBadge, VerifiedBadges } from "@/components/FounderBits";
 import { founderAvatar } from "@/lib/founder-types";
-import { ArrowLeft, MapPin, Briefcase, Loader2, Send, X, Ban, ShieldCheck, Linkedin, Github, EyeOff } from "lucide-react";
+import { ProfileLinkChips } from "@/components/ProfileLinkChips";
+import { parseLinks } from "@/lib/profile-links";
+import { ArrowLeft, MapPin, Briefcase, Loader2, Send, X, Ban, ShieldCheck, EyeOff } from "lucide-react";
+
 import { toast } from "sonner";
 
 export const Route = createFileRoute("/profile/$founderId")({
