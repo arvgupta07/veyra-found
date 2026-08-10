@@ -49,6 +49,7 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
     meta: [
       { charSet: "utf-8" },
       { name: "viewport", content: "width=device-width, initial-scale=1" },
+      { name: "google-site-verification", content: "9ELjQw_ADyI4viRD_d0qsq2bd1MLISkbgqfkfO9DOGE" },
       { title: "Veyra Found — Connect. Build. Beyond." },
       { name: "description", content: "Veyra Found is India's co-founder matching platform. Verified founders, compatibility science, and a structured path from first message to confirmed co-founder." },
       { property: "og:title", content: "Veyra Found — Connect. Build. Beyond." },
