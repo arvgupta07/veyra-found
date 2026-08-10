@@ -23,28 +23,53 @@ const CATEGORY_OPTIONS = [
 
 export const Route = createFileRoute("/forum/$postId")({
   component: PostView,
-  head: ({ params }) => ({
-    meta: [
-      { title: "Forum Discussion — Veyra Found" },
-      { name: "description", content: "Read this founder discussion on Veyra Found: the full post, upvotes and replies from Indian founders building companies." },
-      { property: "og:title", content: "Forum Discussion — Veyra Found" },
-      { property: "og:description", content: "The full post and replies from Indian founders in the Veyra Found community." },
-      { property: "og:type", content: "article" },
-      { property: "og:url", content: `https://veyrafound.in/forum/${params.postId}` },
-    ],
-    links: [{ rel: "canonical", href: `https://veyrafound.in/forum/${params.postId}` }],
-    scripts: [{
-      type: "application/ld+json",
-      children: JSON.stringify({
-        "@context": "https://schema.org",
-        "@type": "DiscussionForumPosting",
-        headline: "Forum Discussion — Veyra Found",
-        url: `https://veyrafound.in/forum/${params.postId}`,
-        author: { "@type": "Organization", name: "Veyra Found" },
-        isPartOf: { "@type": "WebSite", name: "Veyra Found", url: "https://veyrafound.in/" },
-      }),
-    }],
-  }),
+  loader: async ({ params }) => {
+    // Public read: powers per-post title, social preview and JSON-LD.
+    const { data } = await supabase
+      .from("forum_posts")
+      .select("title, content, created_at, author:founders!forum_posts_author_id_fkey(seed_name, profiles(full_name))")
+      .eq("id", params.postId)
+      .maybeSingle();
+    const a = data?.author as { seed_name?: string | null; profiles?: { full_name?: string | null } | null } | null;
+    return {
+      title: data?.title ?? null,
+      snippet: (data?.content ?? "").replace(/\s+/g, " ").trim().slice(0, 155) || null,
+      author: a?.profiles?.full_name ?? a?.seed_name ?? null,
+      createdAt: data?.created_at ?? null,
+    };
+  },
+  head: ({ params, loaderData }) => {
+    const url = `https://veyrafound.in/forum/${params.postId}`;
+    const title = loaderData?.title
+      ? `${loaderData.title.slice(0, 45)} — Veyra Found Forum`
+      : "Forum Discussion — Veyra Found";
+    const description = loaderData?.snippet
+      ?? "Read this founder discussion on Veyra Found: the full post, upvotes and replies from Indian founders building companies.";
+    return {
+      meta: [
+        { title },
+        { name: "description", content: description },
+        { property: "og:title", content: loaderData?.title ?? "Forum Discussion — Veyra Found" },
+        { property: "og:description", content: description },
+        { property: "og:type", content: "article" },
+        { property: "og:url", content: url },
+      ],
+      links: [{ rel: "canonical", href: url }],
+      scripts: [{
+        type: "application/ld+json",
+        children: JSON.stringify({
+          "@context": "https://schema.org",
+          "@type": "DiscussionForumPosting",
+          headline: loaderData?.title ?? "Forum Discussion — Veyra Found",
+          articleBody: loaderData?.snippet ?? undefined,
+          datePublished: loaderData?.createdAt ?? undefined,
+          url,
+          author: { "@type": loaderData?.author ? "Person" : "Organization", name: loaderData?.author ?? "Veyra Found" },
+          isPartOf: { "@type": "WebSite", name: "Veyra Found", url: "https://veyrafound.in/" },
+        }),
+      }],
+    };
+  },
 });
 
 function PostView() {

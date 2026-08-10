@@ -15,27 +15,56 @@ import { toast } from "sonner";
 
 export const Route = createFileRoute("/profile/$founderId")({
   component: FounderProfile,
-  head: ({ params }) => ({
-    meta: [
-      { title: "Founder Profile — Veyra Found" },
-      { name: "description", content: "See this founder's idea, skills, experience and prompt answers on Veyra Found, then send a structured co-founder request." },
-      { property: "og:title", content: "Founder Profile — Veyra Found" },
-      { property: "og:description", content: "Idea, skills, experience and prompt answers of a verified founder on Veyra Found." },
-      { property: "og:type", content: "profile" },
-      { property: "og:url", content: `https://veyrafound.in/profile/${params.founderId}` },
-    ],
-    links: [{ rel: "canonical", href: `https://veyrafound.in/profile/${params.founderId}` }],
-    scripts: [{
-      type: "application/ld+json",
-      children: JSON.stringify({
-        "@context": "https://schema.org",
-        "@type": "ProfilePage",
-        name: "Founder Profile — Veyra Found",
-        url: `https://veyrafound.in/profile/${params.founderId}`,
-        mainEntity: { "@type": "Person", name: "Veyra Found founder" },
-      }),
-    }],
-  }),
+  loader: async ({ params }) => {
+    // Best-effort public read for metadata; returns nulls when not readable.
+    const { data } = await supabase
+      .from("founders")
+      .select("headline, bio, location, seed_name, profiles(full_name)")
+      .eq("id", params.founderId)
+      .maybeSingle();
+    return {
+      name: data?.profiles?.full_name ?? data?.seed_name ?? null,
+      headline: data?.headline ?? null,
+      bio: (data?.bio ?? "").replace(/\s+/g, " ").trim().slice(0, 155) || null,
+      location: data?.location ?? null,
+    };
+  },
+  head: ({ params, loaderData }) => {
+    const url = `https://veyrafound.in/profile/${params.founderId}`;
+    const name = loaderData?.name;
+    const title = name ? `${name.slice(0, 34)} — Founder on Veyra Found` : "Founder Profile — Veyra Found";
+    const description = loaderData?.headline
+      ? [loaderData.headline, loaderData.location].filter(Boolean).join(" · ").slice(0, 155)
+      : loaderData?.bio
+        ?? "See this founder's idea, skills, experience and prompt answers on Veyra Found, then send a structured co-founder request.";
+    return {
+      meta: [
+        { title },
+        { name: "description", content: description },
+        { property: "og:title", content: name ? `${name} on Veyra Found` : "Founder Profile — Veyra Found" },
+        { property: "og:description", content: description },
+        { property: "og:type", content: "profile" },
+        { property: "og:url", content: url },
+      ],
+      links: [{ rel: "canonical", href: url }],
+      scripts: [{
+        type: "application/ld+json",
+        children: JSON.stringify({
+          "@context": "https://schema.org",
+          "@type": "ProfilePage",
+          name: title,
+          url,
+          mainEntity: {
+            "@type": "Person",
+            name: name ?? "Veyra Found founder",
+            jobTitle: loaderData?.headline ?? undefined,
+            description: loaderData?.bio ?? undefined,
+            address: loaderData?.location ?? undefined,
+          },
+        }),
+      }],
+    };
+  },
 });
 
 function FounderProfile() {
