@@ -22,7 +22,7 @@ export const Route = createFileRoute("/")({
       children: JSON.stringify({
         "@context": "https://schema.org",
         "@graph": [
-          { "@type": "Organization", name: "Veyra Found", url: "https://veyrafound.in/", description: "India's co-founder matching platform." },
+          { "@type": "Organization", name: "Veyra Found", url: "https://veyrafound.in/", description: "India's co-founder matching platform.", sameAs: ["https://www.linkedin.com/company/veyra-found"] },
           { "@type": "WebSite", name: "Veyra Found", url: "https://veyrafound.in/" },
         ],
       }),
