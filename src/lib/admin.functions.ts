@@ -163,9 +163,14 @@ export const adminSetShadowBan = createServerFn({ method: "POST" })
   .handler(async ({ data, context }) => {
     await assertAdmin(context);
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
-    const patch: Record<string, unknown> = { shadow_banned: data.banned };
-    if (!data.banned) patch.spam_strikes = 0;
-    const { error } = await supabaseAdmin.from("founders").update(patch).eq("id", data.founderId);
+    const { error } = await supabaseAdmin
+      .from("founders")
+      .update(
+        data.banned
+          ? { shadow_banned: true }
+          : { shadow_banned: false, spam_strikes: 0 },
+      )
+      .eq("id", data.founderId);
     if (error) throw new Error(error.message);
     return { ok: true };
   });
