@@ -110,7 +110,7 @@ function RootComponent() {
   const pathname = useRouterState({ select: (s) => s.location.pathname });
   return (
     <QueryClientProvider client={queryClient}>
-      <div key={pathname} className="animate-page-in">
+      <div className="animate-page-in" data-route={pathname}>
         <Outlet />
       </div>
       <Toaster richColors closeButton position="top-right" duration={5000} offset={16} style={{ zIndex: 9999 }} toastOptions={{ style: { border: "3px solid var(--ink)", borderRadius: "6px", fontWeight: 700 } }} />
