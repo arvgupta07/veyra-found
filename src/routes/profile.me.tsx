@@ -479,7 +479,56 @@ function EditPanel({ initial, founderId, userId, onClose, onSaved }: {
                   className="mt-1 w-full rounded-lg border-2 border-ink bg-white px-3 py-2 text-sm" />
               </div>
             </div>
+
+            <div className="mt-3 border-t-2 border-dashed border-ink/30 pt-3">
+              <div className="text-[10px] font-black uppercase text-muted-text">More links · email, WhatsApp, X, Calendly…</div>
+              <div className="mt-2 space-y-2">
+                {form.links.map((l, i) => {
+                  const meta = LINK_TYPES.find((t) => t.type === l.type);
+                  return (
+                    <div key={i} className="rounded-lg border-2 border-ink bg-cream p-2">
+                      <div className="flex items-center gap-2">
+                        <select value={l.type}
+                          onChange={(e) => setForm((f) => ({
+                            ...f,
+                            links: f.links.map((x, j) => j === i ? { ...x, type: e.target.value as ProfileLinkType } : x),
+                          }))}
+                          className="rounded-md border-2 border-ink bg-white px-2 py-1 text-xs font-black">
+                          {LINK_TYPES.map((t) => <option key={t.type} value={t.type}>{t.label}</option>)}
+                        </select>
+                        <input value={l.value} placeholder={meta?.placeholder ?? "https://..."}
+                          onChange={(e) => setForm((f) => ({
+                            ...f,
+                            links: f.links.map((x, j) => j === i ? { ...x, value: e.target.value } : x),
+                          }))}
+                          className="min-w-0 flex-1 rounded-md border-2 border-ink bg-white px-2 py-1 text-sm" />
+                        <button type="button" title="Remove link"
+                          onClick={() => setForm((f) => ({ ...f, links: f.links.filter((_, j) => j !== i) }))}
+                          className="rounded-md border-2 border-ink bg-red px-1.5 py-1 text-white shadow-brutal-sm">
+                          <Trash className="h-3.5 w-3.5" />
+                        </button>
+                      </div>
+                      <input value={l.label ?? ""} placeholder="Custom label (optional)"
+                        onChange={(e) => setForm((f) => ({
+                          ...f,
+                          links: f.links.map((x, j) => j === i ? { ...x, label: e.target.value } : x),
+                        }))}
+                        className="mt-2 w-full rounded-md border-2 border-ink bg-white px-2 py-1 text-xs" />
+                      {meta && <div className="mt-1 text-[10px] font-bold text-muted-text">{meta.hint}</div>}
+                    </div>
+                  );
+                })}
+              </div>
+              {form.links.length < 12 && (
+                <button type="button"
+                  onClick={() => setForm((f) => ({ ...f, links: [...f.links, { type: "email", value: "" }] }))}
+                  className="mt-2 inline-flex items-center gap-1 rounded-md border-2 border-ink bg-sage px-2 py-1 text-[11px] font-black shadow-brutal-sm box-hover">
+                  <Plus className="h-3 w-3" /> Add link
+                </button>
+              )}
+            </div>
           </div>
+
 
           {/* Preferences */}
           <div className="grid grid-cols-3 gap-3">
