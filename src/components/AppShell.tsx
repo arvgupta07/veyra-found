@@ -94,7 +94,8 @@ export function AppShell({ children }: { children: React.ReactNode }) {
         <nav className="relative mt-8 space-y-1">
           {nav.map((n) => {
             const active = !!n.to && (pathname === n.to || pathname.startsWith(n.to));
-            const dot = n.to === "/inbox" && hasUnread;
+            const dot = dotFor(n.to);
+            const count = n.to === "/inbox" ? unread.length : 0;
             return (
               <NavCell key={n.label} item={n} className={`flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium transition ${active ? "bg-orange text-nav" : "text-nav-fg/75 hover:bg-nav-fg/10 hover:text-nav-fg"}`}>
                 <span className="relative">
@@ -103,7 +104,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
                 </span>
                 {n.label}
                 {dot && (
-                  <span className="ml-auto rounded-full bg-red px-1.5 py-0.5 text-[10px] font-black text-nav">{unread.length}</span>
+                  <span className="ml-auto rounded-full bg-red px-1.5 py-0.5 text-[10px] font-black text-nav">{count}</span>
                 )}
               </NavCell>
             );
@@ -142,12 +143,13 @@ export function AppShell({ children }: { children: React.ReactNode }) {
         <div className="flex gap-1 overflow-x-auto border-t-2 border-nav-fg/25 px-2 py-1.5">
           {nav.map((n) => {
             const active = !!n.to && (pathname === n.to || pathname.startsWith(n.to));
-            const dot = n.to === "/inbox" && hasUnread;
+            const dot = dotFor(n.to);
+            const count = n.to === "/inbox" ? unread.length : 0;
             return (
               <NavCell key={n.label} item={n}
                 className={`relative flex shrink-0 items-center gap-1.5 border-2 px-2.5 py-1 text-[11px] font-black uppercase tracking-wider ${active ? "border-nav-fg bg-orange text-nav" : "border-nav-fg/40 text-nav-fg/80"}`}>
                 <n.icon className="h-3.5 w-3.5" /> {n.label}
-                {dot && <span className="ml-0.5 rounded-full bg-red px-1.5 text-[9px] font-black text-nav">{unread.length}</span>}
+                {dot && <span className="ml-0.5 rounded-full bg-red px-1.5 text-[9px] font-black text-nav">{count}</span>}
               </NavCell>
             );
           })}
@@ -160,7 +162,8 @@ export function AppShell({ children }: { children: React.ReactNode }) {
       <nav className="fixed inset-x-0 bottom-0 z-30 flex border-t-2 border-ink bg-white md:hidden">
         {nav.slice(0, 5).map((n) => {
           const active = !!n.to && (pathname === n.to || pathname.startsWith(n.to));
-          const dot = n.to === "/inbox" && hasUnread;
+          const dot = dotFor(n.to);
+            const count = n.to === "/inbox" ? unread.length : 0;
           return (
             <NavCell key={n.label} item={n} className={`relative flex flex-1 flex-col items-center gap-1 py-2 text-[10px] ${active ? "text-indigo" : "text-muted-text"}`}>
               <span className="relative">
