@@ -74,6 +74,7 @@ function MatchesPage() {
   return (
     <AppShell>
       <div className="mx-auto max-w-3xl px-4 py-6 md:py-10">
+        <VerifyBanner />
         <div className="flex items-end justify-between gap-4">
           <div>
             <h1 className="text-3xl font-black tracking-tight">Your matches</h1>

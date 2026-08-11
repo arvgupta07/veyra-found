@@ -210,6 +210,7 @@ function Inbox() {
   return (
     <AppShell>
       <div className="mx-auto max-w-3xl px-4 py-6 md:py-10">
+        <VerifyBanner />
         <h1 className="text-3xl font-black tracking-tight">Inbox</h1>
         <div className="mt-6 flex gap-2 border-[3px] border-ink bg-white p-1.5 shadow-brutal-sm soft-corners">
           {(["requests", "sent", "talking"] as const).map((t) => {
