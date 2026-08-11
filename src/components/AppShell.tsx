@@ -103,9 +103,12 @@ export function AppShell({ children }: { children: React.ReactNode }) {
                   {dot && <span className="absolute -right-1.5 -top-1.5 h-2.5 w-2.5 rounded-full border border-ink bg-red" />}
                 </span>
                 {n.label}
-                {dot && (
+                {count > 0 ? (
                   <span className="ml-auto rounded-full bg-red px-1.5 py-0.5 text-[10px] font-black text-nav">{count}</span>
-                )}
+                ) : dot ? (
+                  <span className="ml-auto h-2 w-2 rounded-full bg-red" />
+                ) : null}
+
               </NavCell>
             );
           })}
