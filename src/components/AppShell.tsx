@@ -1,6 +1,5 @@
 import { Link, useRouter, useRouterState } from "@tanstack/react-router";
-import { Compass, Inbox, MessagesSquare, User, LogOut, Heart, Moon, Sun, ShieldCheck, BadgeCheck } from "lucide-react";
-import { useMyVerification } from "@/hooks/useVerification";
+import { Compass, Inbox, MessagesSquare, User, LogOut, Heart, Moon, Sun, ShieldCheck } from "lucide-react";
 import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { useMyProfile } from "@/hooks/useMyFounder";
@@ -11,7 +10,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { VeyraMark } from "@/components/VeyraLogo";
 import { ChatDock } from "@/components/ChatDock";
-import { VerifyModalHost, openVerifyModal } from "@/components/VerifyModal";
+import { VerifyModalHost } from "@/components/VerifyModal";
 
 type NavItem = { to?: string; label: string; icon: typeof Compass; onClick?: () => void };
 
