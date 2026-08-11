@@ -274,7 +274,9 @@ function Onboarding() {
             <h1 className="text-3xl font-black tracking-tight">Your work & idea</h1>
             <div className="space-y-6 rounded-2xl border bg-white p-6 shadow-card">
               <div>
-                <label className="text-xs font-semibold text-muted-text">Skills</label>
+                <label className="text-xs font-semibold text-muted-text">
+                  Skills <span className="text-red">*</span> <span className="font-normal text-muted-text">(select at least one)</span>
+                </label>
                 <div className="mt-2 flex flex-wrap gap-1.5">
                   {[...new Set([...SKILLS_LIST, ...f.skills])].map((s) => {
                     const on = f.skills.includes(s);
@@ -306,8 +308,8 @@ function Onboarding() {
                   })}
                 </div>
               </div>
-              <CardChoice label="Commitment" value={f.commitment} onChange={(v) => setF({ ...f, commitment: v as typeof f.commitment })} options={[["full_time","Full-time"],["part_time","Part-time"],["exploring","Exploring"]]} />
-              <CardChoice label="Stage" value={f.idea_stage} onChange={(v) => setF({ ...f, idea_stage: v as typeof f.idea_stage })} options={[["idea","Just an idea"],["mvp","Building MVP"],["revenue","Have revenue"],["funded","Already funded"]]} />
+              <CardChoice label="Commitment" required value={f.commitment} onChange={(v) => setF({ ...f, commitment: v as typeof f.commitment })} options={[["full_time","Full-time"],["part_time","Part-time"],["exploring","Exploring"]]} />
+              <CardChoice label="Stage" required value={f.idea_stage} onChange={(v) => setF({ ...f, idea_stage: v as typeof f.idea_stage })} options={[["idea","Just an idea"],["mvp","Building MVP"],["revenue","Have revenue"],["funded","Already funded"]]} />
               <div>
                 <label className="text-xs font-semibold text-muted-text">Where are you at?</label>
                 <div className="mt-2 grid gap-2 md:grid-cols-3">
@@ -343,11 +345,13 @@ function Onboarding() {
                 <label className="text-xs font-semibold text-muted-text">Equity offer to a co-founder: <span className="text-foreground">{f.equity_offer}%</span></label>
                 <input type="range" min={10} max={60} step={5} value={f.equity_offer} onChange={(e) => setF({ ...f, equity_offer: +e.target.value })} className="mt-2 w-full accent-indigo" />
               </div>
-              <CardChoice label="Exit vision" value={f.exit_vision} onChange={(v) => setF({ ...f, exit_vision: v as typeof f.exit_vision })} options={[["lifestyle","Lifestyle"],["acquisition","Get acquired"],["ipo","Go public"]]} />
-              <CardChoice label="Work location preference" value={f.remote_pref} onChange={(v) => setF({ ...f, remote_pref: v as typeof f.remote_pref })} options={[["onsite","On-site"],["hybrid","Hybrid"],["remote","Remote"]]} />
+              <CardChoice label="Exit vision" required value={f.exit_vision} onChange={(v) => setF({ ...f, exit_vision: v as typeof f.exit_vision })} options={[["lifestyle","Lifestyle"],["acquisition","Get acquired"],["ipo","Go public"]]} />
+              <CardChoice label="Work location preference" required value={f.remote_pref} onChange={(v) => setF({ ...f, remote_pref: v as typeof f.remote_pref })} options={[["onsite","On-site"],["hybrid","Hybrid"],["remote","Remote"]]} />
               <div>
-                <label className="text-xs font-semibold text-muted-text">What I'm looking for in a co-founder</label>
-                <p className="text-[11px] text-muted-text">Pick everything that feels true — skills, style, and stage.</p>
+                <label className="text-xs font-semibold text-muted-text">
+                  What I'm looking for in a co-founder <span className="text-red">*</span>
+                </label>
+                <p className="text-[11px] text-muted-text">Pick at least one — skills, style, or stage.</p>
                 <div className="mt-2 flex flex-wrap gap-1.5">
                   {LOOKING_FOR_OPTIONS.map((s) => {
                     const on = f.looking_for.includes(s);
@@ -359,10 +363,11 @@ function Onboarding() {
             </div>
             <div className="flex justify-between">
               <button onClick={() => setStep(1)} className="rounded-lg border px-4 py-2 text-sm">Back</button>
-              <button onClick={saveStep2} disabled={saving} className="inline-flex items-center gap-2 rounded-lg bg-indigo px-5 py-2.5 text-sm font-semibold text-white disabled:opacity-50">
+              <button onClick={saveStep2} disabled={saving || !step2Valid} className="inline-flex items-center gap-2 rounded-lg bg-indigo px-5 py-2.5 text-sm font-semibold text-white disabled:opacity-50">
                 {saving && <Loader2 className="h-4 w-4 animate-spin" />} Continue <ChevronRight className="h-4 w-4" />
               </button>
             </div>
+
           </div>
         )}
 
