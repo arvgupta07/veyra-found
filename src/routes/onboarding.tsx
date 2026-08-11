@@ -89,6 +89,13 @@ function Onboarding() {
   }
 
   async function saveStep1() {
+    if (!step1Valid) {
+      if (!f.full_name.trim() || !f.headline.trim() || !f.location.trim()) return toast.error("Full name, headline and location are required.");
+      if (f.bio.trim().length < 30) return toast.error("Bio must be at least 30 characters so others can understand you.");
+      if (!isValidLinkedIn(f.linkedin_url)) return toast.error("A valid LinkedIn profile URL (linkedin.com/in/...) is required.");
+      if (f.age < 16 || f.age > 100) return toast.error("Please enter a valid age between 16 and 100.");
+      return;
+    }
     if (!session) return;
     setSaving(true);
     // upsert founder (create if missing)
@@ -108,6 +115,7 @@ function Onboarding() {
     if (err) return toast.error(err.message);
     setStep(2);
   }
+
 
   async function saveStep2() {
     setSaving(true);
