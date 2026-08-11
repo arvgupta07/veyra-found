@@ -42,9 +42,35 @@ export function AppShell({ children }: { children: React.ReactNode }) {
   useLiveInbox();
   const unread = useUnreadConversations();
   const hasUnread = unread.length > 0;
+  const { data: myFounder } = useMyFounder();
+  const seen = useSyncExternalStore(subscribeSeen, getSeenSnapshot, () => ({}) as Record<string, number>);
+
+  const profileIncomplete = !!myFounder && (
+    !myFounder.profile_complete ||
+    !myFounder.bio ||
+    !myFounder.headline ||
+    !myFounder.location ||
+    (myFounder.skills ?? []).length === 0 ||
+    !myFounder.linkedin_url
+  );
+  const forumStale = isStale("forum", seen);
+
+  useEffect(() => {
+    if (pathname.startsWith("/forum")) markSeen("forum");
+    if (pathname.startsWith("/matches")) markSeen("matches");
+  }, [pathname]);
+
+  function dotFor(to?: string) {
+    if (to === "/inbox") return hasUnread;
+    if (to === "/forum") return forumStale;
+    if (to === "/profile/me") return profileIncomplete;
+    return false;
+  }
+
   const [confirmSignOut, setConfirmSignOut] = useState(false);
   const baseNav = founderNav;
   const nav = isAdmin ? [...baseNav, { to: "/admin", label: "Admin", icon: ShieldCheck }] : baseNav;
+
 
   async function signOut() {
     setConfirmSignOut(false);
