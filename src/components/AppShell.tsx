@@ -152,7 +152,12 @@ export function AppShell({ children }: { children: React.ReactNode }) {
               <NavCell key={n.label} item={n}
                 className={`relative flex shrink-0 items-center gap-1.5 border-2 px-2.5 py-1 text-[11px] font-black uppercase tracking-wider ${active ? "border-nav-fg bg-orange text-nav" : "border-nav-fg/40 text-nav-fg/80"}`}>
                 <n.icon className="h-3.5 w-3.5" /> {n.label}
-                {dot && <span className="ml-0.5 rounded-full bg-red px-1.5 text-[9px] font-black text-nav">{count}</span>}
+                {count > 0 ? (
+                  <span className="ml-0.5 rounded-full bg-red px-1.5 text-[9px] font-black text-nav">{count}</span>
+                ) : dot ? (
+                  <span className="ml-0.5 h-2 w-2 rounded-full bg-red" />
+                ) : null}
+
               </NavCell>
             );
           })}
