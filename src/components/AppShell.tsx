@@ -11,8 +11,11 @@ import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { VeyraMark } from "@/components/VeyraLogo";
 import { ChatDock } from "@/components/ChatDock";
+import { VerifyModalHost, openVerifyModal } from "@/components/VerifyModal";
 
-const founderNav = [
+type NavItem = { to?: string; label: string; icon: typeof Compass; onClick?: () => void };
+
+const founderNav: NavItem[] = [
   { to: "/discover", label: "Discover", icon: Compass },
   { to: "/matches", label: "Matches", icon: Heart },
   { to: "/inbox", label: "Inbox", icon: Inbox },
@@ -41,8 +44,8 @@ export function AppShell({ children }: { children: React.ReactNode }) {
   const [confirmSignOut, setConfirmSignOut] = useState(false);
   const baseNav = founderNav;
   const { verified, founderId } = useMyVerification();
-  const withVerify = !verified && founderId
-    ? [...baseNav, { to: "/verify", label: "Verify", icon: BadgeCheck }]
+  const withVerify: NavItem[] = !verified && founderId
+    ? [...baseNav, { label: "Verify", icon: BadgeCheck, onClick: openVerifyModal }]
     : baseNav;
   const nav = isAdmin ? [...withVerify, { to: "/admin", label: "Admin", icon: ShieldCheck }] : withVerify;
 
@@ -67,10 +70,10 @@ export function AppShell({ children }: { children: React.ReactNode }) {
         </Link>
         <nav className="relative mt-8 space-y-1">
           {nav.map((n) => {
-            const active = pathname === n.to || (n.to !== "/" && pathname.startsWith(n.to));
+            const active = !!n.to && (pathname === n.to || pathname.startsWith(n.to));
             const dot = n.to === "/inbox" && hasUnread;
             return (
-              <Link key={n.to} to={n.to} className={`flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium transition ${active ? "bg-orange text-nav" : "text-nav-fg/75 hover:bg-nav-fg/10 hover:text-nav-fg"}`}>
+              <NavCell key={n.label} item={n} className={`flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium transition ${active ? "bg-orange text-nav" : "text-nav-fg/75 hover:bg-nav-fg/10 hover:text-nav-fg"}`}>
                 <span className="relative">
                   <n.icon className="h-4 w-4" />
                   {dot && <span className="absolute -right-1.5 -top-1.5 h-2.5 w-2.5 rounded-full border border-ink bg-red" />}
@@ -79,7 +82,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
                 {dot && (
                   <span className="ml-auto rounded-full bg-red px-1.5 py-0.5 text-[10px] font-black text-nav">{unread.length}</span>
                 )}
-              </Link>
+              </NavCell>
             );
           })}
         </nav>
@@ -115,14 +118,14 @@ export function AppShell({ children }: { children: React.ReactNode }) {
         </div>
         <div className="flex gap-1 overflow-x-auto border-t-2 border-nav-fg/25 px-2 py-1.5">
           {nav.map((n) => {
-            const active = pathname === n.to || (n.to !== "/" && pathname.startsWith(n.to));
+            const active = !!n.to && (pathname === n.to || pathname.startsWith(n.to));
             const dot = n.to === "/inbox" && hasUnread;
             return (
-              <Link key={n.to} to={n.to}
+              <NavCell key={n.label} item={n}
                 className={`relative flex shrink-0 items-center gap-1.5 border-2 px-2.5 py-1 text-[11px] font-black uppercase tracking-wider ${active ? "border-nav-fg bg-orange text-nav" : "border-nav-fg/40 text-nav-fg/80"}`}>
                 <n.icon className="h-3.5 w-3.5" /> {n.label}
                 {dot && <span className="ml-0.5 rounded-full bg-red px-1.5 text-[9px] font-black text-nav">{unread.length}</span>}
-              </Link>
+              </NavCell>
             );
           })}
         </div>
@@ -133,16 +136,16 @@ export function AppShell({ children }: { children: React.ReactNode }) {
       {/* Mobile bottom nav */}
       <nav className="fixed inset-x-0 bottom-0 z-30 flex border-t-2 border-ink bg-white md:hidden">
         {nav.slice(0, 5).map((n) => {
-          const active = pathname === n.to || (n.to !== "/" && pathname.startsWith(n.to));
+          const active = !!n.to && (pathname === n.to || pathname.startsWith(n.to));
           const dot = n.to === "/inbox" && hasUnread;
           return (
-            <Link key={n.to} to={n.to} className={`relative flex flex-1 flex-col items-center gap-1 py-2 text-[10px] ${active ? "text-indigo" : "text-muted-text"}`}>
+            <NavCell key={n.label} item={n} className={`relative flex flex-1 flex-col items-center gap-1 py-2 text-[10px] ${active ? "text-indigo" : "text-muted-text"}`}>
               <span className="relative">
                 <n.icon className="h-5 w-5" />
                 {dot && <span className="absolute -right-1.5 -top-1 h-2.5 w-2.5 rounded-full border border-ink bg-red" />}
               </span>
               {n.label}
-            </Link>
+            </NavCell>
           );
         })}
       </nav>
@@ -168,9 +171,25 @@ export function AppShell({ children }: { children: React.ReactNode }) {
       )}
 
       <ChatDock />
+      <VerifyModalHost />
 
       <main className="page-paper w-full md:pl-60 pt-[6.5rem] pb-16 md:pt-0 md:pb-0">{children}</main>
 
     </div>
+  );
+}
+
+function NavCell({ item, className, children }: { item: NavItem; className: string; children: React.ReactNode }) {
+  if (item.onClick) {
+    return (
+      <button type="button" onClick={item.onClick} className={className}>
+        {children}
+      </button>
+    );
+  }
+  return (
+    <Link to={item.to!} className={className}>
+      {children}
+    </Link>
   );
 }
