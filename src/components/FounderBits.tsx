@@ -18,9 +18,6 @@ export function TierBadge({ tier }: { tier: Founder["trust_tier"] }) {
 export function VerifiedBadges({ f }: { f: Founder }) {
   return (
     <div className="flex flex-wrap items-center gap-1.5">
-      {f.linkedin_verified && (
-        <span className="inline-flex items-center gap-1 rounded-md bg-emerald/10 px-1.5 py-0.5 text-[10px] font-semibold text-emerald"><CheckCircle2 className="h-3 w-3" />LinkedIn</span>
-      )}
       {f.github_verified && (
         <span className="inline-flex items-center gap-1 rounded-md bg-slate-800/10 px-1.5 py-0.5 text-[10px] font-semibold text-slate-800"><CheckCircle2 className="h-3 w-3" />GitHub</span>
       )}
