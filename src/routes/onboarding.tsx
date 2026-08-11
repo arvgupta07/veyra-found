@@ -217,17 +217,22 @@ function Onboarding() {
           <div className="space-y-6">
             <h1 className="text-3xl font-black tracking-tight">Let's build your profile</h1>
             <div className="grid gap-4 rounded-2xl border bg-white p-6 shadow-card">
-              <Input label="Full name" value={f.full_name} onChange={(v) => setF({ ...f, full_name: v })} />
-              <Input label="Headline" placeholder="Full-stack engineer obsessed with fintech" value={f.headline} onChange={(v) => setF({ ...f, headline: v })} />
+              <Input label="Full name" required value={f.full_name} onChange={(v) => setF({ ...f, full_name: v })} />
+              <Input label="Headline" required placeholder="Full-stack engineer obsessed with fintech" value={f.headline} onChange={(v) => setF({ ...f, headline: v })} />
               <div>
-                <label className="text-xs font-semibold text-muted-text">Bio</label>
+                <label className="text-xs font-semibold text-muted-text">
+                  Bio <span className="text-red">*</span> <span className="font-normal text-muted-text">(min 30 chars)</span>
+                </label>
                 <textarea maxLength={280} rows={3} value={f.bio} onChange={(e) => setF({ ...f, bio: e.target.value })} className="mt-1 w-full rounded-lg border px-3 py-2 text-sm focus:ring-2 focus:ring-indigo focus:outline-none" />
-                <div className="mt-1 text-right text-[10px] text-muted-text">{f.bio.length}/280</div>
+                <div className="mt-1 flex justify-between text-[10px] text-muted-text">
+                  <span>{f.bio.trim().length < 30 && f.bio.trim().length > 0 ? `${30 - f.bio.trim().length} more characters needed` : "Great length"}</span>
+                  <span>{f.bio.length}/280</span>
+                </div>
               </div>
               <div className="grid grid-cols-3 gap-3">
-                <Input label="Location" placeholder="Mumbai" value={f.location} onChange={(v) => setF({ ...f, location: v })} />
+                <Input label="Location" required placeholder="Mumbai" value={f.location} onChange={(v) => setF({ ...f, location: v })} />
                 <div>
-                  <label className="text-xs font-semibold text-muted-text">Age</label>
+                  <label className="text-xs font-semibold text-muted-text">Age <span className="text-red">*</span></label>
                   <input type="number" min={16} max={100} value={f.age}
                     onChange={(e) => setF({ ...f, age: +e.target.value || 0 })}
                     className="mt-1 w-full rounded-lg border-2 border-ink bg-white px-3 py-2 text-sm" />
@@ -240,11 +245,11 @@ function Onboarding() {
                 </div>
               </div>
               <div className="grid grid-cols-2 gap-3">
-                <Input label="LinkedIn URL" placeholder="https://linkedin.com/in/..." value={f.linkedin_url} onChange={(v) => setF({ ...f, linkedin_url: v })} />
+                <Input label="LinkedIn URL" required placeholder="https://linkedin.com/in/..." value={f.linkedin_url} onChange={(v) => setF({ ...f, linkedin_url: v })} />
                 <Input label="GitHub URL" placeholder="https://github.com/..." value={f.github_url} onChange={(v) => setF({ ...f, github_url: v })} />
               </div>
               <div>
-                <label className="text-xs font-semibold text-muted-text">Background</label>
+                <label className="text-xs font-semibold text-muted-text">Background <span className="text-red">*</span></label>
                 <div className="mt-2 grid grid-cols-4 gap-2">
                   {BACKGROUNDS.map(({ v, label, icon: Icon }) => (
                     <button key={v} type="button" onClick={() => setF({ ...f, background: v })} className={`rounded-lg border-2 p-3 text-center ${f.background === v ? "border-indigo bg-indigo/5" : "border-border"}`}>
@@ -256,10 +261,11 @@ function Onboarding() {
               </div>
             </div>
             <div className="flex justify-end">
-              <button onClick={saveStep1} disabled={saving || !f.headline || !f.location} className="inline-flex items-center gap-2 rounded-lg bg-indigo px-5 py-2.5 text-sm font-semibold text-white disabled:opacity-50">
+              <button onClick={saveStep1} disabled={saving || !step1Valid} className="inline-flex items-center gap-2 rounded-lg bg-indigo px-5 py-2.5 text-sm font-semibold text-white disabled:opacity-50">
                 {saving && <Loader2 className="h-4 w-4 animate-spin" />} Continue <ChevronRight className="h-4 w-4" />
               </button>
             </div>
+
           </div>
         )}
 
