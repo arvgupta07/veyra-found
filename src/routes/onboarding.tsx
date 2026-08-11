@@ -457,18 +457,24 @@ function Onboarding() {
   );
 }
 
-function Input({ label, value, onChange, placeholder }: { label: string; value: string; onChange: (v: string) => void; placeholder?: string }) {
+function Input({ label, value, onChange, placeholder, required }: { label: string; value: string; onChange: (v: string) => void; placeholder?: string; required?: boolean }) {
   return (
     <div>
-      <label className="text-xs font-semibold text-muted-text">{label}</label>
+      <label className="text-xs font-semibold text-muted-text">
+        {label}
+        {required && <span className="ml-0.5 text-red">*</span>}
+      </label>
       <input value={value} onChange={(e) => onChange(e.target.value)} placeholder={placeholder} className="mt-1 w-full rounded-lg border px-3 py-2 text-sm focus:ring-2 focus:ring-indigo focus:outline-none" />
     </div>
   );
 }
-function CardChoice({ label, value, onChange, options }: { label: string; value: string; onChange: (v: string) => void; options: [string, string][] }) {
+function CardChoice({ label, value, onChange, options, required }: { label: string; value: string; onChange: (v: string) => void; options: [string, string][]; required?: boolean }) {
   return (
     <div>
-      <label className="text-xs font-semibold text-muted-text">{label}</label>
+      <label className="text-xs font-semibold text-muted-text">
+        {label}
+        {required && <span className="ml-0.5 text-red">*</span>}
+      </label>
       <div className="mt-2 grid gap-2" style={{ gridTemplateColumns: `repeat(${options.length}, minmax(0, 1fr))` }}>
         {options.map(([v, l]) => (
           <button key={v} type="button" onClick={() => onChange(v)} className={`rounded-lg border-2 p-3 text-sm font-medium ${value === v ? "border-indigo bg-indigo/5 text-indigo" : "border-border text-muted-text"}`}>{l}</button>
@@ -477,3 +483,4 @@ function CardChoice({ label, value, onChange, options }: { label: string; value:
     </div>
   );
 }
+
