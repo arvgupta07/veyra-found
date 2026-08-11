@@ -12,7 +12,7 @@ export function VeyraMark({ size = 32, className = "" }: { size?: number; classN
       decoding="sync"
       fetchPriority="high"
       className={className}
-      style={{ width: size, height: size, objectFit: "contain", display: "block" }}
+      style={{ width: size, height: size, objectFit: "cover", display: "block" }}
       draggable={false}
     />
   );
