@@ -82,7 +82,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
                 {dot && (
                   <span className="ml-auto rounded-full bg-red px-1.5 py-0.5 text-[10px] font-black text-nav">{unread.length}</span>
                 )}
-              </Link>
+              </NavCell>
             );
           })}
         </nav>
