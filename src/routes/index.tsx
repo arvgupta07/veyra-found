@@ -4,7 +4,7 @@ import {
   Sparkles, ShieldCheck, ArrowRight, CheckCircle2, BarChart3, MessagesSquare,
   Zap, Users, Rocket, Star, MoveUpRight, Linkedin, Moon, Sun,
 } from "lucide-react";
-import { VeyraMark } from "@/components/VeyraLogo";
+import { VEYRA_MARK_SRC } from "@/assets/veyra-mark";
 import { useDarkMode } from "@/hooks/useDarkMode";
 
 export const Route = createFileRoute("/")({
