@@ -7,6 +7,7 @@ import { founderAvatar } from "@/lib/founder-types";
 import { clearUnread } from "@/lib/unread-store";
 import { Send, ArrowLeft, Pencil, Trash2, Smile, Check, X, Minus, ShieldAlert } from "lucide-react";
 import { useMyVerification } from "@/hooks/useVerification";
+import { openVerifyModal } from "@/components/VerifyModal";
 import { toast } from "sonner";
 
 const REACTIONS = ["👍", "❤️", "😂", "🎉", "🔥", "🤔"];
