@@ -12,6 +12,8 @@ import { useRequireAuth } from "@/hooks/useRequireAuth";
 import { useConnectedIds } from "@/hooks/useConnectedIds";
 import { useMyVerification } from "@/hooks/useVerification";
 import { VerifyBanner, VerifyRequiredCard } from "@/components/VerifyGate";
+import { getDiscoverCursor, setDiscoverCursor } from "@/lib/discover-cursor";
+
 
 export const Route = createFileRoute("/discover")({
   component: Discover,
