@@ -87,8 +87,8 @@ function Landing() {
       <header className="border-b-[3px] border-ink bg-cream">
         <div className="mx-auto flex max-w-7xl items-center justify-between gap-3 px-4 py-4 sm:px-6">
           <Link to="/" className="group flex items-center gap-2">
-            <div className="grid h-10 w-10 shrink-0 place-items-center border-[3px] border-ink bg-cream shadow-brutal-sm transition-transform group-hover:-rotate-6">
-              <VeyraMark size={22} />
+            <div className="h-10 w-10 shrink-0 overflow-hidden border-[3px] border-ink bg-cream shadow-brutal-sm transition-transform group-hover:-rotate-6">
+              <img src={VEYRA_MARK_SRC} alt="Veyra Found" width={40} height={40} loading="eager" decoding="sync" draggable={false} className="h-full w-full object-cover" />
             </div>
             <div className="flex flex-col leading-none">
               <span className="text-xl font-black tracking-tight">Veyra Found</span>
