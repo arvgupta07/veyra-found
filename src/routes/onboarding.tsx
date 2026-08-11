@@ -70,6 +70,19 @@ function Onboarding() {
   const progress = ((step - 1) / 4) * 100;
   const canNextP = selectedPrompts.length === 4 && selectedPrompts.every((p) => p.a.trim().length > 0);
 
+  const isValidLinkedIn = (url: string) => {
+    try {
+      const u = new URL(url.startsWith("http") ? url : `https://${url}`);
+      return u.hostname.replace(/^www\./, "").toLowerCase() === "linkedin.com" && /\/in\/.+/.test(u.pathname);
+    } catch {
+      return false;
+    }
+  };
+
+  const step1Valid = f.full_name.trim() && f.headline.trim() && f.bio.trim().length >= 30 && f.location.trim() && isValidLinkedIn(f.linkedin_url) && f.age >= 16 && f.age <= 100;
+  const step2Valid = f.skills.length > 0 && f.looking_for.length > 0 && f.commitment && f.idea_stage && f.remote_pref && f.exit_vision;
+
+
   async function handleCancel() {
     await supabase.auth.signOut();
     router.navigate({ to: "/auth/login" });
