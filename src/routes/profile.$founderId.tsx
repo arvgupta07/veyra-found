@@ -9,6 +9,8 @@ import { SkillTag, TierBadge, VerifiedBadges } from "@/components/FounderBits";
 import { founderAvatar } from "@/lib/founder-types";
 import { ProfileLinkChips } from "@/components/ProfileLinkChips";
 import { parseLinks } from "@/lib/profile-links";
+import { useMyVerification } from "@/hooks/useVerification";
+import { VerifiedTick, VerifyRequiredCard } from "@/components/VerifyGate";
 import { ArrowLeft, MapPin, Briefcase, Loader2, Send, X, Ban, ShieldCheck, EyeOff } from "lucide-react";
 
 import { toast } from "sonner";
@@ -152,7 +154,10 @@ function FounderProfile() {
               <img src={founderAvatar({ seed_avatar: data.seed_avatar, seed_name: data.seed_name, profile: data.profiles })}
                 className="h-20 w-20 rounded-2xl border-2 border-ink object-cover shadow-brutal-sm" alt="" />
               <div className="flex-1">
-                <h1 className="text-2xl font-black text-ink">{name}</h1>
+                <div className="flex flex-wrap items-center gap-2">
+                  <h1 className="text-2xl font-black text-ink">{name}</h1>
+                  {(data as { verified?: boolean }).verified && <VerifiedTick />}
+                </div>
                 <div className="mt-1 text-sm font-semibold text-ink/80">{data.headline}</div>
                 <div className="mt-2 flex flex-wrap items-center gap-3 text-xs text-ink/70">
                   <span className="inline-flex items-center gap-1"><MapPin className="h-3 w-3" /> {data.location}</span>
@@ -276,6 +281,7 @@ function ConnectModal({ founder, myFounderId, onClose }: {
   const [message, setMessage] = useState("");
   const [sending, setSending] = useState(false);
   const name = founder.profiles?.full_name ?? founder.seed_name ?? "them";
+  const { verified } = useMyVerification();
 
   async function send() {
     if (message.trim().length < 20) return toast.error("Add a bit more context (20+ chars).");
@@ -291,6 +297,14 @@ function ConnectModal({ founder, myFounderId, onClose }: {
     if (error) return toast.error(error.message);
     toast.success(`Request sent to ${name}!`);
     onClose();
+  }
+
+  if (!verified) {
+    return (
+      <div className="fixed inset-0 z-40 grid place-items-center bg-ink/60 p-4" onClick={onClose}>
+        <div onClick={(e) => e.stopPropagation()} className="w-full max-w-md"><VerifyRequiredCard /></div>
+      </div>
+    );
   }
 
   return (

@@ -609,6 +609,8 @@ export type Database = {
           spam_strikes: number
           trust_tier: Database["public"]["Enums"]["trust_tier"] | null
           user_id: string | null
+          verified: boolean
+          verified_at: string | null
           video_intro_url: string | null
           vouches_count: number | null
           years_experience: number | null
@@ -648,6 +650,8 @@ export type Database = {
           spam_strikes?: number
           trust_tier?: Database["public"]["Enums"]["trust_tier"] | null
           user_id?: string | null
+          verified?: boolean
+          verified_at?: string | null
           video_intro_url?: string | null
           vouches_count?: number | null
           years_experience?: number | null
@@ -687,6 +691,8 @@ export type Database = {
           spam_strikes?: number
           trust_tier?: Database["public"]["Enums"]["trust_tier"] | null
           user_id?: string | null
+          verified?: boolean
+          verified_at?: string | null
           video_intro_url?: string | null
           vouches_count?: number | null
           years_experience?: number | null
@@ -984,6 +990,56 @@ export type Database = {
         }
         Relationships: []
       }
+      verification_requests: {
+        Row: {
+          affiliation: string | null
+          created_at: string
+          founder_id: string
+          id: string
+          linkedin_url: string
+          note: string
+          review_note: string | null
+          reviewed_at: string | null
+          reviewed_by: string | null
+          status: Database["public"]["Enums"]["verification_status"]
+          updated_at: string
+        }
+        Insert: {
+          affiliation?: string | null
+          created_at?: string
+          founder_id: string
+          id?: string
+          linkedin_url: string
+          note: string
+          review_note?: string | null
+          reviewed_at?: string | null
+          reviewed_by?: string | null
+          status?: Database["public"]["Enums"]["verification_status"]
+          updated_at?: string
+        }
+        Update: {
+          affiliation?: string | null
+          created_at?: string
+          founder_id?: string
+          id?: string
+          linkedin_url?: string
+          note?: string
+          review_note?: string | null
+          reviewed_at?: string | null
+          reviewed_by?: string | null
+          status?: Database["public"]["Enums"]["verification_status"]
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "verification_requests_founder_id_fkey"
+            columns: ["founder_id"]
+            isOneToOne: false
+            referencedRelation: "founders"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       vouches: {
         Row: {
           accepted: boolean | null
@@ -1044,6 +1100,7 @@ export type Database = {
       }
       is_admin: { Args: never; Returns: boolean }
       is_blocked_between: { Args: { a: string; b: string }; Returns: boolean }
+      is_verified_founder: { Args: never; Returns: boolean }
     }
     Enums: {
       app_role: "admin" | "user"
@@ -1065,6 +1122,7 @@ export type Database = {
       trust_tier: "Builder" | "Maker" | "Veteran"
       user_role: "founder" | "investor"
       venture_outcome: "running" | "exited" | "shut_down"
+      verification_status: "pending" | "approved" | "rejected"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -1212,6 +1270,7 @@ export const Constants = {
       trust_tier: ["Builder", "Maker", "Veteran"],
       user_role: ["founder", "investor"],
       venture_outcome: ["running", "exited", "shut_down"],
+      verification_status: ["pending", "approved", "rejected"],
     },
   },
 } as const

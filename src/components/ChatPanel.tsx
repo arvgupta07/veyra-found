@@ -5,7 +5,8 @@ import { supabase } from "@/integrations/supabase/client";
 import { useMyFounder } from "@/hooks/useMyFounder";
 import { founderAvatar } from "@/lib/founder-types";
 import { clearUnread } from "@/lib/unread-store";
-import { Send, ArrowLeft, Pencil, Trash2, Smile, Check, X, Minus } from "lucide-react";
+import { Send, ArrowLeft, Pencil, Trash2, Smile, Check, X, Minus, ShieldAlert } from "lucide-react";
+import { useMyVerification } from "@/hooks/useVerification";
 import { toast } from "sonner";
 
 const REACTIONS = ["👍", "❤️", "😂", "🎉", "🔥", "🤔"];
@@ -56,6 +57,7 @@ export function ChatPanel({
   onMinimize?: () => void;
 }) {
   const { data: me } = useMyFounder();
+  const { verified, status: vStatus } = useMyVerification();
   const qc = useQueryClient();
   const bottomRef = useRef<HTMLDivElement>(null);
   const [text, setText] = useState("");
@@ -286,6 +288,18 @@ export function ChatPanel({
 
       {/* Composer */}
       <div className={`border-t-2 border-ink bg-white ${dock ? "p-2" : "p-3"}`}>
+        {!verified ? (
+          <Link to="/verify" className={dock ? "flex items-center gap-2" : "mx-auto flex max-w-2xl items-center gap-2"}>
+            <span className="grid h-8 w-8 shrink-0 place-items-center rounded-lg border-2 border-ink bg-orange text-white">
+              <ShieldAlert className="h-4 w-4" />
+            </span>
+            <span className="text-[11px] font-black uppercase tracking-wider text-ink">
+              {vStatus === "pending"
+                ? "Verification in review — messaging unlocks once approved"
+                : "Verify your founder profile to send messages"}
+            </span>
+          </Link>
+        ) : (
         <div className={dock ? "flex items-center gap-2" : "mx-auto flex max-w-2xl items-center gap-2"}>
           <input value={text} onChange={(e) => setText(e.target.value)}
             onKeyDown={(e) => { if (e.key === "Enter" && !e.shiftKey) { e.preventDefault(); send(); } }}
@@ -296,6 +310,7 @@ export function ChatPanel({
             <Send className="h-4 w-4" />
           </button>
         </div>
+        )}
         {!dock && (
           <div className="mx-auto mt-1 max-w-2xl text-[10px] text-muted-text">
             <Smile className="mr-1 inline h-3 w-3" /> Tap any message to react, edit, or delete.
