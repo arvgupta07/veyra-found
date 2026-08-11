@@ -118,6 +118,11 @@ function Onboarding() {
 
 
   async function saveStep2() {
+    if (!step2Valid) {
+      if (f.skills.length === 0) return toast.error("Add at least one skill so we can match you better.");
+      if (f.looking_for.length === 0) return toast.error("Tell us what you're looking for in a co-founder.");
+      return toast.error("Please fill in all the required fields.");
+    }
     setSaving(true);
     const { data: founder } = await supabase.from("founders").select("id").eq("user_id", session!.user.id).maybeSingle();
     if (!founder) { setSaving(false); return toast.error("Please complete step 1 first"); }
@@ -133,6 +138,7 @@ function Onboarding() {
       remote_pref: f.remote_pref,
       looking_for: f.looking_for,
     }).eq("id", founder.id);
+
     setSaving(false);
     if (error) return toast.error(error.message);
     setStep(3);
