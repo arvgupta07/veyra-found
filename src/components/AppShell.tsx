@@ -11,8 +11,11 @@ import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { VeyraMark } from "@/components/VeyraLogo";
 import { ChatDock } from "@/components/ChatDock";
+import { VerifyModalHost, openVerifyModal } from "@/components/VerifyModal";
 
-const founderNav = [
+type NavItem = { to?: string; label: string; icon: typeof Compass; onClick?: () => void };
+
+const founderNav: NavItem[] = [
   { to: "/discover", label: "Discover", icon: Compass },
   { to: "/matches", label: "Matches", icon: Heart },
   { to: "/inbox", label: "Inbox", icon: Inbox },
@@ -41,8 +44,8 @@ export function AppShell({ children }: { children: React.ReactNode }) {
   const [confirmSignOut, setConfirmSignOut] = useState(false);
   const baseNav = founderNav;
   const { verified, founderId } = useMyVerification();
-  const withVerify = !verified && founderId
-    ? [...baseNav, { to: "/verify", label: "Verify", icon: BadgeCheck }]
+  const withVerify: NavItem[] = !verified && founderId
+    ? [...baseNav, { label: "Verify", icon: BadgeCheck, onClick: openVerifyModal }]
     : baseNav;
   const nav = isAdmin ? [...withVerify, { to: "/admin", label: "Admin", icon: ShieldCheck }] : withVerify;
 
@@ -168,6 +171,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
       )}
 
       <ChatDock />
+      <VerifyModalHost />
 
       <main className="page-paper w-full md:pl-60 pt-[6.5rem] pb-16 md:pt-0 md:pb-0">{children}</main>
 

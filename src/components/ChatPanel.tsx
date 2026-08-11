@@ -289,7 +289,7 @@ export function ChatPanel({
       {/* Composer */}
       <div className={`border-t-2 border-ink bg-white ${dock ? "p-2" : "p-3"}`}>
         {!verified ? (
-          <Link to="/verify" className={dock ? "flex items-center gap-2" : "mx-auto flex max-w-2xl items-center gap-2"}>
+          <button onClick={openVerifyModal} className={dock ? "flex items-center gap-2" : "mx-auto flex max-w-2xl items-center gap-2"}>
             <span className="grid h-8 w-8 shrink-0 place-items-center rounded-lg border-2 border-ink bg-orange text-white">
               <ShieldAlert className="h-4 w-4" />
             </span>
@@ -298,7 +298,7 @@ export function ChatPanel({
                 ? "Verification in review — messaging unlocks once approved"
                 : "Verify your founder profile to send messages"}
             </span>
-          </Link>
+          </button>
         ) : (
         <div className={dock ? "flex items-center gap-2" : "mx-auto flex max-w-2xl items-center gap-2"}>
           <input value={text} onChange={(e) => setText(e.target.value)}
