@@ -1,4 +1,5 @@
 import { createFileRoute, useRouter } from "@tanstack/react-router";
+import { useQueryClient } from "@tanstack/react-query";
 import { useEffect, useMemo, useState } from "react";
 import { toast } from "sonner";
 import { Loader2, ChevronRight, Rocket, Briefcase, Palette, Wrench, X } from "lucide-react";
@@ -32,6 +33,7 @@ const BACKGROUNDS = [
 
 function Onboarding() {
   const router = useRouter();
+  const queryClient = useQueryClient();
   const { session, loading: sLoading } = useSession();
   const { data: profile } = useMyProfile();
   const { data: existingFounder } = useMyFounder();
@@ -191,6 +193,10 @@ function Onboarding() {
       await supabase.from("founders").update({ profile_complete: true }).eq("id", founder.id);
     }
     await new Promise((r) => setTimeout(r, 2500));
+    // Refresh the cached founder row before navigating, otherwise the guard on
+    // /discover still sees profile_complete=false and bounces back here.
+    await queryClient.invalidateQueries({ queryKey: ["me-founder", session!.user.id] });
+    await queryClient.refetchQueries({ queryKey: ["me-founder", session!.user.id] });
     setGenerating(false);
     toast.success("Profile complete!");
     router.navigate({ to: "/discover" });
