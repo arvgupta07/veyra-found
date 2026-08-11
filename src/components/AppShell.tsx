@@ -1,5 +1,6 @@
 import { Link, useRouter, useRouterState } from "@tanstack/react-router";
-import { Compass, Inbox, MessagesSquare, User, LogOut, Heart, Moon, Sun, ShieldCheck } from "lucide-react";
+import { Compass, Inbox, MessagesSquare, User, LogOut, Heart, Moon, Sun, ShieldCheck, BadgeCheck } from "lucide-react";
+import { useMyVerification } from "@/hooks/useVerification";
 import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { useMyProfile } from "@/hooks/useMyFounder";
@@ -39,7 +40,11 @@ export function AppShell({ children }: { children: React.ReactNode }) {
   const hasUnread = unread.length > 0;
   const [confirmSignOut, setConfirmSignOut] = useState(false);
   const baseNav = founderNav;
-  const nav = isAdmin ? [...baseNav, { to: "/admin", label: "Admin", icon: ShieldCheck }] : baseNav;
+  const { verified, founderId } = useMyVerification();
+  const withVerify = !verified && founderId
+    ? [...baseNav, { to: "/verify", label: "Verify", icon: BadgeCheck }]
+    : baseNav;
+  const nav = isAdmin ? [...withVerify, { to: "/admin", label: "Admin", icon: ShieldCheck }] : withVerify;
 
   async function signOut() {
     setConfirmSignOut(false);

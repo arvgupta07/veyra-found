@@ -10,6 +10,8 @@ import { toast } from "sonner";
 import { founderAvatar } from "@/lib/founder-types";
 import { useRequireAuth } from "@/hooks/useRequireAuth";
 import { useConnectedIds } from "@/hooks/useConnectedIds";
+import { useMyVerification } from "@/hooks/useVerification";
+import { VerifyBanner, VerifyRequiredCard } from "@/components/VerifyGate";
 
 export const Route = createFileRoute("/discover")({
   component: Discover,
@@ -92,6 +94,7 @@ function Discover() {
   return (
     <AppShell>
       <div className="mx-auto max-w-2xl px-4 py-6 md:py-10">
+        <VerifyBanner />
         <div className="mb-6 flex items-end justify-between gap-4">
           <div>
             <h1 className="text-3xl font-black tracking-tight">Discover</h1>
@@ -299,6 +302,7 @@ function PromptCard({
   onOpen: () => void;
   onClose: () => void;
 }) {
+  const { verified } = useMyVerification();
   const [open, setOpen] = useState(isOpen);
   const [reply, setReply] = useState("");
   const [sending, setSending] = useState(false);
@@ -345,6 +349,8 @@ function PromptCard({
         >
           <Sparkles className="h-3 w-3" /> Reply to this prompt
         </button>
+      ) : !verified ? (
+        <div className="mt-3"><VerifyRequiredCard action="reply to prompts" /></div>
       ) : (
         <div className="mt-3 space-y-2">
           <textarea
@@ -391,6 +397,7 @@ function ConnectModal({ founder, myFounderId, onClose }: { founder: any; myFound
   const [message, setMessage] = useState("");
   const [sending, setSending] = useState(false);
   const name = founder.profiles?.full_name ?? founder.seed_name ?? "them";
+  const { verified } = useMyVerification();
 
   async function send() {
     if (message.trim().length < 20) return toast.error("Add a bit more context (20+ chars).");
@@ -406,6 +413,14 @@ function ConnectModal({ founder, myFounderId, onClose }: { founder: any; myFound
     if (error) return toast.error(error.message);
     toast.success(`Request sent to ${name}!`);
     onClose();
+  }
+
+  if (!verified) {
+    return (
+      <div className="fixed inset-0 z-40 grid place-items-center bg-ink/70 p-4" onClick={onClose}>
+        <div onClick={(e) => e.stopPropagation()} className="w-full max-w-md"><VerifyRequiredCard /></div>
+      </div>
+    );
   }
 
   return (

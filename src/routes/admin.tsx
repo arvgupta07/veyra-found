@@ -6,7 +6,7 @@ import { toast } from "sonner";
 import {
   Trash2, MessageSquare, Users, FileText, ArrowLeft, ShieldCheck, BarChart3,
   Ban, Pin, PinOff, Crown, Search, Shield, ShieldOff, Link2, MessageCircle,
-  RefreshCw, Sparkles, UserX,
+  RefreshCw, Sparkles, UserX, BadgeCheck,
 } from "lucide-react";
 import { AppShell } from "@/components/AppShell";
 import { useRequireAuth } from "@/hooks/useRequireAuth";
@@ -34,11 +34,12 @@ export const Route = createFileRoute("/admin")({
   }),
 });
 
-type Tab = "overview" | "users" | "posts" | "comments" | "dms" | "requests" | "blocks";
+type Tab = "overview" | "users" | "verify" | "posts" | "comments" | "dms" | "requests" | "blocks";
 
 const TABS: { id: Tab; label: string; icon: any }[] = [
   { id: "overview", label: "Overview", icon: BarChart3 },
   { id: "users", label: "Users", icon: Users },
+  { id: "verify", label: "Verification", icon: BadgeCheck },
   { id: "posts", label: "Posts", icon: FileText },
   { id: "comments", label: "Comments", icon: MessageCircle },
   { id: "dms", label: "Conversations", icon: MessageSquare },
@@ -96,6 +97,7 @@ function AdminPage() {
 
         {tab === "overview" && <OverviewPanel onJump={setTab} />}
         {tab === "users" && <UsersPanel meId={session!.user.id} />}
+        {tab === "verify" && <VerificationPanel />}
         {tab === "posts" && <PostsPanel />}
         {tab === "comments" && <CommentsPanel />}
         {tab === "dms" && <DmsPanel />}
@@ -519,6 +521,106 @@ function BlocksPanel() {
           </div>
         </Card>
       ))}
+    </div>
+  );
+}
+
+/* ----------------------------- verification ------------------------------ */
+
+function VerificationPanel() {
+  const qc = useQueryClient();
+  const [filter, setFilter] = useState<"pending" | "all">("pending");
+
+  const { data, isLoading } = useQuery({
+    queryKey: ["admin-verifications", filter],
+    queryFn: async () => {
+      let q = supabase
+        .from("verification_requests")
+        .select("*, founder:founders!verification_requests_founder_id_fkey(id, headline, location, seed_name, verified, profiles(full_name))")
+        .order("created_at", { ascending: false })
+        .limit(200);
+      if (filter === "pending") q = q.eq("status", "pending");
+      const { data, error } = await q;
+      if (error) throw error;
+      return data ?? [];
+    },
+  });
+
+  const mReview = useMutation({
+    mutationFn: async ({ id, status, reviewNote }: { id: string; status: "approved" | "rejected"; reviewNote?: string }) => {
+      const { error } = await supabase
+        .from("verification_requests")
+        .update({ status, review_note: reviewNote ?? null })
+        .eq("id", id);
+      if (error) throw error;
+    },
+    onSuccess: () => {
+      toast.success("Review saved");
+      qc.invalidateQueries({ queryKey: ["admin-verifications"] });
+      qc.invalidateQueries({ queryKey: ["admin-users"] });
+    },
+    onError: (e: any) => toast.error(e.message),
+  });
+
+  if (isLoading) return <div className="text-sm text-muted-text">Loading verification queue…</div>;
+
+  return (
+    <div className="space-y-3">
+      <div className="flex gap-2">
+        {(["pending", "all"] as const).map((f) => (
+          <button key={f} onClick={() => setFilter(f)}
+            className={`border-2 border-ink px-3 py-1 text-[11px] font-black uppercase tracking-wider ${filter === f ? "bg-ink text-cream" : "bg-white text-ink"}`}>
+            {f}
+          </button>
+        ))}
+      </div>
+
+      {(data ?? []).length === 0 ? (
+        <Empty>Queue is clear. No founders waiting on verification.</Empty>
+      ) : (
+        (data ?? []).map((r: any) => {
+          const name = r.founder?.profiles?.full_name ?? r.founder?.seed_name ?? "unknown founder";
+          return (
+            <Card key={r.id}>
+              <div className="flex flex-wrap items-start justify-between gap-3">
+                <div className="min-w-0 flex-1">
+                  <div className="flex flex-wrap items-center gap-2">
+                    <span className="font-black">{name}</span>
+                    <Badge tone={r.status === "approved" ? "bg-sage" : r.status === "rejected" ? "bg-red text-white" : "bg-cream"}>{r.status}</Badge>
+                    {r.founder?.verified && <Badge tone="bg-sage">verified</Badge>}
+                  </div>
+                  <div className="text-xs text-muted-text">
+                    {r.founder?.headline ?? "—"} · {r.founder?.location ?? "—"} · {new Date(r.created_at).toLocaleString()}
+                  </div>
+                  <a href={r.linkedin_url} target="_blank" rel="noreferrer noopener"
+                    className="mt-1 inline-flex items-center gap-1 text-xs font-black text-orange underline">
+                    <Link2 className="h-3 w-3" /> {r.linkedin_url}
+                  </a>
+                  {r.affiliation && <div className="mt-1 text-xs font-semibold">Affiliation: {r.affiliation}</div>}
+                  <p className="mt-2 whitespace-pre-wrap text-sm">{r.note}</p>
+                  {r.review_note && <p className="mt-1 text-xs font-bold text-red">Review note: {r.review_note}</p>}
+                </div>
+                {r.status === "pending" && (
+                  <div className="flex shrink-0 flex-col gap-2">
+                    <button onClick={() => mReview.mutate({ id: r.id, status: "approved" })}
+                      className="border-[3px] border-ink bg-sage px-3 py-1.5 text-[11px] font-black uppercase tracking-wider text-ink shadow-brutal-sm">
+                      Approve
+                    </button>
+                    <button onClick={() => {
+                        const reason = prompt("Reason for declining (shown to the founder):") ?? "";
+                        if (!reason.trim()) return;
+                        mReview.mutate({ id: r.id, status: "rejected", reviewNote: reason.trim() });
+                      }}
+                      className="border-[3px] border-ink bg-red px-3 py-1.5 text-[11px] font-black uppercase tracking-wider text-white shadow-brutal-sm">
+                      Decline
+                    </button>
+                  </div>
+                )}
+              </div>
+            </Card>
+          );
+        })
+      )}
     </div>
   );
 }
