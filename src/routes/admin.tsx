@@ -6,7 +6,7 @@ import { toast } from "sonner";
 import {
   Trash2, MessageSquare, Users, FileText, ArrowLeft, ShieldCheck, BarChart3,
   Ban, Pin, PinOff, Crown, Search, Shield, ShieldOff, Link2, MessageCircle,
-  RefreshCw, Sparkles, UserX,
+  RefreshCw, Sparkles, UserX, BadgeCheck,
 } from "lucide-react";
 import { AppShell } from "@/components/AppShell";
 import { useRequireAuth } from "@/hooks/useRequireAuth";
@@ -34,11 +34,12 @@ export const Route = createFileRoute("/admin")({
   }),
 });
 
-type Tab = "overview" | "users" | "posts" | "comments" | "dms" | "requests" | "blocks";
+type Tab = "overview" | "users" | "verify" | "posts" | "comments" | "dms" | "requests" | "blocks";
 
 const TABS: { id: Tab; label: string; icon: any }[] = [
   { id: "overview", label: "Overview", icon: BarChart3 },
   { id: "users", label: "Users", icon: Users },
+  { id: "verify", label: "Verification", icon: BadgeCheck },
   { id: "posts", label: "Posts", icon: FileText },
   { id: "comments", label: "Comments", icon: MessageCircle },
   { id: "dms", label: "Conversations", icon: MessageSquare },
@@ -96,6 +97,7 @@ function AdminPage() {
 
         {tab === "overview" && <OverviewPanel onJump={setTab} />}
         {tab === "users" && <UsersPanel meId={session!.user.id} />}
+        {tab === "verify" && <VerificationPanel />}
         {tab === "posts" && <PostsPanel />}
         {tab === "comments" && <CommentsPanel />}
         {tab === "dms" && <DmsPanel />}
