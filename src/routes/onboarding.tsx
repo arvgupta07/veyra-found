@@ -70,12 +70,32 @@ function Onboarding() {
   const progress = ((step - 1) / 4) * 100;
   const canNextP = selectedPrompts.length === 4 && selectedPrompts.every((p) => p.a.trim().length > 0);
 
+  const isValidLinkedIn = (url: string) => {
+    try {
+      const u = new URL(url.startsWith("http") ? url : `https://${url}`);
+      return u.hostname.replace(/^www\./, "").toLowerCase() === "linkedin.com" && /\/in\/.+/.test(u.pathname);
+    } catch {
+      return false;
+    }
+  };
+
+  const step1Valid = f.full_name.trim() && f.headline.trim() && f.bio.trim().length >= 30 && f.location.trim() && isValidLinkedIn(f.linkedin_url) && f.age >= 16 && f.age <= 100;
+  const step2Valid = f.skills.length > 0 && f.looking_for.length > 0 && f.commitment && f.idea_stage && f.remote_pref && f.exit_vision;
+
+
   async function handleCancel() {
     await supabase.auth.signOut();
     router.navigate({ to: "/auth/login" });
   }
 
   async function saveStep1() {
+    if (!step1Valid) {
+      if (!f.full_name.trim() || !f.headline.trim() || !f.location.trim()) return toast.error("Full name, headline and location are required.");
+      if (f.bio.trim().length < 30) return toast.error("Bio must be at least 30 characters so others can understand you.");
+      if (!isValidLinkedIn(f.linkedin_url)) return toast.error("A valid LinkedIn profile URL (linkedin.com/in/...) is required.");
+      if (f.age < 16 || f.age > 100) return toast.error("Please enter a valid age between 16 and 100.");
+      return;
+    }
     if (!session) return;
     setSaving(true);
     // upsert founder (create if missing)
@@ -96,7 +116,13 @@ function Onboarding() {
     setStep(2);
   }
 
+
   async function saveStep2() {
+    if (!step2Valid) {
+      if (f.skills.length === 0) return toast.error("Add at least one skill so we can match you better.");
+      if (f.looking_for.length === 0) return toast.error("Tell us what you're looking for in a co-founder.");
+      return toast.error("Please fill in all the required fields.");
+    }
     setSaving(true);
     const { data: founder } = await supabase.from("founders").select("id").eq("user_id", session!.user.id).maybeSingle();
     if (!founder) { setSaving(false); return toast.error("Please complete step 1 first"); }
@@ -112,6 +138,7 @@ function Onboarding() {
       remote_pref: f.remote_pref,
       looking_for: f.looking_for,
     }).eq("id", founder.id);
+
     setSaving(false);
     if (error) return toast.error(error.message);
     setStep(3);
@@ -190,17 +217,22 @@ function Onboarding() {
           <div className="space-y-6">
             <h1 className="text-3xl font-black tracking-tight">Let's build your profile</h1>
             <div className="grid gap-4 rounded-2xl border bg-white p-6 shadow-card">
-              <Input label="Full name" value={f.full_name} onChange={(v) => setF({ ...f, full_name: v })} />
-              <Input label="Headline" placeholder="Full-stack engineer obsessed with fintech" value={f.headline} onChange={(v) => setF({ ...f, headline: v })} />
+              <Input label="Full name" required value={f.full_name} onChange={(v) => setF({ ...f, full_name: v })} />
+              <Input label="Headline" required placeholder="Full-stack engineer obsessed with fintech" value={f.headline} onChange={(v) => setF({ ...f, headline: v })} />
               <div>
-                <label className="text-xs font-semibold text-muted-text">Bio</label>
+                <label className="text-xs font-semibold text-muted-text">
+                  Bio <span className="text-red">*</span> <span className="font-normal text-muted-text">(min 30 chars)</span>
+                </label>
                 <textarea maxLength={280} rows={3} value={f.bio} onChange={(e) => setF({ ...f, bio: e.target.value })} className="mt-1 w-full rounded-lg border px-3 py-2 text-sm focus:ring-2 focus:ring-indigo focus:outline-none" />
-                <div className="mt-1 text-right text-[10px] text-muted-text">{f.bio.length}/280</div>
+                <div className="mt-1 flex justify-between text-[10px] text-muted-text">
+                  <span>{f.bio.trim().length < 30 && f.bio.trim().length > 0 ? `${30 - f.bio.trim().length} more characters needed` : "Great length"}</span>
+                  <span>{f.bio.length}/280</span>
+                </div>
               </div>
               <div className="grid grid-cols-3 gap-3">
-                <Input label="Location" placeholder="Mumbai" value={f.location} onChange={(v) => setF({ ...f, location: v })} />
+                <Input label="Location" required placeholder="Mumbai" value={f.location} onChange={(v) => setF({ ...f, location: v })} />
                 <div>
-                  <label className="text-xs font-semibold text-muted-text">Age</label>
+                  <label className="text-xs font-semibold text-muted-text">Age <span className="text-red">*</span></label>
                   <input type="number" min={16} max={100} value={f.age}
                     onChange={(e) => setF({ ...f, age: +e.target.value || 0 })}
                     className="mt-1 w-full rounded-lg border-2 border-ink bg-white px-3 py-2 text-sm" />
@@ -213,11 +245,11 @@ function Onboarding() {
                 </div>
               </div>
               <div className="grid grid-cols-2 gap-3">
-                <Input label="LinkedIn URL" placeholder="https://linkedin.com/in/..." value={f.linkedin_url} onChange={(v) => setF({ ...f, linkedin_url: v })} />
+                <Input label="LinkedIn URL" required placeholder="https://linkedin.com/in/..." value={f.linkedin_url} onChange={(v) => setF({ ...f, linkedin_url: v })} />
                 <Input label="GitHub URL" placeholder="https://github.com/..." value={f.github_url} onChange={(v) => setF({ ...f, github_url: v })} />
               </div>
               <div>
-                <label className="text-xs font-semibold text-muted-text">Background</label>
+                <label className="text-xs font-semibold text-muted-text">Background <span className="text-red">*</span></label>
                 <div className="mt-2 grid grid-cols-4 gap-2">
                   {BACKGROUNDS.map(({ v, label, icon: Icon }) => (
                     <button key={v} type="button" onClick={() => setF({ ...f, background: v })} className={`rounded-lg border-2 p-3 text-center ${f.background === v ? "border-indigo bg-indigo/5" : "border-border"}`}>
@@ -229,10 +261,11 @@ function Onboarding() {
               </div>
             </div>
             <div className="flex justify-end">
-              <button onClick={saveStep1} disabled={saving || !f.headline || !f.location} className="inline-flex items-center gap-2 rounded-lg bg-indigo px-5 py-2.5 text-sm font-semibold text-white disabled:opacity-50">
+              <button onClick={saveStep1} disabled={saving || !step1Valid} className="inline-flex items-center gap-2 rounded-lg bg-indigo px-5 py-2.5 text-sm font-semibold text-white disabled:opacity-50">
                 {saving && <Loader2 className="h-4 w-4 animate-spin" />} Continue <ChevronRight className="h-4 w-4" />
               </button>
             </div>
+
           </div>
         )}
 
@@ -241,7 +274,9 @@ function Onboarding() {
             <h1 className="text-3xl font-black tracking-tight">Your work & idea</h1>
             <div className="space-y-6 rounded-2xl border bg-white p-6 shadow-card">
               <div>
-                <label className="text-xs font-semibold text-muted-text">Skills</label>
+                <label className="text-xs font-semibold text-muted-text">
+                  Skills <span className="text-red">*</span> <span className="font-normal text-muted-text">(select at least one)</span>
+                </label>
                 <div className="mt-2 flex flex-wrap gap-1.5">
                   {[...new Set([...SKILLS_LIST, ...f.skills])].map((s) => {
                     const on = f.skills.includes(s);
@@ -273,8 +308,8 @@ function Onboarding() {
                   })}
                 </div>
               </div>
-              <CardChoice label="Commitment" value={f.commitment} onChange={(v) => setF({ ...f, commitment: v as typeof f.commitment })} options={[["full_time","Full-time"],["part_time","Part-time"],["exploring","Exploring"]]} />
-              <CardChoice label="Stage" value={f.idea_stage} onChange={(v) => setF({ ...f, idea_stage: v as typeof f.idea_stage })} options={[["idea","Just an idea"],["mvp","Building MVP"],["revenue","Have revenue"],["funded","Already funded"]]} />
+              <CardChoice label="Commitment" required value={f.commitment} onChange={(v) => setF({ ...f, commitment: v as typeof f.commitment })} options={[["full_time","Full-time"],["part_time","Part-time"],["exploring","Exploring"]]} />
+              <CardChoice label="Stage" required value={f.idea_stage} onChange={(v) => setF({ ...f, idea_stage: v as typeof f.idea_stage })} options={[["idea","Just an idea"],["mvp","Building MVP"],["revenue","Have revenue"],["funded","Already funded"]]} />
               <div>
                 <label className="text-xs font-semibold text-muted-text">Where are you at?</label>
                 <div className="mt-2 grid gap-2 md:grid-cols-3">
@@ -310,11 +345,13 @@ function Onboarding() {
                 <label className="text-xs font-semibold text-muted-text">Equity offer to a co-founder: <span className="text-foreground">{f.equity_offer}%</span></label>
                 <input type="range" min={10} max={60} step={5} value={f.equity_offer} onChange={(e) => setF({ ...f, equity_offer: +e.target.value })} className="mt-2 w-full accent-indigo" />
               </div>
-              <CardChoice label="Exit vision" value={f.exit_vision} onChange={(v) => setF({ ...f, exit_vision: v as typeof f.exit_vision })} options={[["lifestyle","Lifestyle"],["acquisition","Get acquired"],["ipo","Go public"]]} />
-              <CardChoice label="Work location preference" value={f.remote_pref} onChange={(v) => setF({ ...f, remote_pref: v as typeof f.remote_pref })} options={[["onsite","On-site"],["hybrid","Hybrid"],["remote","Remote"]]} />
+              <CardChoice label="Exit vision" required value={f.exit_vision} onChange={(v) => setF({ ...f, exit_vision: v as typeof f.exit_vision })} options={[["lifestyle","Lifestyle"],["acquisition","Get acquired"],["ipo","Go public"]]} />
+              <CardChoice label="Work location preference" required value={f.remote_pref} onChange={(v) => setF({ ...f, remote_pref: v as typeof f.remote_pref })} options={[["onsite","On-site"],["hybrid","Hybrid"],["remote","Remote"]]} />
               <div>
-                <label className="text-xs font-semibold text-muted-text">What I'm looking for in a co-founder</label>
-                <p className="text-[11px] text-muted-text">Pick everything that feels true — skills, style, and stage.</p>
+                <label className="text-xs font-semibold text-muted-text">
+                  What I'm looking for in a co-founder <span className="text-red">*</span>
+                </label>
+                <p className="text-[11px] text-muted-text">Pick at least one — skills, style, or stage.</p>
                 <div className="mt-2 flex flex-wrap gap-1.5">
                   {LOOKING_FOR_OPTIONS.map((s) => {
                     const on = f.looking_for.includes(s);
@@ -326,10 +363,11 @@ function Onboarding() {
             </div>
             <div className="flex justify-between">
               <button onClick={() => setStep(1)} className="rounded-lg border px-4 py-2 text-sm">Back</button>
-              <button onClick={saveStep2} disabled={saving} className="inline-flex items-center gap-2 rounded-lg bg-indigo px-5 py-2.5 text-sm font-semibold text-white disabled:opacity-50">
+              <button onClick={saveStep2} disabled={saving || !step2Valid} className="inline-flex items-center gap-2 rounded-lg bg-indigo px-5 py-2.5 text-sm font-semibold text-white disabled:opacity-50">
                 {saving && <Loader2 className="h-4 w-4 animate-spin" />} Continue <ChevronRight className="h-4 w-4" />
               </button>
             </div>
+
           </div>
         )}
 
@@ -430,18 +468,24 @@ function Onboarding() {
   );
 }
 
-function Input({ label, value, onChange, placeholder }: { label: string; value: string; onChange: (v: string) => void; placeholder?: string }) {
+function Input({ label, value, onChange, placeholder, required }: { label: string; value: string; onChange: (v: string) => void; placeholder?: string; required?: boolean }) {
   return (
     <div>
-      <label className="text-xs font-semibold text-muted-text">{label}</label>
+      <label className="text-xs font-semibold text-muted-text">
+        {label}
+        {required && <span className="ml-0.5 text-red">*</span>}
+      </label>
       <input value={value} onChange={(e) => onChange(e.target.value)} placeholder={placeholder} className="mt-1 w-full rounded-lg border px-3 py-2 text-sm focus:ring-2 focus:ring-indigo focus:outline-none" />
     </div>
   );
 }
-function CardChoice({ label, value, onChange, options }: { label: string; value: string; onChange: (v: string) => void; options: [string, string][] }) {
+function CardChoice({ label, value, onChange, options, required }: { label: string; value: string; onChange: (v: string) => void; options: [string, string][]; required?: boolean }) {
   return (
     <div>
-      <label className="text-xs font-semibold text-muted-text">{label}</label>
+      <label className="text-xs font-semibold text-muted-text">
+        {label}
+        {required && <span className="ml-0.5 text-red">*</span>}
+      </label>
       <div className="mt-2 grid gap-2" style={{ gridTemplateColumns: `repeat(${options.length}, minmax(0, 1fr))` }}>
         {options.map(([v, l]) => (
           <button key={v} type="button" onClick={() => onChange(v)} className={`rounded-lg border-2 p-3 text-sm font-medium ${value === v ? "border-indigo bg-indigo/5 text-indigo" : "border-border text-muted-text"}`}>{l}</button>
@@ -450,3 +494,4 @@ function CardChoice({ label, value, onChange, options }: { label: string; value:
     </div>
   );
 }
+
