@@ -5,6 +5,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { useMyFounder } from "@/hooks/useMyFounder";
 import { isDockViewport, openDockedChat } from "@/lib/chat-dock";
 import { AppShell } from "@/components/AppShell";
+import { VerifyBanner } from "@/components/VerifyGate";
 import { useRequireAuth } from "@/hooks/useRequireAuth";
 import { founderAvatar } from "@/lib/founder-types";
 import { Check, X, Loader2, MessageSquare, Tag, Plus, Pin, PinOff } from "lucide-react";

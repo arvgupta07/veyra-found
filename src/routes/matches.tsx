@@ -4,6 +4,7 @@ import { useMemo } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { useMyFounder, useMyProfile } from "@/hooks/useMyFounder";
 import { AppShell } from "@/components/AppShell";
+import { VerifyBanner } from "@/components/VerifyGate";
 import { useRequireAuth } from "@/hooks/useRequireAuth";
 import { useConnectedIds } from "@/hooks/useConnectedIds";
 import { TierBadge, VerifiedBadges, SkillTag } from "@/components/FounderBits";
