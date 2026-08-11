@@ -43,11 +43,6 @@ export function AppShell({ children }: { children: React.ReactNode }) {
   const hasUnread = unread.length > 0;
   const [confirmSignOut, setConfirmSignOut] = useState(false);
   const baseNav = founderNav;
-  const { verified, founderId } = useMyVerification();
-  const withVerify: NavItem[] = !verified && founderId
-    ? [...baseNav, { label: "Verify", icon: BadgeCheck, onClick: openVerifyModal }]
-    : baseNav;
-  const nav = isAdmin ? [...withVerify, { to: "/admin", label: "Admin", icon: ShieldCheck }] : withVerify;
 
   async function signOut() {
     setConfirmSignOut(false);
