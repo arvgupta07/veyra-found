@@ -91,24 +91,25 @@ export function AppShell({ children }: { children: React.ReactNode }) {
           </div>
           <span className="text-2xl font-black tracking-tight text-nav-fg">Veyra Found</span>
         </Link>
-        <nav className="relative mt-8 space-y-1">
+        <nav className="relative mt-8 space-y-2">
           {nav.map((n) => {
             const active = !!n.to && (pathname === n.to || pathname.startsWith(n.to));
             const dot = dotFor(n.to);
             const count = n.to === "/inbox" ? unread.length : 0;
             return (
-              <NavCell key={n.label} item={n} className={`flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium transition ${active ? "bg-orange text-nav" : "text-nav-fg/75 hover:bg-nav-fg/10 hover:text-nav-fg"}`}>
-                <span className="relative">
-                  <n.icon className="h-4 w-4" />
-                  {dot && <span className="absolute -right-1.5 -top-1.5 h-2.5 w-2.5 rounded-full border border-ink bg-red" />}
+              <NavCell key={n.label} item={n} className={`flex w-full items-center justify-between gap-3 rounded-lg px-4 py-3 text-sm font-black uppercase tracking-wide transition ${active ? "bg-orange text-nav shadow-brutal-sm" : "text-nav-fg/75 hover:bg-nav-fg/10 hover:text-nav-fg"}`}>
+                <span className="flex items-center gap-3">
+                  <span className="relative">
+                    <n.icon className="h-4 w-4" />
+                    {dot && <span className="absolute -right-1.5 -top-1.5 h-2.5 w-2.5 rounded-full border border-ink bg-red" />}
+                  </span>
+                  {n.label}
                 </span>
-                {n.label}
                 {count > 0 ? (
-                  <span className="ml-auto rounded-full bg-red px-1.5 py-0.5 text-[10px] font-black text-nav">{count}</span>
+                  <span className="rounded-full bg-red px-2 py-0.5 text-[10px] font-black text-nav">{count}</span>
                 ) : dot ? (
-                  <span className="ml-auto h-2 w-2 rounded-full bg-red" />
+                  <span className="h-2.5 w-2.5 rounded-full bg-red" />
                 ) : null}
-
               </NavCell>
             );
           })}
@@ -143,21 +144,24 @@ export function AppShell({ children }: { children: React.ReactNode }) {
             <button onClick={() => setConfirmSignOut(true)} className="border-2 border-nav-fg bg-orange px-2 py-1 text-[10px] font-black uppercase text-nav">Sign out</button>
           </div>
         </div>
-        <div className="flex gap-1 overflow-x-auto border-t-2 border-nav-fg/25 px-2 py-1.5">
+        <div className="grid grid-cols-5 gap-1 border-t-2 border-nav-fg/25 px-2 py-1.5">
           {nav.map((n) => {
             const active = !!n.to && (pathname === n.to || pathname.startsWith(n.to));
             const dot = dotFor(n.to);
             const count = n.to === "/inbox" ? unread.length : 0;
             return (
               <NavCell key={n.label} item={n}
-                className={`relative flex shrink-0 items-center gap-1.5 border-2 px-2.5 py-1 text-[11px] font-black uppercase tracking-wider ${active ? "border-nav-fg bg-orange text-nav" : "border-nav-fg/40 text-nav-fg/80"}`}>
-                <n.icon className="h-3.5 w-3.5" /> {n.label}
+                className={`flex items-center justify-center gap-1 border-2 px-1 py-1.5 text-[10px] font-black uppercase tracking-wider ${active ? "border-nav-fg bg-orange text-nav" : "border-nav-fg/40 text-nav-fg/80"}`}>
+                <span className="relative">
+                  <n.icon className="h-3.5 w-3.5" />
+                  {dot && <span className="absolute -right-1 -top-1 h-1.5 w-1.5 rounded-full bg-red" />}
+                </span>
+                <span className="hidden sm:inline">{n.label}</span>
                 {count > 0 ? (
-                  <span className="ml-0.5 rounded-full bg-red px-1.5 text-[9px] font-black text-nav">{count}</span>
+                  <span className="ml-0.5 rounded-full bg-red px-1 text-[9px] font-black text-nav">{count}</span>
                 ) : dot ? (
-                  <span className="ml-0.5 h-2 w-2 rounded-full bg-red" />
+                  <span className="ml-0.5 h-1.5 w-1.5 rounded-full bg-red" />
                 ) : null}
-
               </NavCell>
             );
           })}
