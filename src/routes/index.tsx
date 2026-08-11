@@ -74,11 +74,9 @@ function Landing() {
         <div className="flex whitespace-nowrap animate-marquee py-2 text-sm font-bold uppercase tracking-widest">
           {Array.from({ length: 2 }).map((_, i) => (
             <div key={i} className="flex shrink-0 items-center gap-8 pr-8">
+              <span className="text-orange">★</span> Student made
+              <span className="text-orange">★</span> Built for founders
               <span className="text-orange">★</span> Verified founders only
-              <span className="text-orange">★</span> Built in Bangalore
-              <span className="text-orange">★</span> 940+ co-founder pairs matched
-              <span className="text-orange">★</span> ₹48Cr raised
-              <span className="text-orange">★</span> No swipes. No games.
               <span className="text-orange">★</span>
             </div>
           ))}
