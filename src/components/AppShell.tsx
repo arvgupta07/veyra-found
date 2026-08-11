@@ -43,6 +43,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
   const hasUnread = unread.length > 0;
   const [confirmSignOut, setConfirmSignOut] = useState(false);
   const baseNav = founderNav;
+  const nav = isAdmin ? [...baseNav, { to: "/admin", label: "Admin", icon: ShieldCheck }] : baseNav;
 
   async function signOut() {
     setConfirmSignOut(false);
