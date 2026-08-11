@@ -1,6 +1,5 @@
 import { Link, useRouter, useRouterState } from "@tanstack/react-router";
-import { Compass, Inbox, MessagesSquare, User, LogOut, Heart, Moon, Sun, ShieldCheck, BadgeCheck } from "lucide-react";
-import { useMyVerification } from "@/hooks/useVerification";
+import { Compass, Inbox, MessagesSquare, User, LogOut, Heart, Moon, Sun, ShieldCheck } from "lucide-react";
 import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { useMyProfile } from "@/hooks/useMyFounder";
@@ -11,7 +10,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { VeyraMark } from "@/components/VeyraLogo";
 import { ChatDock } from "@/components/ChatDock";
-import { VerifyModalHost, openVerifyModal } from "@/components/VerifyModal";
+import { VerifyModalHost } from "@/components/VerifyModal";
 
 type NavItem = { to?: string; label: string; icon: typeof Compass; onClick?: () => void };
 
@@ -43,11 +42,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
   const hasUnread = unread.length > 0;
   const [confirmSignOut, setConfirmSignOut] = useState(false);
   const baseNav = founderNav;
-  const { verified, founderId } = useMyVerification();
-  const withVerify: NavItem[] = !verified && founderId
-    ? [...baseNav, { label: "Verify", icon: BadgeCheck, onClick: openVerifyModal }]
-    : baseNav;
-  const nav = isAdmin ? [...withVerify, { to: "/admin", label: "Admin", icon: ShieldCheck }] : withVerify;
+  const nav = isAdmin ? [...baseNav, { to: "/admin", label: "Admin", icon: ShieldCheck }] : baseNav;
 
   async function signOut() {
     setConfirmSignOut(false);
