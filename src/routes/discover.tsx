@@ -12,6 +12,8 @@ import { useRequireAuth } from "@/hooks/useRequireAuth";
 import { useConnectedIds } from "@/hooks/useConnectedIds";
 import { useMyVerification } from "@/hooks/useVerification";
 import { VerifyBanner, VerifyRequiredCard } from "@/components/VerifyGate";
+import { getDiscoverCursor, setDiscoverCursor } from "@/lib/discover-cursor";
+
 
 export const Route = createFileRoute("/discover")({
   component: Discover,
@@ -31,9 +33,14 @@ function Discover() {
   const { ready } = useRequireAuth({ requireOnboarded: true });
   const { data: me } = useMyFounder();
   const [connectFor, setConnectFor] = useState<string | null>(null);
-  const [index, setIndex] = useState(0);
-  const [skipped, setSkipped] = useState(0);
+  const [index, setIndex] = useState(() => getDiscoverCursor().index);
+  const [skipped, setSkipped] = useState(() => getDiscoverCursor().skipped);
   const [openPrompt, setOpenPrompt] = useState<{ founderId: string; question: string } | null>(null);
+
+  useEffect(() => {
+    setDiscoverCursor({ index, skipped });
+  }, [index, skipped]);
+
 
   const connectedIds = useConnectedIds(me?.id);
 

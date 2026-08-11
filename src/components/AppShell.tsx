@@ -1,16 +1,18 @@
 import { Link, useRouter, useRouterState } from "@tanstack/react-router";
 import { Compass, Inbox, MessagesSquare, User, LogOut, Heart, Moon, Sun, ShieldCheck } from "lucide-react";
-import { useState } from "react";
+import { useEffect, useState, useSyncExternalStore } from "react";
 import { useQuery } from "@tanstack/react-query";
-import { useMyProfile } from "@/hooks/useMyFounder";
+import { useMyProfile, useMyFounder } from "@/hooks/useMyFounder";
 import { useSession } from "@/hooks/useSession";
 import { useDarkMode } from "@/hooks/useDarkMode";
 import { useLiveInbox, useUnreadConversations } from "@/hooks/useLiveInbox";
+import { getSeenSnapshot, isStale, markSeen, subscribeSeen } from "@/lib/nav-activity";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { VeyraMark } from "@/components/VeyraLogo";
 import { ChatDock } from "@/components/ChatDock";
 import { VerifyModalHost } from "@/components/VerifyModal";
+
 
 type NavItem = { to?: string; label: string; icon: typeof Compass; onClick?: () => void };
 
@@ -40,9 +42,35 @@ export function AppShell({ children }: { children: React.ReactNode }) {
   useLiveInbox();
   const unread = useUnreadConversations();
   const hasUnread = unread.length > 0;
+  const { data: myFounder } = useMyFounder();
+  const seen = useSyncExternalStore(subscribeSeen, getSeenSnapshot, () => ({}) as Record<string, number>);
+
+  const profileIncomplete = !!myFounder && (
+    !myFounder.profile_complete ||
+    !myFounder.bio ||
+    !myFounder.headline ||
+    !myFounder.location ||
+    (myFounder.skills ?? []).length === 0 ||
+    !myFounder.linkedin_url
+  );
+  const forumStale = isStale("forum", seen);
+
+  useEffect(() => {
+    if (pathname.startsWith("/forum")) markSeen("forum");
+    if (pathname.startsWith("/matches")) markSeen("matches");
+  }, [pathname]);
+
+  function dotFor(to?: string) {
+    if (to === "/inbox") return hasUnread;
+    if (to === "/forum") return forumStale;
+    if (to === "/profile/me") return profileIncomplete;
+    return false;
+  }
+
   const [confirmSignOut, setConfirmSignOut] = useState(false);
   const baseNav = founderNav;
   const nav = isAdmin ? [...baseNav, { to: "/admin", label: "Admin", icon: ShieldCheck }] : baseNav;
+
 
   async function signOut() {
     setConfirmSignOut(false);
@@ -66,7 +94,8 @@ export function AppShell({ children }: { children: React.ReactNode }) {
         <nav className="relative mt-8 space-y-1">
           {nav.map((n) => {
             const active = !!n.to && (pathname === n.to || pathname.startsWith(n.to));
-            const dot = n.to === "/inbox" && hasUnread;
+            const dot = dotFor(n.to);
+            const count = n.to === "/inbox" ? unread.length : 0;
             return (
               <NavCell key={n.label} item={n} className={`flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium transition ${active ? "bg-orange text-nav" : "text-nav-fg/75 hover:bg-nav-fg/10 hover:text-nav-fg"}`}>
                 <span className="relative">
@@ -74,9 +103,12 @@ export function AppShell({ children }: { children: React.ReactNode }) {
                   {dot && <span className="absolute -right-1.5 -top-1.5 h-2.5 w-2.5 rounded-full border border-ink bg-red" />}
                 </span>
                 {n.label}
-                {dot && (
-                  <span className="ml-auto rounded-full bg-red px-1.5 py-0.5 text-[10px] font-black text-nav">{unread.length}</span>
-                )}
+                {count > 0 ? (
+                  <span className="ml-auto rounded-full bg-red px-1.5 py-0.5 text-[10px] font-black text-nav">{count}</span>
+                ) : dot ? (
+                  <span className="ml-auto h-2 w-2 rounded-full bg-red" />
+                ) : null}
+
               </NavCell>
             );
           })}
@@ -114,12 +146,18 @@ export function AppShell({ children }: { children: React.ReactNode }) {
         <div className="flex gap-1 overflow-x-auto border-t-2 border-nav-fg/25 px-2 py-1.5">
           {nav.map((n) => {
             const active = !!n.to && (pathname === n.to || pathname.startsWith(n.to));
-            const dot = n.to === "/inbox" && hasUnread;
+            const dot = dotFor(n.to);
+            const count = n.to === "/inbox" ? unread.length : 0;
             return (
               <NavCell key={n.label} item={n}
                 className={`relative flex shrink-0 items-center gap-1.5 border-2 px-2.5 py-1 text-[11px] font-black uppercase tracking-wider ${active ? "border-nav-fg bg-orange text-nav" : "border-nav-fg/40 text-nav-fg/80"}`}>
                 <n.icon className="h-3.5 w-3.5" /> {n.label}
-                {dot && <span className="ml-0.5 rounded-full bg-red px-1.5 text-[9px] font-black text-nav">{unread.length}</span>}
+                {count > 0 ? (
+                  <span className="ml-0.5 rounded-full bg-red px-1.5 text-[9px] font-black text-nav">{count}</span>
+                ) : dot ? (
+                  <span className="ml-0.5 h-2 w-2 rounded-full bg-red" />
+                ) : null}
+
               </NavCell>
             );
           })}
@@ -132,7 +170,8 @@ export function AppShell({ children }: { children: React.ReactNode }) {
       <nav className="fixed inset-x-0 bottom-0 z-30 flex border-t-2 border-ink bg-white md:hidden">
         {nav.slice(0, 5).map((n) => {
           const active = !!n.to && (pathname === n.to || pathname.startsWith(n.to));
-          const dot = n.to === "/inbox" && hasUnread;
+          const dot = dotFor(n.to);
+            const count = n.to === "/inbox" ? unread.length : 0;
           return (
             <NavCell key={n.label} item={n} className={`relative flex flex-1 flex-col items-center gap-1 py-2 text-[10px] ${active ? "text-indigo" : "text-muted-text"}`}>
               <span className="relative">
