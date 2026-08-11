@@ -2,9 +2,10 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import {
   Sparkles, ShieldCheck, ArrowRight, CheckCircle2, BarChart3, MessagesSquare,
-  Zap, Users, Rocket, Star, MoveUpRight, Linkedin,
+  Zap, Users, Rocket, Star, MoveUpRight, Linkedin, Moon, Sun,
 } from "lucide-react";
 import { VeyraMark } from "@/components/VeyraLogo";
+import { useDarkMode } from "@/hooks/useDarkMode";
 
 export const Route = createFileRoute("/")({
   component: Landing,
@@ -37,6 +38,7 @@ const PROMPTS = [
 ];
 
 function Landing() {
+  const { dark, toggle } = useDarkMode();
   const [pIdx, setPIdx] = useState(0);
   const [count, setCount] = useState({ f: 0, c: 0, p: 0, r: 0 });
 
@@ -107,6 +109,13 @@ function Landing() {
             ))}
           </nav>
           <div className="flex items-center gap-2">
+            <button
+              onClick={toggle}
+              aria-label={dark ? "Switch to light mode" : "Switch to dark mode"}
+              className="grid h-10 w-10 place-items-center border-[3px] border-ink bg-cream text-ink shadow-brutal-sm box-hover"
+            >
+              {dark ? <Sun className="h-4 w-4" /> : <Moon className="h-4 w-4" />}
+            </button>
             <Link to="/auth/login" className="hidden border-[3px] border-ink bg-cream px-3 py-2 text-sm font-black uppercase box-hover sm:inline-block">
               Sign in
             </Link>
