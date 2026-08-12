@@ -65,6 +65,19 @@ export function ChatPanel({
   const [activeMsg, setActiveMsg] = useState<string | null>(null);
   const [editingId, setEditingId] = useState<string | null>(null);
   const [editText, setEditText] = useState("");
+  const [clearing, setClearing] = useState(false);
+
+  async function clearChat() {
+    if (!window.confirm("Delete this chat? Every message will be removed for both of you. You'll stay connected.")) return;
+    setClearing(true);
+    const { error } = await supabase.rpc("clear_conversation", { _conversation_id: conversationId });
+    setClearing(false);
+    if (error) return toast.error(error.message);
+    toast.success("Chat deleted");
+    qc.invalidateQueries({ queryKey: ["messages", conversationId] });
+    qc.invalidateQueries({ queryKey: ["inbox-convos"] });
+  }
+
   const dock = variant === "dock";
 
   const { data: convo } = useQuery({
