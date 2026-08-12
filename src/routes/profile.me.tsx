@@ -694,57 +694,81 @@ function PromptsPanel({ founderId, existing, onClose, onSaved }: {
   }
 
   return (
-    <div className="fixed inset-0 z-40 grid place-items-center bg-ink/60 p-4" onClick={onClose}>
-      <div onClick={(e) => e.stopPropagation()} className="max-h-[85vh] w-full max-w-lg overflow-y-auto rounded-2xl border-2 border-ink bg-cream p-6 shadow-brutal">
-        <div className="flex items-start justify-between">
+    <div className="fixed inset-0 z-40 grid place-items-center bg-ink/70 p-3 sm:p-6" onClick={onClose}>
+      <div
+        onClick={(e) => e.stopPropagation()}
+        className="flex max-h-[92vh] w-full max-w-3xl flex-col overflow-hidden rounded-2xl border-2 border-ink bg-cream shadow-brutal-lg"
+      >
+        {/* Header */}
+        <div className="flex items-start justify-between border-b-2 border-ink bg-white p-5 sm:p-6">
           <div>
-            <div className="text-xl font-black">Your prompts</div>
-            <div className="text-[11px] font-bold text-muted-text">Pick up to 3. Change them any time.</div>
+            <div className="text-2xl font-black sm:text-3xl">Your prompts</div>
+            <div className="mt-1 text-xs font-bold text-muted-text">Pick up to 3 conversation starters. Change them any time.</div>
           </div>
-          <button onClick={onClose}><X className="h-5 w-5" /></button>
+          <button
+            onClick={onClose}
+            className="grid h-10 w-10 place-items-center rounded-lg border-2 border-ink bg-cream shadow-brutal-sm box-hover"
+            aria-label="Close"
+          >
+            <X className="h-5 w-5" />
+          </button>
         </div>
 
-        <div className="mt-4 space-y-4">
-          {rows.map((row, i) => (
-            <div key={i} className="rounded-xl border-2 border-ink bg-white p-3">
-              <div className="flex items-center justify-between">
-                <div className="text-[10px] font-black uppercase text-orange">Prompt {i + 1}</div>
-                {rows.length > 1 && (
-                  <button onClick={() => setRows((r) => r.filter((_, idx) => idx !== i))}
-                    className="inline-flex items-center gap-1 text-[10px] font-black text-red">
-                    <Trash2 className="h-3 w-3" /> Remove
-                  </button>
-                )}
+        {/* Body */}
+        <div className="flex-1 overflow-y-auto p-4 sm:p-6">
+          <div className="space-y-5">
+            {rows.map((row, i) => (
+              <div key={i} className="rounded-2xl border-2 border-ink bg-white p-4 shadow-brutal-sm sm:p-5">
+                <div className="mb-3 flex items-center justify-between">
+                  <div className="inline-flex items-center gap-2 rounded-md border-2 border-ink bg-orange px-2.5 py-1 text-[10px] font-black uppercase text-white">
+                    Prompt {i + 1}
+                  </div>
+                  {rows.length > 1 && (
+                    <button onClick={() => setRows((r) => r.filter((_, idx) => idx !== i))}
+                      className="inline-flex items-center gap-1.5 rounded-md border-2 border-ink bg-red px-2 py-1 text-[10px] font-black text-white shadow-brutal-sm box-hover">
+                      <Trash2 className="h-3 w-3" /> Remove
+                    </button>
+                  )}
+                </div>
+                <label className="text-[11px] font-black uppercase text-muted-text">Question</label>
+                <select value={row.question} onChange={(e) => update(i, { question: e.target.value })}
+                  className="mt-1.5 w-full rounded-lg border-2 border-ink bg-white px-3 py-2.5 text-sm font-semibold focus:outline-none focus:ring-2 focus:ring-orange">
+                  <option value="">Choose a prompt…</option>
+                  {PROMPT_GROUPS.map((g) => (
+                    <optgroup key={g.label} label={g.label}>
+                      {g.prompts.map((p) => <option key={p} value={p}>{p}</option>)}
+                    </optgroup>
+                  ))}
+                  {row.question && !PROMPT_GROUPS.some((g) => g.prompts.includes(row.question)) && (
+                    <option value={row.question}>{row.question}</option>
+                  )}
+                </select>
+                <label className="mt-4 block text-[11px] font-black uppercase text-muted-text">Answer</label>
+                <textarea rows={4} maxLength={300} value={row.answer} placeholder="Your answer…"
+                  onChange={(e) => update(i, { answer: e.target.value })}
+                  className="mt-1.5 w-full rounded-lg border-2 border-ink bg-white px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-orange" />
+                <div className="mt-1 text-right text-[10px] font-bold text-muted-text">{row.answer.length}/300</div>
               </div>
-              <select value={row.question} onChange={(e) => update(i, { question: e.target.value })}
-                className="mt-2 w-full rounded-lg border-2 border-ink bg-white px-3 py-2 text-sm font-semibold">
-                <option value="">Choose a prompt…</option>
-                {PROMPT_GROUPS.map((g) => (
-                  <optgroup key={g.label} label={g.label}>
-                    {g.prompts.map((p) => <option key={p} value={p}>{p}</option>)}
-                  </optgroup>
-                ))}
-                {row.question && !PROMPT_GROUPS.some((g) => g.prompts.includes(row.question)) && (
-                  <option value={row.question}>{row.question}</option>
-                )}
-              </select>
-              <textarea rows={3} maxLength={300} value={row.answer} placeholder="Your answer…"
-                onChange={(e) => update(i, { answer: e.target.value })}
-                className="mt-2 w-full rounded-lg border-2 border-ink bg-white px-3 py-2 text-sm" />
-            </div>
-          ))}
-          {rows.length < 3 && (
-            <button onClick={() => setRows((r) => [...r, { question: "", answer: "" }])}
-              className="inline-flex items-center gap-1.5 rounded-lg border-2 border-ink bg-white px-3 py-2 text-xs font-black shadow-brutal-sm box-hover">
-              <Plus className="h-3.5 w-3.5" /> Add another prompt
-            </button>
-          )}
+            ))}
+            {rows.length < 3 && (
+              <button onClick={() => setRows((r) => [...r, { question: "", answer: "" }])}
+                className="inline-flex w-full items-center justify-center gap-2 rounded-xl border-2 border-dashed border-ink bg-white py-3 text-sm font-black shadow-brutal-sm box-hover">
+                <Plus className="h-4 w-4" /> Add another prompt
+              </button>
+            )}
+          </div>
         </div>
 
-        <button onClick={save} disabled={saving}
-          className="mt-5 flex w-full items-center justify-center gap-2 rounded-lg border-2 border-ink bg-orange py-2.5 text-sm font-black text-white shadow-brutal-sm disabled:opacity-50">
-          {saving ? <Loader2 className="h-4 w-4 animate-spin" /> : <Save className="h-4 w-4" />} Save prompts
-        </button>
+        {/* Footer */}
+        <div className="flex items-center justify-between border-t-2 border-ink bg-white p-4 sm:p-6">
+          <button onClick={onClose} className="rounded-lg border-2 border-ink bg-cream px-5 py-2.5 text-sm font-black shadow-brutal-sm box-hover">
+            Cancel
+          </button>
+          <button onClick={save} disabled={saving}
+            className="inline-flex items-center gap-2 rounded-lg border-2 border-ink bg-orange px-6 py-2.5 text-sm font-black text-white shadow-brutal box-hover disabled:opacity-50">
+            {saving ? <Loader2 className="h-4 w-4 animate-spin" /> : <Save className="h-4 w-4" />} Save prompts
+          </button>
+        </div>
       </div>
     </div>
   );
