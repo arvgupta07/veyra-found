@@ -9,6 +9,9 @@ import { useMyFounder, useMyProfile } from "@/hooks/useMyFounder";
 import { PROMPT_GROUPS, SKILLS_LIST, INDUSTRIES, ASSESSMENT_QUESTIONS, LOOKING_FOR_OPTIONS } from "@/lib/founder-types";
 import { LocationInput } from "@/components/LocationInput";
 import { AgeField } from "@/components/AgeField";
+import { useAccountType } from "@/hooks/useAccountType";
+import { InvestorOnboarding } from "@/components/onboarding/InvestorOnboarding";
+import { TalentOnboarding } from "@/components/onboarding/TalentOnboarding";
 
 export const Route = createFileRoute("/onboarding")({
   component: Onboarding,
