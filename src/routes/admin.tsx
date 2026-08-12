@@ -5,7 +5,7 @@ import { useMemo, useState } from "react";
 import { toast } from "sonner";
 import {
   Trash2, MessageSquare, Users, FileText, ArrowLeft, ShieldCheck, BarChart3,
-  Ban, Pin, PinOff, Crown, Search, Shield, ShieldOff, Link2, MessageCircle,
+  Ban, Pin, PinOff, Search, Shield, ShieldOff, Link2, MessageCircle,
   RefreshCw, Sparkles, UserX, BadgeCheck,
 } from "lucide-react";
 import { AppShell } from "@/components/AppShell";
@@ -14,7 +14,7 @@ import { supabase } from "@/integrations/supabase/client";
 import {
   adminListUsers, adminListConversations, adminListMessages, adminListPosts,
   adminDeleteUser, adminDeletePost, adminStats, adminSetShadowBan, adminSetAdminRole,
-  adminSetPro, adminSetPostPinned, adminListComments, adminDeleteComment,
+  adminSetPostPinned, adminListComments, adminDeleteComment,
   adminDeleteMessage, adminDeleteConversation, adminListBlocks, adminDeleteBlock,
   adminListRequests,
 } from "@/lib/admin.functions";
@@ -169,7 +169,6 @@ function OverviewPanel({ onJump }: { onJump: (t: Tab) => void }) {
     { label: "Requests", value: s.requests, tone: "bg-cream", tab: "requests" },
     { label: "Pending requests", value: s.pending, tone: "bg-orange text-white", tab: "requests" },
     { label: "Blocks", value: s.blocks, tone: "bg-cream", tab: "blocks" },
-    { label: "Pro members", value: s.pro, tone: "bg-ink text-cream" },
   ];
 
   return (
@@ -201,7 +200,6 @@ function UsersPanel({ meId }: { meId: string }) {
   const del = useServerFn(adminDeleteUser);
   const ban = useServerFn(adminSetShadowBan);
   const role = useServerFn(adminSetAdminRole);
-  const pro = useServerFn(adminSetPro);
   const [q, setQ] = useState("");
   const [filter, setFilter] = useState<"all" | "banned" | "incomplete" | "admins">("all");
 
