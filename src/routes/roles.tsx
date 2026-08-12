@@ -10,15 +10,18 @@ import { Card, Chip, Empty, Field, Modal, PageHeader, Pill, TabBar, inputCls } f
 import {
   REMOTE_PREFS, ROLE_TYPES, TALENT_SKILLS, compRange, labelOf, normalizeUrl, toggleIn,
 } from "@/lib/marketplace";
-import { Briefcase, Building2, Loader2, MapPin, Plus, Save, Send, Trash2, Users } from "lucide-react";
+import { Briefcase, Building2, Loader2, MapPin, Paperclip, Plus, Save, Send, Trash2, Users } from "lucide-react";
 import { toast } from "sonner";
 import { LocationInput } from "@/components/LocationInput";
+import { useAccountType, useMyTalent } from "@/hooks/useAccountType";
+import { isJobSeeker } from "@/lib/account-types";
+import { RoleBadge } from "@/components/RoleBadge";
 
 export const Route = createFileRoute("/roles")({
   component: RolesPage,
   head: () => ({
     meta: [
-      { title: "Open Roles & Internships — Veyra Found" },
+      { title: "Opportunities — Internships & Startup Jobs | Veyra Found" },
       { name: "description", content: "Join an early Indian startup: co-founder, full-time, part-time and internship roles posted by verified founders on Veyra Found." },
       { property: "og:title", content: "Open Roles & Internships — Veyra Found" },
       { property: "og:description", content: "Startup roles and internships posted by Indian founders — apply in one click." },
@@ -54,6 +57,9 @@ function RolesPage() {
   const { ready } = useRequireAuth({ requireOnboarded: true });
   const { user } = useSession();
   const { data: me } = useMyFounder();
+  const { accountType } = useAccountType();
+  const { data: myTalent } = useMyTalent();
+  const canPost = !isJobSeeker(accountType);
   const qc = useQueryClient();
   const [tab, setTab] = useState<Tab>("board");
   const [type, setType] = useState("all");
@@ -97,19 +103,19 @@ function RolesPage() {
     <AppShell>
       <div className="mx-auto max-w-4xl px-4 py-6 md:py-10">
         <PageHeader
-          title="Open roles"
+          title="Opportunities"
           subtitle="Founders hiring their first team — co-founders, early employees, interns and freelancers."
-          action={
+          action={canPost ? (
             <button onClick={() => setCompose(true)}
               className="inline-flex items-center gap-2 border-2 border-ink bg-orange px-4 py-2 text-xs font-black uppercase tracking-wider text-white shadow-brutal-sm box-hover soft-corners">
               <Plus className="h-4 w-4" /> Post a role
             </button>
-          }
+          ) : undefined}
         />
 
         <TabBar<Tab> value={tab} onChange={setTab} tabs={[
           { v: "board", label: "Board", count: board.length },
-          { v: "mine", label: "My postings", count: mineRoles.length },
+          ...(canPost ? [{ v: "mine" as Tab, label: "My postings", count: mineRoles.length }] : []),
           { v: "applications", label: "My applications", count: (myApps ?? []).length },
         ]} />
 
@@ -194,7 +200,8 @@ function RolesPage() {
           onSaved={() => { setCompose(false); qc.invalidateQueries({ queryKey: ["open-roles"] }); }} />
       )}
       {applyTo && (
-        <ApplyModal role={applyTo} userId={user?.id} onClose={() => setApplyTo(null)}
+        <ApplyModal role={applyTo} userId={user?.id} resumeUrl={(myTalent as { resume_url?: string | null } | null | undefined)?.resume_url ?? null}
+          onClose={() => setApplyTo(null)}
           onSent={() => { setApplyTo(null); qc.invalidateQueries({ queryKey: ["my-applications"] }); }} />
       )}
       {viewApplicants && <ApplicantsModal role={viewApplicants} onClose={() => setViewApplicants(null)} />}
@@ -340,11 +347,14 @@ function RoleComposer({ userId, founderId, onClose, onSaved }: { userId?: string
   );
 }
 
-function ApplyModal({ role, userId, onClose, onSent }: { role: Role; userId?: string; onClose: () => void; onSent: () => void }) {
+function ApplyModal({ role, userId, resumeUrl, onClose, onSent }: {
+  role: Role; userId?: string; resumeUrl: string | null; onClose: () => void; onSent: () => void;
+}) {
   const [note, setNote] = useState("");
   const m = useMutation({
     mutationFn: async () => {
       if (!userId) throw new Error("Sign in first");
+      if (!resumeUrl) throw new Error("Add a CV to your profile first — it gets attached to every application");
       if (note.trim().length < 40) throw new Error("Write at least 40 characters about why you're a fit");
       const { error } = await supabase.from("role_applications").insert({
         role_id: role.id, applicant_id: userId, note: note.trim(),
@@ -366,10 +376,22 @@ function ApplyModal({ role, userId, onClose, onSent }: { role: Role; userId?: st
         </div>
       }>
       <Field label="Why you" hint="Founders read the first three lines — lead with proof.">
-        <textarea rows={7} className={inputCls} value={note} onChange={(e) => setNote(e.target.value)}
+        <textarea rows={7} maxLength={800} className={inputCls} value={note} onChange={(e) => setNote(e.target.value)}
           placeholder="What you've built, links, how soon you can start." />
       </Field>
-      <p className="mt-3 text-xs text-muted-text">Tip: fill in your talent profile so founders can see your skills and links.</p>
+      <div className="mt-3 flex flex-wrap items-center gap-2 border-2 border-ink bg-cream px-3 py-2 soft-corners">
+        <Paperclip className="h-4 w-4" />
+        {resumeUrl ? (
+          <span className="text-xs font-black uppercase tracking-wider">
+            CV attached automatically ·{" "}
+            <a href={normalizeUrl(resumeUrl)!} target="_blank" rel="noreferrer" className="underline">preview</a>
+          </span>
+        ) : (
+          <span className="text-xs font-black uppercase tracking-wider text-red">
+            No CV on your profile — add one in Profile before applying.
+          </span>
+        )}
+      </div>
     </Modal>
   );
 }
@@ -384,12 +406,13 @@ function ApplicantsModal({ role, onClose }: { role: Role; onClose: () => void })
       const ids = (apps ?? []).map((a: any) => a.applicant_id);
       if (ids.length === 0) return [];
       const [{ data: profiles }, { data: talent }] = await Promise.all([
-        supabase.from("profiles").select("id, full_name").in("id", ids),
+        supabase.from("profiles").select("id, full_name, account_type").in("id", ids),
         supabase.from("talent_profiles").select("*").in("user_id", ids),
       ]);
       return (apps ?? []).map((a: any) => ({
         ...a,
         name: (profiles ?? []).find((p: any) => p.id === a.applicant_id)?.full_name ?? "Applicant",
+        account_type: (profiles ?? []).find((p: any) => p.id === a.applicant_id)?.account_type ?? "talent",
         talent: (talent ?? []).find((t: any) => t.user_id === a.applicant_id) ?? null,
       }));
     },
@@ -409,7 +432,10 @@ function ApplicantsModal({ role, onClose }: { role: Role; onClose: () => void })
           {(data ?? []).map((a: any) => (
             <Card key={a.id}>
               <div className="flex flex-wrap items-center justify-between gap-2">
-                <div className="text-sm font-black">{a.name}</div>
+                <div className="flex flex-wrap items-center gap-2">
+                  <span className="text-sm font-black">{a.name}</span>
+                  <RoleBadge type={a.account_type} size="xs" />
+                </div>
                 <Pill tone={a.status === "shortlisted" ? "bg-sage" : a.status === "rejected" ? "bg-red text-white" : "bg-cream"}>{a.status}</Pill>
               </div>
               {a.talent?.headline && <div className="mt-1 text-sm text-muted-text">{a.talent.headline}</div>}
@@ -417,7 +443,12 @@ function ApplicantsModal({ role, onClose }: { role: Role; onClose: () => void })
               <div className="mt-2 flex flex-wrap gap-2">
                 {a.talent?.linkedin_url && <a className="text-xs font-black underline" href={normalizeUrl(a.talent.linkedin_url)!} target="_blank" rel="noreferrer">LinkedIn</a>}
                 {a.talent?.portfolio_url && <a className="text-xs font-black underline" href={normalizeUrl(a.talent.portfolio_url)!} target="_blank" rel="noreferrer">Portfolio</a>}
-                {a.talent?.resume_url && <a className="text-xs font-black underline" href={normalizeUrl(a.talent.resume_url)!} target="_blank" rel="noreferrer">Resume</a>}
+                {a.talent?.resume_url && (
+                  <a className="inline-flex items-center gap-1 border-2 border-ink bg-cream px-2 py-1 text-xs font-black uppercase soft-corners box-hover"
+                    href={normalizeUrl(a.talent.resume_url)!} target="_blank" rel="noreferrer">
+                    <Paperclip className="h-3 w-3" /> CV
+                  </a>
+                )}
               </div>
               <div className="mt-3 flex gap-2">
                 <button onClick={() => setStatus(a.id, "shortlisted")} className="border-2 border-ink bg-sage px-3 py-1.5 text-xs font-black soft-corners box-hover">Shortlist</button>
