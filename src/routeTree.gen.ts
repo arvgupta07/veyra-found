@@ -9,6 +9,7 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
+import { Route as RolesRouteImport } from './routes/roles'
 import { Route as OnboardingRouteImport } from './routes/onboarding'
 import { Route as MatchesRouteImport } from './routes/matches'
 import { Route as InvestorsRouteImport } from './routes/investors'
@@ -27,6 +28,11 @@ import { Route as AuthResetPasswordRouteImport } from './routes/auth.reset-passw
 import { Route as AuthLoginRouteImport } from './routes/auth.login'
 import { Route as AuthCallbackRouteImport } from './routes/auth.callback'
 
+const RolesRoute = RolesRouteImport.update({
+  id: '/roles',
+  path: '/roles',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const OnboardingRoute = OnboardingRouteImport.update({
   id: '/onboarding',
   path: '/onboarding',
@@ -121,6 +127,7 @@ export interface FileRoutesByFullPath {
   '/investors': typeof InvestorsRoute
   '/matches': typeof MatchesRoute
   '/onboarding': typeof OnboardingRoute
+  '/roles': typeof RolesRoute
   '/auth/callback': typeof AuthCallbackRoute
   '/auth/login': typeof AuthLoginRoute
   '/auth/reset-password': typeof AuthResetPasswordRoute
@@ -140,6 +147,7 @@ export interface FileRoutesByTo {
   '/investors': typeof InvestorsRoute
   '/matches': typeof MatchesRoute
   '/onboarding': typeof OnboardingRoute
+  '/roles': typeof RolesRoute
   '/auth/callback': typeof AuthCallbackRoute
   '/auth/login': typeof AuthLoginRoute
   '/auth/reset-password': typeof AuthResetPasswordRoute
@@ -160,6 +168,7 @@ export interface FileRoutesById {
   '/investors': typeof InvestorsRoute
   '/matches': typeof MatchesRoute
   '/onboarding': typeof OnboardingRoute
+  '/roles': typeof RolesRoute
   '/auth/callback': typeof AuthCallbackRoute
   '/auth/login': typeof AuthLoginRoute
   '/auth/reset-password': typeof AuthResetPasswordRoute
@@ -181,6 +190,7 @@ export interface FileRouteTypes {
     | '/investors'
     | '/matches'
     | '/onboarding'
+    | '/roles'
     | '/auth/callback'
     | '/auth/login'
     | '/auth/reset-password'
@@ -200,6 +210,7 @@ export interface FileRouteTypes {
     | '/investors'
     | '/matches'
     | '/onboarding'
+    | '/roles'
     | '/auth/callback'
     | '/auth/login'
     | '/auth/reset-password'
@@ -219,6 +230,7 @@ export interface FileRouteTypes {
     | '/investors'
     | '/matches'
     | '/onboarding'
+    | '/roles'
     | '/auth/callback'
     | '/auth/login'
     | '/auth/reset-password'
@@ -239,6 +251,7 @@ export interface RootRouteChildren {
   InvestorsRoute: typeof InvestorsRoute
   MatchesRoute: typeof MatchesRoute
   OnboardingRoute: typeof OnboardingRoute
+  RolesRoute: typeof RolesRoute
   AuthCallbackRoute: typeof AuthCallbackRoute
   AuthLoginRoute: typeof AuthLoginRoute
   AuthResetPasswordRoute: typeof AuthResetPasswordRoute
@@ -253,6 +266,13 @@ export interface RootRouteChildren {
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
+    '/roles': {
+      id: '/roles'
+      path: '/roles'
+      fullPath: '/roles'
+      preLoaderRoute: typeof RolesRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/onboarding': {
       id: '/onboarding'
       path: '/onboarding'
@@ -383,6 +403,7 @@ const rootRouteChildren: RootRouteChildren = {
   InvestorsRoute: InvestorsRoute,
   MatchesRoute: MatchesRoute,
   OnboardingRoute: OnboardingRoute,
+  RolesRoute: RolesRoute,
   AuthCallbackRoute: AuthCallbackRoute,
   AuthLoginRoute: AuthLoginRoute,
   AuthResetPasswordRoute: AuthResetPasswordRoute,
