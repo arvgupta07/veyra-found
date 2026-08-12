@@ -72,13 +72,17 @@ export function AuthScreen({
             <EmailAuthBox mode={mode} />
           </div>
 
-          <p className="text-center text-xs font-bold text-muted-text">
-            {mode === "signup" ? (
-              <>Already have an account? <Link to="/auth/login" className="underline">Sign in</Link></>
-            ) : (
-              <>New here? <Link to="/auth/signup" className="underline">Create an account</Link></>
-            )}
-          </p>
+          <div className="flex flex-col items-center gap-3 border-t-[3px] border-ink/20 pt-4">
+            <p className="text-xs font-black uppercase tracking-wide text-muted-text">
+              {mode === "signup" ? "Already a user?" : "New user?"}
+            </p>
+            <Link
+              to={mode === "signup" ? "/auth/login" : "/auth/signup"}
+              className="inline-flex items-center justify-center gap-2 border-[3px] border-ink bg-cream px-6 py-2.5 text-xs font-black uppercase tracking-wide text-ink shadow-brutal-sm box-hover"
+            >
+              {mode === "signup" ? "Log in" : "Sign up"}
+            </Link>
+          </div>
 
 
         </div>
