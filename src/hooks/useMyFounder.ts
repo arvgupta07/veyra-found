@@ -8,6 +8,7 @@ export function useMyProfile() {
   return useQuery({
     queryKey: ["me", user?.id],
     enabled: !!user,
+    staleTime: 5 * 60_000,
     queryFn: async () => {
       const { data } = await supabase.from("profiles").select("*").eq("id", user!.id).maybeSingle();
       return data;
@@ -20,6 +21,7 @@ export function useMyFounder() {
   return useQuery({
     queryKey: ["me-founder", user?.id],
     enabled: !!user,
+    staleTime: 5 * 60_000,
     queryFn: async () => {
       const { data } = await supabase.from("founders").select("*").eq("user_id", user!.id).maybeSingle();
       return data as Founder | null;
