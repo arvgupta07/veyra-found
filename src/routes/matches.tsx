@@ -2,7 +2,7 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
 import { useMemo } from "react";
 import { supabase } from "@/integrations/supabase/client";
-import { useMyFounder, useMyProfile } from "@/hooks/useMyFounder";
+import { useMyFounder } from "@/hooks/useMyFounder";
 import { AppShell } from "@/components/AppShell";
 import { VerifyBanner } from "@/components/VerifyGate";
 import { useRequireAuth } from "@/hooks/useRequireAuth";
@@ -10,7 +10,7 @@ import { useConnectedIds } from "@/hooks/useConnectedIds";
 import { TierBadge, VerifiedBadges, SkillTag } from "@/components/FounderBits";
 import { founderAvatar } from "@/lib/founder-types";
 import { scoreCompatibility, bandLabel } from "@/lib/compatibility";
-import { Lock, Sparkles, MapPin } from "lucide-react";
+import { MapPin } from "lucide-react";
 
 export const Route = createFileRoute("/matches")({
   component: MatchesPage,
