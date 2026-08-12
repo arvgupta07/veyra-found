@@ -8,7 +8,7 @@ import { AppShell } from "@/components/AppShell";
 import { VerifyBanner } from "@/components/VerifyGate";
 import { useRequireAuth } from "@/hooks/useRequireAuth";
 import { founderAvatar } from "@/lib/founder-types";
-import { Check, X, Loader2, MessageSquare, Tag, Plus, Pin, PinOff } from "lucide-react";
+import { Check, X, Loader2, MessageSquare, Tag, Plus, Pin, PinOff, UserMinus } from "lucide-react";
 import { useUnreadConversations } from "@/hooks/useLiveInbox";
 import { toast } from "sonner";
 
