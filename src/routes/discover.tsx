@@ -3,6 +3,7 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { sendConnectionRequest } from "@/lib/connect-requests";
+import { useAccountType } from "@/hooks/useAccountType";
 import { useMyFounder } from "@/hooks/useMyFounder";
 import { AppShell } from "@/components/AppShell";
 import { SkillTag, VerifiedBadges } from "@/components/FounderBits";
@@ -405,6 +406,8 @@ function ConnectModal({ founder, myFounderId, onClose }: { founder: any; myFound
   const [sending, setSending] = useState(false);
   const name = founder.profiles?.full_name ?? founder.seed_name ?? "them";
   const { verified } = useMyVerification();
+  const { accountType } = useAccountType();
+  const isFounderAccount = accountType === "founder";
 
   async function send() {
     if (message.trim().length < 20) return toast.error("Add a bit more context (20+ chars).");
@@ -439,6 +442,7 @@ function ConnectModal({ founder, myFounderId, onClose }: { founder: any; myFound
           </div>
           <button onClick={onClose} aria-label="Close" className="grid h-8 w-8 place-items-center border-2 border-ink bg-cream box-hover"><X className="h-4 w-4" /></button>
         </div>
+        {isFounderAccount && (
         <div className="mt-5">
           <div className="text-[10px] font-black uppercase tracking-wider text-muted-text">Reacting to</div>
           <PromptDropdown
@@ -450,8 +454,11 @@ function ConnectModal({ founder, myFounderId, onClose }: { founder: any; myFound
             ]}
           />
         </div>
+        )}
         <div className="mt-4">
-          <div className="text-[10px] font-black uppercase tracking-wider text-muted-text">Your message</div>
+          <div className="text-[10px] font-black uppercase tracking-wider text-muted-text">
+            {isFounderAccount ? "Your message" : "Your note"}
+          </div>
           <textarea rows={5} maxLength={400} value={message} onChange={(e) => setMessage(e.target.value)}
             placeholder="Say something specific about what resonates. Vague opens get ignored."
             className="mt-1 w-full rounded-lg border-2 border-ink bg-white px-3 py-2 text-sm outline-none focus:shadow-brutal-sm" />
