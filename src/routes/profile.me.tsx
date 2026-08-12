@@ -750,12 +750,12 @@ function PromptsPanel({ founderId, existing, onClose, onSaved }: {
   );
 }
 
-function Field({ label, v, onChange }: { label: string; v: string; onChange: (v: string) => void }) {
+function Field({ label, v, onChange, placeholder }: { label: string; v: string; onChange: (v: string) => void; placeholder?: string }) {
   return (
     <div>
       <label className="text-[11px] font-black uppercase text-muted-text">{label}</label>
-      <input value={v} onChange={(e) => onChange(e.target.value)}
-        className="mt-1 w-full rounded-lg border-2 border-ink bg-white px-3 py-2 text-sm" />
+      <input value={v} placeholder={placeholder} onChange={(e) => onChange(e.target.value)}
+        className="mt-1.5 w-full rounded-lg border-2 border-ink bg-white px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-orange" />
     </div>
   );
 }
@@ -765,9 +765,23 @@ function Select({ label, v, onChange, opts }: { label: string; v: string; onChan
     <div>
       <label className="text-[11px] font-black uppercase text-muted-text">{label}</label>
       <select value={v} onChange={(e) => onChange(e.target.value)}
-        className="mt-1 w-full rounded-lg border-2 border-ink bg-white px-2 py-2 text-xs font-semibold">
+        className="mt-1.5 w-full rounded-lg border-2 border-ink bg-white px-2 py-2.5 text-xs font-semibold focus:outline-none focus:ring-2 focus:ring-orange">
         {opts.map(([val, lab]) => <option key={val} value={val}>{lab}</option>)}
       </select>
+    </div>
+  );
+}
+
+function Section({ title, icon: Icon, children }: { title: string; icon: LucideIcon; children: React.ReactNode }) {
+  return (
+    <div className="rounded-2xl border-2 border-ink bg-white p-4 shadow-brutal-sm sm:p-5">
+      <div className="mb-4 flex items-center gap-2 border-b-2 border-ink/10 pb-2">
+        <div className="grid h-7 w-7 place-items-center rounded-md border-2 border-ink bg-cream">
+          <Icon className="h-3.5 w-3.5" />
+        </div>
+        <div className="text-xs font-black uppercase tracking-wider text-muted-text">{title}</div>
+      </div>
+      {children}
     </div>
   );
 }
