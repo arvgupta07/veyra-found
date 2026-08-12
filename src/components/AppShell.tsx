@@ -4,7 +4,8 @@ import { useEffect, useState, useSyncExternalStore } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { useMyProfile, useMyFounder } from "@/hooks/useMyFounder";
 import { useAccountType } from "@/hooks/useAccountType";
-import { canSee, accountLabel } from "@/lib/account-types";
+import { canSee } from "@/lib/account-types";
+import { RoleBadge } from "@/components/RoleBadge";
 import { useSession } from "@/hooks/useSession";
 import { useDarkMode } from "@/hooks/useDarkMode";
 import { useLiveInbox, useUnreadConversations } from "@/hooks/useLiveInbox";
@@ -23,7 +24,7 @@ const founderNav: NavItem[] = [
   { to: "/matches", label: "Matches", icon: Heart },
   { to: "/inbox", label: "Inbox", icon: Inbox },
   { to: "/investors", label: "Investors", icon: Landmark },
-  { to: "/roles", label: "Roles", icon: Briefcase },
+  { to: "/roles", label: "Opportunities", icon: Briefcase },
   { to: "/talent", label: "Talent", icon: GraduationCap },
   { to: "/forum", label: "Forum", icon: MessagesSquare },
   { to: "/profile/me", label: "Profile", icon: User },
@@ -125,7 +126,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
           <div className="rounded-lg bg-nav-fg/10 p-3">
             <div className="text-xs text-nav-fg/60">Signed in as</div>
             <div className="truncate text-sm font-medium text-nav-fg">{profile?.full_name ?? "…"}</div>
-            <div className="mt-1 inline-block border-2 border-nav-fg/40 px-1.5 py-0.5 text-[9px] font-black uppercase tracking-wider text-nav-fg/70">{accountLabel(accountType)}</div>
+            <div className="mt-1"><RoleBadge type={accountType} size="xs" /></div>
           </div>
           <button onClick={toggle} className="flex w-full items-center gap-2 rounded-lg px-3 py-2 text-sm text-nav-fg/75 hover:bg-nav-fg/10 hover:text-nav-fg">
             {dark ? <Sun className="h-4 w-4" /> : <Moon className="h-4 w-4" />} {dark ? "Light mode" : "Dark mode"}

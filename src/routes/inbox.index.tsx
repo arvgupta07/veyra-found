@@ -2,6 +2,7 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useMemo, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
+import { RoleBadge } from "@/components/RoleBadge";
 import { useMyFounder } from "@/hooks/useMyFounder";
 import { isDockViewport, openDockedChat } from "@/lib/chat-dock";
 import { AppShell } from "@/components/AppShell";
@@ -297,7 +298,10 @@ function Inbox() {
                     className="h-12 w-12 rounded-xl border-2 border-ink object-cover transition hover:scale-105" alt="" />
                 </Link>
                 <div className="flex-1">
-                  <Link to="/profile/$founderId" params={{ founderId: r.from_founder_id }} className="font-black hover:text-orange">{r.founder.profiles?.full_name ?? r.founder.seed_name}</Link>
+                  <div className="flex flex-wrap items-center gap-2">
+                    <Link to="/profile/$founderId" params={{ founderId: r.from_founder_id }} className="font-black hover:text-orange">{r.founder.profiles?.full_name ?? r.founder.seed_name}</Link>
+                    <RoleBadge type={r.founder.account_type} size="xs" />
+                  </div>
                   <div className="text-xs text-muted-text">{r.founder.headline}</div>
                   {r.prompt_question && (
                     <div className="mt-3 rounded-lg border-2 border-ink bg-cream p-3">
@@ -339,7 +343,10 @@ function Inbox() {
                   <div className="min-w-0 flex-1">
                     <div className="flex items-center justify-between gap-2">
                       <div className="min-w-0">
-                        <div className="truncate font-black">To {r.founder.profiles?.full_name ?? r.founder.seed_name}</div>
+                        <div className="flex flex-wrap items-center gap-2">
+                          <div className="truncate font-black">To {r.founder.profiles?.full_name ?? r.founder.seed_name}</div>
+                          <RoleBadge type={r.founder.account_type} size="xs" />
+                        </div>
                         <div className="truncate text-xs text-muted-text">{r.founder.headline}</div>
                       </div>
                       <span className={`shrink-0 rounded-md border-2 px-2 py-0.5 text-[10px] font-black uppercase tracking-wider ${badge}`}>
@@ -406,6 +413,7 @@ function Inbox() {
                       <div className="flex items-center gap-2">
                         {pinned && <Pin className="h-3 w-3 fill-orange text-orange" />}
                         <div className="font-black truncate">{other.profiles?.full_name ?? other.seed_name}</div>
+                        <RoleBadge type={other.account_type} size="xs" />
                         <div className="ml-auto text-[10px] font-black uppercase text-muted-text">{c.stage?.replace("_", " ")}</div>
                       </div>
                       <div className={`truncate text-xs ${isUnread ? "font-bold text-ink" : "text-muted-text"}`}>{lastMsg?.content ?? "Start the conversation →"}</div>

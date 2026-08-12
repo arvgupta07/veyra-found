@@ -13,7 +13,25 @@ export function isValidLinkedIn(url: string) {
   }
 }
 
-/** Shared frame for the single-step investor / talent onboarding flows. */
+/** Step counter + progress bar for the 3-step investor / intern / talent flows. */
+export function StepBar({ step, total, labels }: { step: number; total: number; labels: string[] }) {
+  return (
+    <div className="mb-5">
+      <div className="flex items-center justify-between text-[11px] font-black uppercase tracking-wider text-muted-text">
+        <span>Step {step} of {total} · {labels[step - 1]}</span>
+        <span>{Math.round((step / total) * 100)}%</span>
+      </div>
+      <div className="mt-2 grid gap-1.5" style={{ gridTemplateColumns: `repeat(${total}, minmax(0, 1fr))` }}>
+        {labels.map((l, i) => (
+          <div key={l} className={`h-2.5 border-2 border-ink transition ${i < step ? "bg-orange" : "bg-white"}`} />
+        ))}
+      </div>
+    </div>
+  );
+}
+
+/** Shared frame for the multi-step investor / talent onboarding flows. */
+
 export function OnboardShell({
   icon: Icon,
   kicker,

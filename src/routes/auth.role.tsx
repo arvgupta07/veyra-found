@@ -1,5 +1,5 @@
 import { createFileRoute, Link, useRouter } from "@tanstack/react-router";
-import { Landmark, Rocket, GraduationCap, ArrowRight } from "lucide-react";
+import { Landmark, Rocket, GraduationCap, Briefcase, ArrowRight } from "lucide-react";
 import { VeyraMark } from "@/components/VeyraLogo";
 import { ACCOUNT_TYPES, setPendingAccountType, type AccountType } from "@/lib/account-types";
 
@@ -20,8 +20,10 @@ export const Route = createFileRoute("/auth/role")({
 const ICONS: Record<AccountType, typeof Rocket> = {
   founder: Rocket,
   investor: Landmark,
-  talent: GraduationCap,
+  intern: GraduationCap,
+  talent: Briefcase,
 };
+
 
 function RolePicker() {
   const router = useRouter();
@@ -56,7 +58,7 @@ function RolePicker() {
             This shapes your onboarding and what you see. You can't switch later without asking us, so pick the one that fits.
           </p>
 
-          <div className="mt-8 grid gap-4 sm:grid-cols-3">
+          <div className="mt-8 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
             {ACCOUNT_TYPES.map((a) => {
               const Icon = ICONS[a.value];
               return (
@@ -65,8 +67,8 @@ function RolePicker() {
                   onClick={() => pick(a.value)}
                   className="group flex flex-col items-start gap-3 border-[3px] border-ink bg-cream p-5 text-left shadow-brutal-sm transition hover:-translate-y-1 hover:shadow-brutal"
                 >
-                  <span className="grid h-11 w-11 place-items-center border-[3px] border-ink bg-orange shadow-brutal-sm">
-                    <Icon className="h-5 w-5 text-ink" />
+                  <span className={`grid h-11 w-11 place-items-center border-[3px] border-ink shadow-brutal-sm ${a.badge}`}>
+                    <Icon className="h-5 w-5" />
                   </span>
                   <span className="text-lg font-black uppercase">{a.label}</span>
                   <span className="text-sm font-bold text-ink/80">{a.blurb}</span>
@@ -78,6 +80,7 @@ function RolePicker() {
               );
             })}
           </div>
+
 
           <p className="mt-8 text-xs font-bold text-muted-text">
             Already have an account? <Link to="/auth/login" className="underline">Sign in instead</Link>.

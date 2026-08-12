@@ -58,8 +58,9 @@ function OnboardingRouter() {
 
   const name = profile?.full_name ?? "";
   if (accountType === "investor") return <InvestorOnboarding fullName={name} />;
-  if (accountType === "talent") return <TalentOnboarding fullName={name} />;
+  if (accountType === "intern" || accountType === "talent") return <TalentOnboarding fullName={name} kind={accountType} />;
   return <Onboarding />;
+
 }
 
 function Onboarding() {

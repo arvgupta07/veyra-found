@@ -13,6 +13,7 @@ import { Banknote, Building2, Globe, Linkedin, Loader2, MapPin, Send, Save, Spar
 import { toast } from "sonner";
 import { LocationInput } from "@/components/LocationInput";
 import { useAccountType } from "@/hooks/useAccountType";
+import { isJobSeeker } from "@/lib/account-types";
 import { useEffect } from "react";
 
 export const Route = createFileRoute("/investors")({
@@ -61,8 +62,8 @@ function InvestorsPage() {
 
   // Talent / interns don't get access to the investor directory.
   useEffect(() => {
-    if (loaded && accountType === "talent") {
-      toast.error("The investor directory is for founders and investors.");
+    if (loaded && isJobSeeker(accountType)) {
+      toast.error("The investor directory is for founders and investors only.");
       router.navigate({ to: "/discover" });
     }
   }, [loaded, accountType, router]);
