@@ -117,7 +117,7 @@ function Landing() {
             <Link to="/auth/login" className="hidden border-[3px] border-ink bg-cream px-3 py-2 text-sm font-black uppercase box-hover sm:inline-block">
               Sign in
             </Link>
-            <Link to="/auth/signup" className="border-[3px] border-ink bg-red px-3 py-2 text-sm font-black uppercase text-cream box-hover">
+            <Link to="/auth/role" className="border-[3px] border-ink bg-red px-3 py-2 text-sm font-black uppercase text-cream box-hover">
               Start
             </Link>
           </div>
@@ -150,7 +150,7 @@ function Landing() {
             </p>
 
             <div className="mt-8 flex flex-wrap gap-3">
-              <Link to="/auth/signup" className="inline-flex items-center gap-2 border-[3px] border-ink bg-red px-6 py-3.5 text-sm font-black uppercase text-cream box-press">
+              <Link to="/auth/role" className="inline-flex items-center gap-2 border-[3px] border-ink bg-red px-6 py-3.5 text-sm font-black uppercase text-cream box-press">
                 Find my co-founder <ArrowRight className="h-4 w-4" strokeWidth={3} />
               </Link>
               <Link to="/auth/login" className="inline-flex items-center gap-2 border-[3px] border-ink bg-cream px-6 py-3.5 text-sm font-black uppercase box-press">
@@ -330,7 +330,7 @@ function Landing() {
         <div className="mx-auto max-w-7xl px-4 py-20 text-center sm:px-6 md:py-28">
           <h2 className="text-5xl md:text-7xl">Ready to find<br /><span className="bg-cream px-3 text-ink border-[3px] border-ink shadow-brutal inline-block">your co-founder?</span></h2>
           <p className="mt-6 text-lg font-bold text-cream/90">Free. No credit card. Real founders only.</p>
-          <Link to="/auth/signup" className="mt-8 inline-flex items-center gap-2 border-[3px] border-cream bg-ink px-8 py-4 text-sm font-black uppercase text-cream box-press">
+          <Link to="/auth/role" className="mt-8 inline-flex items-center gap-2 border-[3px] border-cream bg-ink px-8 py-4 text-sm font-black uppercase text-cream box-press">
             Get started <ArrowRight className="h-4 w-4" strokeWidth={3} />
           </Link>
         </div>
