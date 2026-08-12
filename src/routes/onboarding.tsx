@@ -7,6 +7,8 @@ import { supabase } from "@/integrations/supabase/client";
 import { useSession } from "@/hooks/useSession";
 import { useMyFounder, useMyProfile } from "@/hooks/useMyFounder";
 import { PROMPT_GROUPS, SKILLS_LIST, INDUSTRIES, ASSESSMENT_QUESTIONS, LOOKING_FOR_OPTIONS } from "@/lib/founder-types";
+import { LocationInput } from "@/components/LocationInput";
+import { AgeField } from "@/components/AgeField";
 
 export const Route = createFileRoute("/onboarding")({
   component: Onboarding,
