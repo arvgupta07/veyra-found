@@ -11,7 +11,7 @@ import { founderAvatar, SKILLS_LIST, AVATAR_PRESETS, PROMPT_GROUPS, LOOKING_FOR_
 import { uploadImage } from "@/lib/uploads";
 import { ProfileLinkChips } from "@/components/ProfileLinkChips";
 import { LINK_TYPES, parseLinks, type ProfileLink, type ProfileLinkType } from "@/lib/profile-links";
-import { MapPin, Briefcase, Pencil, X, Loader2, Save, LogOut, Trash2, ImagePlus, Linkedin, Github, Eye, EyeOff, Plus, MessageSquareQuote, Trash } from "lucide-react";
+import { MapPin, Briefcase, Pencil, X, Loader2, Save, LogOut, Trash2, ImagePlus, Linkedin, Github, Eye, EyeOff, Plus, MessageSquareQuote, Trash, Rocket, Zap, BarChart3, Users, type LucideIcon } from "lucide-react";
 
 
 export const Route = createFileRoute("/profile/me")({
