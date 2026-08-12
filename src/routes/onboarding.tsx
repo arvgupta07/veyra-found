@@ -36,6 +36,31 @@ const BACKGROUNDS = [
   { v: "other",     label: "Other",     icon: Rocket },
 ] as const;
 
+/** Sends each account type to the onboarding built for it. */
+function OnboardingRouter() {
+  const router = useRouter();
+  const { session, loading: sLoading } = useSession();
+  const { data: profile } = useMyProfile();
+  const { accountType, loaded } = useAccountType();
+
+  useEffect(() => {
+    if (!sLoading && !session) router.navigate({ to: "/auth/login" });
+  }, [sLoading, session, router]);
+
+  if (sLoading || !session || !loaded) {
+    return (
+      <div className="grid min-h-screen place-items-center bg-surface">
+        <Loader2 className="h-6 w-6 animate-spin" />
+      </div>
+    );
+  }
+
+  const name = profile?.full_name ?? "";
+  if (accountType === "investor") return <InvestorOnboarding fullName={name} />;
+  if (accountType === "talent") return <TalentOnboarding fullName={name} />;
+  return <Onboarding />;
+}
+
 function Onboarding() {
   const router = useRouter();
   const queryClient = useQueryClient();
