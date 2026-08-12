@@ -182,6 +182,10 @@ export function ChatPanel({
         {!dock && (
           <span className="rounded-md border-2 border-ink bg-cream px-2 py-1 text-[10px] font-black uppercase tracking-wider">{convo.stage?.replace("_", " ")}</span>
         )}
+        <button onClick={clearChat} disabled={clearing} title="Delete all messages in this chat"
+          className="grid h-7 w-7 shrink-0 place-items-center rounded-md border-2 border-ink bg-white text-ink shadow-brutal-sm hover:bg-red hover:text-white disabled:opacity-60">
+          {clearing ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <Trash2 className="h-3.5 w-3.5" />}
+        </button>
         <Link to="/profile/$founderId" params={{ founderId: other.id }}
           className="rounded-md border-2 border-ink bg-white px-2 py-1 text-[10px] font-black uppercase tracking-wider text-ink shadow-brutal-sm hover:bg-cream"
           title="Open profile to block">
