@@ -6,9 +6,11 @@ import { useMyFounder } from "@/hooks/useMyFounder";
 import { AppShell } from "@/components/AppShell";
 import { useRequireAuth } from "@/hooks/useRequireAuth";
 import { founderAvatar } from "@/lib/founder-types";
-import { uploadImage } from "@/lib/uploads";
+import { uploadImage, uploadVideo } from "@/lib/uploads";
 import { deleteForumPost, visibleToViewer } from "@/lib/forum-actions";
-import { ArrowBigUp, ArrowBigDown, MessageCircle, Plus, Loader2, X, MessageSquareText, ImagePlus, Trash2 } from "lucide-react";
+import { ArrowBigUp, ArrowBigDown, MessageCircle, Plus, Loader2, X, MessageSquareText, ImagePlus, Trash2, Video, BarChart3, Type, Link2 } from "lucide-react";
+import { PostMedia } from "@/components/forum/PostMedia";
+import { PollBlock } from "@/components/forum/PollBlock";
 import { toast } from "sonner";
 
 const CATEGORIES = [
@@ -121,11 +123,13 @@ function Forum() {
                 <Link to="/forum/$postId" params={{ postId: p.id }} className="mt-2 block">
                   <h2 className="text-lg font-black hover:text-orange">{p.title}</h2>
                   <p className="mt-1 line-clamp-2 text-sm text-muted-text">{p.content}</p>
-                  {p.image_url && (
-                    <img src={p.image_url} alt="" loading="lazy"
-                      className="mt-3 max-h-72 w-full rounded-xl border-2 border-ink object-cover" />
-                  )}
+                  <PostMedia imageUrl={p.image_url} videoUrl={p.video_url} className="mt-3" />
                 </Link>
+                {(p.poll_options ?? []).length >= 2 && (
+                  <div className="mt-3">
+                    <PollBlock postId={p.id} question={p.poll_question} options={p.poll_options} founderId={me?.id} />
+                  </div>
+                )}
                 <div className="mt-3 flex items-center gap-3 text-xs text-muted-text">
                   <div className="inline-flex items-stretch overflow-hidden rounded-lg border-2 border-ink bg-white shadow-brutal-sm">
                     <button
@@ -178,20 +182,34 @@ function Forum() {
   );
 }
 
+type Kind = "text" | "photo" | "video" | "poll";
+
+const KINDS: { v: Kind; label: string; icon: typeof Type }[] = [
+  { v: "text", label: "Text", icon: Type },
+  { v: "photo", label: "Photo", icon: ImagePlus },
+  { v: "video", label: "Video", icon: Video },
+  { v: "poll", label: "Poll", icon: BarChart3 },
+];
+
 function ComposeModal({ onClose, founderId }: { onClose: (postedCategory?: string) => void; founderId: string }) {
+  const [kind, setKind] = useState<Kind>("text");
   const [title, setTitle] = useState("");
   const [content, setContent] = useState("");
   const [category, setCategory] = useState<string>("idea_validation");
   const [seeking, setSeeking] = useState(false);
   const [saving, setSaving] = useState(false);
   const [imageUrl, setImageUrl] = useState<string | null>(null);
+  const [videoUrl, setVideoUrl] = useState<string | null>(null);
+  const [videoLink, setVideoLink] = useState("");
+  const [pollQuestion, setPollQuestion] = useState("");
+  const [pollOptions, setPollOptions] = useState<string[]>(["", ""]);
   const [uploading, setUploading] = useState(false);
 
-  async function pickImage(file: File) {
+  async function pick(file: File, type: "image" | "video") {
     setUploading(true);
     try {
-      const url = await uploadImage(file, "forum");
-      setImageUrl(url);
+      const url = type === "image" ? await uploadImage(file, "forum") : await uploadVideo(file, "forum");
+      if (type === "image") setImageUrl(url); else { setVideoUrl(url); setVideoLink(""); }
     } catch (err) {
       toast.error(err instanceof Error ? err.message : "Upload failed");
     } finally {
@@ -201,16 +219,36 @@ function ComposeModal({ onClose, founderId }: { onClose: (postedCategory?: strin
 
   async function submit() {
     if (!title.trim() || !content.trim()) return toast.error("Title and content required");
+    if (kind === "photo" && !imageUrl) return toast.error("Add a photo or switch to a text post");
+
+    const link = videoLink.trim();
+    if (kind === "video") {
+      if (!videoUrl && !link) return toast.error("Upload a video or paste a YouTube / Vimeo link");
+      if (link && !/^https?:\/\/\S+$/i.test(link)) return toast.error("Paste a full video link starting with https://");
+    }
+
+    const cleanOptions = pollOptions.map((o) => o.trim()).filter(Boolean).slice(0, 4);
+    if (kind === "poll") {
+      if (!pollQuestion.trim()) return toast.error("Add a poll question");
+      if (cleanOptions.length < 2) return toast.error("A poll needs at least 2 options");
+    }
+
     setSaving(true);
     const { error } = await supabase.from("forum_posts").insert({
       title: title.trim(), content: content.trim(), category: category as never, author_id: founderId,
-      seeking_feedback: seeking, image_url: imageUrl,
-    });
+      seeking_feedback: seeking,
+      image_url: kind === "photo" ? imageUrl : null,
+      video_url: kind === "video" ? (videoUrl ?? link) : null,
+      poll_question: kind === "poll" ? pollQuestion.trim() : null,
+      poll_options: kind === "poll" ? cleanOptions : [],
+    } as never);
     setSaving(false);
     if (error) return toast.error(error.message);
     toast.success("Posted!");
     onClose(category);
   }
+
+  const inputCls = "w-full rounded-lg border-2 border-ink bg-white px-3 py-2 text-sm";
 
   return (
     <div className="fixed inset-0 z-40 grid place-items-center bg-ink/60 p-4" onClick={() => onClose()}>
@@ -219,14 +257,30 @@ function ComposeModal({ onClose, founderId }: { onClose: (postedCategory?: strin
           <div className="text-xl font-black">New post</div>
           <button onClick={() => onClose()} aria-label="Close"><X className="h-5 w-5" /></button>
         </div>
+
+        {/* Post type switcher */}
+        <div className="mt-4 grid grid-cols-4 gap-2">
+          {KINDS.map((k) => {
+            const Icon = k.icon;
+            const on = kind === k.v;
+            return (
+              <button key={k.v} type="button" onClick={() => setKind(k.v)}
+                className={`flex flex-col items-center gap-1 rounded-lg border-2 border-ink px-2 py-2 text-[11px] font-black uppercase tracking-wide shadow-brutal-sm box-hover ${on ? "bg-orange text-white" : "bg-white text-ink"}`}>
+                <Icon className="h-4 w-4" /> {k.label}
+              </button>
+            );
+          })}
+        </div>
+
         <div className="mt-4 space-y-3">
           <select value={category} onChange={(e) => setCategory(e.target.value)} className="w-full rounded-lg border-2 border-ink bg-white px-3 py-2 text-sm font-semibold">
             {CATEGORIES.map((c) => <option key={c.v} value={c.v}>{c.label}</option>)}
           </select>
-          <input value={title} onChange={(e) => setTitle(e.target.value)} placeholder="Title" className="w-full rounded-lg border-2 border-ink bg-white px-3 py-2 text-sm" />
-          <textarea rows={6} value={content} onChange={(e) => setContent(e.target.value)} placeholder="Share your thoughts…" className="w-full rounded-lg border-2 border-ink bg-white px-3 py-2 text-sm" />
+          <input value={title} onChange={(e) => setTitle(e.target.value)} maxLength={140} placeholder="Title" className={inputCls} />
+          <textarea rows={kind === "text" ? 6 : 4} value={content} onChange={(e) => setContent(e.target.value)} maxLength={4000}
+            placeholder={kind === "poll" ? "Give people context for your poll…" : "Share your thoughts…"} className={inputCls} />
 
-          {imageUrl ? (
+          {kind === "photo" && (imageUrl ? (
             <div className="relative">
               <img src={imageUrl} alt="" className="max-h-60 w-full rounded-xl border-2 border-ink object-cover" />
               <button type="button" aria-label="Remove image" onClick={() => setImageUrl(null)}
@@ -239,8 +293,63 @@ function ComposeModal({ onClose, founderId }: { onClose: (postedCategory?: strin
               {uploading ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <ImagePlus className="h-3.5 w-3.5" />}
               Add photo
               <input type="file" accept="image/*" className="hidden" disabled={uploading}
-                onChange={(e) => { const f = e.target.files?.[0]; e.target.value = ""; if (f) pickImage(f); }} />
+                onChange={(e) => { const f = e.target.files?.[0]; e.target.value = ""; if (f) pick(f, "image"); }} />
             </label>
+          ))}
+
+          {kind === "video" && (
+            <div className="space-y-2">
+              {videoUrl ? (
+                <div className="relative">
+                  <video src={videoUrl} controls className="max-h-60 w-full rounded-xl border-2 border-ink bg-ink" />
+                  <button type="button" aria-label="Remove video" onClick={() => setVideoUrl(null)}
+                    className="absolute right-2 top-2 rounded-md border-2 border-ink bg-white p-1 shadow-brutal-sm">
+                    <X className="h-3.5 w-3.5" />
+                  </button>
+                </div>
+              ) : (
+                <>
+                  <label className={`inline-flex cursor-pointer items-center gap-2 rounded-lg border-2 border-ink bg-white px-3 py-2 text-xs font-black shadow-brutal-sm box-hover ${uploading ? "opacity-50" : ""}`}>
+                    {uploading ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <Video className="h-3.5 w-3.5" />}
+                    Upload video (max 40 MB)
+                    <input type="file" accept="video/mp4,video/webm,video/quicktime" className="hidden" disabled={uploading}
+                      onChange={(e) => { const f = e.target.files?.[0]; e.target.value = ""; if (f) pick(f, "video"); }} />
+                  </label>
+                  <div className="flex items-center gap-2">
+                    <Link2 className="h-3.5 w-3.5 shrink-0" />
+                    <input value={videoLink} onChange={(e) => setVideoLink(e.target.value)}
+                      placeholder="…or paste a YouTube / Vimeo link" className={inputCls} />
+                  </div>
+                </>
+              )}
+            </div>
+          )}
+
+          {kind === "poll" && (
+            <div className="space-y-2 rounded-xl border-2 border-ink bg-white p-3">
+              <input value={pollQuestion} onChange={(e) => setPollQuestion(e.target.value)} maxLength={140}
+                placeholder="Poll question" className={inputCls} />
+              {pollOptions.map((opt, i) => (
+                <div key={i} className="flex items-center gap-2">
+                  <input value={opt} maxLength={80}
+                    onChange={(e) => setPollOptions(pollOptions.map((o, j) => (j === i ? e.target.value : o)))}
+                    placeholder={`Option ${i + 1}`} className={inputCls} />
+                  {pollOptions.length > 2 && (
+                    <button type="button" aria-label="Remove option"
+                      onClick={() => setPollOptions(pollOptions.filter((_, j) => j !== i))}
+                      className="rounded-md border-2 border-ink bg-white p-1.5 shadow-brutal-sm">
+                      <X className="h-3.5 w-3.5" />
+                    </button>
+                  )}
+                </div>
+              ))}
+              {pollOptions.length < 4 && (
+                <button type="button" onClick={() => setPollOptions([...pollOptions, ""])}
+                  className="inline-flex items-center gap-1 rounded-lg border-2 border-ink bg-cream px-3 py-1.5 text-xs font-black shadow-brutal-sm box-hover">
+                  <Plus className="h-3.5 w-3.5" /> Add option
+                </button>
+              )}
+            </div>
           )}
 
           <label className="flex items-center gap-2 text-sm font-semibold">
@@ -248,7 +357,7 @@ function ComposeModal({ onClose, founderId }: { onClose: (postedCategory?: strin
             Seeking feedback (vs. just sharing)
           </label>
         </div>
-        <button onClick={submit} disabled={saving} className="mt-4 flex w-full items-center justify-center gap-2 rounded-lg border-2 border-ink bg-orange py-2.5 text-sm font-black text-white shadow-brutal-sm disabled:opacity-50">
+        <button onClick={submit} disabled={saving || uploading} className="mt-4 flex w-full items-center justify-center gap-2 rounded-lg border-2 border-ink bg-orange py-2.5 text-sm font-black text-white shadow-brutal-sm disabled:opacity-50">
           {saving && <Loader2 className="h-4 w-4 animate-spin" />} Publish
         </button>
       </div>
