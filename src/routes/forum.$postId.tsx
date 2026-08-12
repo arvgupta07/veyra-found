@@ -2,6 +2,7 @@ import { createFileRoute, Link, useParams, useNavigate } from "@tanstack/react-r
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
+import { sendConnectionRequest } from "@/lib/connect-requests";
 import { useMyFounder } from "@/hooks/useMyFounder";
 import { AppShell } from "@/components/AppShell";
 import { useRequireAuth } from "@/hooks/useRequireAuth";
@@ -192,12 +193,14 @@ function PostView() {
   async function sendConnect() {
     if (!me || !post?.author_id || connectMsg.trim().length < 20) return toast.error("Add 20+ characters");
     setConnectSending(true);
-    const { error } = await supabase.from("connection_requests").insert({
-      from_founder_id: me.id, to_founder_id: post.author_id,
-      prompt_question: `Forum post: ${post.title}`, message: connectMsg.trim(), status: "pending",
+    const { error } = await sendConnectionRequest({
+      fromFounderId: me.id,
+      toFounderId: post.author_id,
+      promptQuestion: `Forum post: ${post.title}`,
+      message: connectMsg.trim(),
     });
     setConnectSending(false);
-    if (error) return toast.error(error.message);
+    if (error) return toast.error(error);
     toast.success("Request sent!");
     setConnectOpen(false);
     setConnectMsg("");

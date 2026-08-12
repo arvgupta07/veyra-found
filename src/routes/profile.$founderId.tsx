@@ -2,6 +2,7 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
+import { sendConnectionRequest } from "@/lib/connect-requests";
 import { useMyFounder } from "@/hooks/useMyFounder";
 import { AppShell } from "@/components/AppShell";
 import { useRequireAuth } from "@/hooks/useRequireAuth";
@@ -330,19 +331,21 @@ function ConnectModal({ founder, myFounderId, onClose }: {
   const [sending, setSending] = useState(false);
   const name = founder.profiles?.full_name ?? founder.seed_name ?? "them";
   const { verified } = useMyVerification();
+  const qc = useQueryClient();
+
 
   async function send() {
     if (message.trim().length < 20) return toast.error("Add a bit more context (20+ chars).");
     setSending(true);
-    const { error } = await supabase.from("connection_requests").insert({
-      from_founder_id: myFounderId,
-      to_founder_id: founder.id,
-      prompt_question: selectedPrompt,
+    const { error } = await sendConnectionRequest({
+      fromFounderId: myFounderId,
+      toFounderId: founder.id,
+      promptQuestion: selectedPrompt,
       message: message.trim(),
-      status: "pending",
     });
     setSending(false);
-    if (error) return toast.error(error.message);
+    if (error) return toast.error(error);
+    qc.invalidateQueries({ queryKey: ["inbox-sent"] });
     toast.success(`Request sent to ${name}!`);
     onClose();
   }

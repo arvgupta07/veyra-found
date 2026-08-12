@@ -2,6 +2,7 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
+import { sendConnectionRequest } from "@/lib/connect-requests";
 import { useMyFounder } from "@/hooks/useMyFounder";
 import { AppShell } from "@/components/AppShell";
 import { SkillTag, VerifiedBadges } from "@/components/FounderBits";
@@ -329,15 +330,14 @@ function PromptCard({
     if (!myFounderId) return toast.error("Loading your profile…");
     if (reply.trim().length < 20) return toast.error("Add a bit more context (20+ chars).");
     setSending(true);
-    const { error } = await supabase.from("connection_requests").insert({
-      from_founder_id: myFounderId,
-      to_founder_id: toFounderId,
-      prompt_question: question,
+    const { error } = await sendConnectionRequest({
+      fromFounderId: myFounderId,
+      toFounderId: toFounderId,
+      promptQuestion: question,
       message: reply.trim(),
-      status: "pending",
     });
     setSending(false);
-    if (error) return toast.error(error.message);
+    if (error) return toast.error(error);
     toast.success(`Request sent to ${toName}!`);
     setReply("");
     setOpen(false);
@@ -409,15 +409,14 @@ function ConnectModal({ founder, myFounderId, onClose }: { founder: any; myFound
   async function send() {
     if (message.trim().length < 20) return toast.error("Add a bit more context (20+ chars).");
     setSending(true);
-    const { error } = await supabase.from("connection_requests").insert({
-      from_founder_id: myFounderId,
-      to_founder_id: founder.id,
-      prompt_question: selectedPrompt,
+    const { error } = await sendConnectionRequest({
+      fromFounderId: myFounderId,
+      toFounderId: founder.id,
+      promptQuestion: selectedPrompt,
       message: message.trim(),
-      status: "pending",
     });
     setSending(false);
-    if (error) return toast.error(error.message);
+    if (error) return toast.error(error);
     toast.success(`Request sent to ${name}!`);
     onClose();
   }
