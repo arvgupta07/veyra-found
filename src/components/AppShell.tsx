@@ -1,5 +1,5 @@
 import { Link, useRouter, useRouterState } from "@tanstack/react-router";
-import { Compass, Inbox, MessagesSquare, User, LogOut, Heart, Moon, Sun, ShieldCheck } from "lucide-react";
+import { Compass, Inbox, MessagesSquare, User, LogOut, Heart, Moon, Sun, ShieldCheck, Landmark, Briefcase, GraduationCap } from "lucide-react";
 import { useEffect, useState, useSyncExternalStore } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { useMyProfile, useMyFounder } from "@/hooks/useMyFounder";
@@ -20,9 +20,13 @@ const founderNav: NavItem[] = [
   { to: "/discover", label: "Discover", icon: Compass },
   { to: "/matches", label: "Matches", icon: Heart },
   { to: "/inbox", label: "Inbox", icon: Inbox },
+  { to: "/investors", label: "Investors", icon: Landmark },
+  { to: "/roles", label: "Roles", icon: Briefcase },
+  { to: "/talent", label: "Talent", icon: GraduationCap },
   { to: "/forum", label: "Forum", icon: MessagesSquare },
   { to: "/profile/me", label: "Profile", icon: User },
 ];
+
 
 export function AppShell({ children }: { children: React.ReactNode }) {
   const router = useRouter();
@@ -144,7 +148,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
             <button onClick={() => setConfirmSignOut(true)} className="border-2 border-nav-fg bg-orange px-2 py-1 text-[10px] font-black uppercase text-nav">Sign out</button>
           </div>
         </div>
-        <div className="grid grid-cols-5 gap-1 border-t-2 border-nav-fg/25 px-2 py-1.5">
+        <div className="grid grid-cols-4 gap-1 border-t-2 border-nav-fg/25 px-2 py-1.5">
           {nav.map((n) => {
             const active = !!n.to && (pathname === n.to || pathname.startsWith(n.to));
             const dot = dotFor(n.to);

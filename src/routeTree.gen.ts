@@ -9,8 +9,11 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
+import { Route as TalentRouteImport } from './routes/talent'
+import { Route as RolesRouteImport } from './routes/roles'
 import { Route as OnboardingRouteImport } from './routes/onboarding'
 import { Route as MatchesRouteImport } from './routes/matches'
+import { Route as InvestorsRouteImport } from './routes/investors'
 import { Route as DiscoverRouteImport } from './routes/discover'
 import { Route as DashboardRouteImport } from './routes/dashboard'
 import { Route as AdminRouteImport } from './routes/admin'
@@ -26,6 +29,16 @@ import { Route as AuthResetPasswordRouteImport } from './routes/auth.reset-passw
 import { Route as AuthLoginRouteImport } from './routes/auth.login'
 import { Route as AuthCallbackRouteImport } from './routes/auth.callback'
 
+const TalentRoute = TalentRouteImport.update({
+  id: '/talent',
+  path: '/talent',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const RolesRoute = RolesRouteImport.update({
+  id: '/roles',
+  path: '/roles',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const OnboardingRoute = OnboardingRouteImport.update({
   id: '/onboarding',
   path: '/onboarding',
@@ -34,6 +47,11 @@ const OnboardingRoute = OnboardingRouteImport.update({
 const MatchesRoute = MatchesRouteImport.update({
   id: '/matches',
   path: '/matches',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const InvestorsRoute = InvestorsRouteImport.update({
+  id: '/investors',
+  path: '/investors',
   getParentRoute: () => rootRouteImport,
 } as any)
 const DiscoverRoute = DiscoverRouteImport.update({
@@ -112,8 +130,11 @@ export interface FileRoutesByFullPath {
   '/admin': typeof AdminRoute
   '/dashboard': typeof DashboardRoute
   '/discover': typeof DiscoverRoute
+  '/investors': typeof InvestorsRoute
   '/matches': typeof MatchesRoute
   '/onboarding': typeof OnboardingRoute
+  '/roles': typeof RolesRoute
+  '/talent': typeof TalentRoute
   '/auth/callback': typeof AuthCallbackRoute
   '/auth/login': typeof AuthLoginRoute
   '/auth/reset-password': typeof AuthResetPasswordRoute
@@ -130,8 +151,11 @@ export interface FileRoutesByTo {
   '/admin': typeof AdminRoute
   '/dashboard': typeof DashboardRoute
   '/discover': typeof DiscoverRoute
+  '/investors': typeof InvestorsRoute
   '/matches': typeof MatchesRoute
   '/onboarding': typeof OnboardingRoute
+  '/roles': typeof RolesRoute
+  '/talent': typeof TalentRoute
   '/auth/callback': typeof AuthCallbackRoute
   '/auth/login': typeof AuthLoginRoute
   '/auth/reset-password': typeof AuthResetPasswordRoute
@@ -149,8 +173,11 @@ export interface FileRoutesById {
   '/admin': typeof AdminRoute
   '/dashboard': typeof DashboardRoute
   '/discover': typeof DiscoverRoute
+  '/investors': typeof InvestorsRoute
   '/matches': typeof MatchesRoute
   '/onboarding': typeof OnboardingRoute
+  '/roles': typeof RolesRoute
+  '/talent': typeof TalentRoute
   '/auth/callback': typeof AuthCallbackRoute
   '/auth/login': typeof AuthLoginRoute
   '/auth/reset-password': typeof AuthResetPasswordRoute
@@ -169,8 +196,11 @@ export interface FileRouteTypes {
     | '/admin'
     | '/dashboard'
     | '/discover'
+    | '/investors'
     | '/matches'
     | '/onboarding'
+    | '/roles'
+    | '/talent'
     | '/auth/callback'
     | '/auth/login'
     | '/auth/reset-password'
@@ -187,8 +217,11 @@ export interface FileRouteTypes {
     | '/admin'
     | '/dashboard'
     | '/discover'
+    | '/investors'
     | '/matches'
     | '/onboarding'
+    | '/roles'
+    | '/talent'
     | '/auth/callback'
     | '/auth/login'
     | '/auth/reset-password'
@@ -205,8 +238,11 @@ export interface FileRouteTypes {
     | '/admin'
     | '/dashboard'
     | '/discover'
+    | '/investors'
     | '/matches'
     | '/onboarding'
+    | '/roles'
+    | '/talent'
     | '/auth/callback'
     | '/auth/login'
     | '/auth/reset-password'
@@ -224,8 +260,11 @@ export interface RootRouteChildren {
   AdminRoute: typeof AdminRoute
   DashboardRoute: typeof DashboardRoute
   DiscoverRoute: typeof DiscoverRoute
+  InvestorsRoute: typeof InvestorsRoute
   MatchesRoute: typeof MatchesRoute
   OnboardingRoute: typeof OnboardingRoute
+  RolesRoute: typeof RolesRoute
+  TalentRoute: typeof TalentRoute
   AuthCallbackRoute: typeof AuthCallbackRoute
   AuthLoginRoute: typeof AuthLoginRoute
   AuthResetPasswordRoute: typeof AuthResetPasswordRoute
@@ -240,6 +279,20 @@ export interface RootRouteChildren {
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
+    '/talent': {
+      id: '/talent'
+      path: '/talent'
+      fullPath: '/talent'
+      preLoaderRoute: typeof TalentRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/roles': {
+      id: '/roles'
+      path: '/roles'
+      fullPath: '/roles'
+      preLoaderRoute: typeof RolesRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/onboarding': {
       id: '/onboarding'
       path: '/onboarding'
@@ -252,6 +305,13 @@ declare module '@tanstack/react-router' {
       path: '/matches'
       fullPath: '/matches'
       preLoaderRoute: typeof MatchesRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/investors': {
+      id: '/investors'
+      path: '/investors'
+      fullPath: '/investors'
+      preLoaderRoute: typeof InvestorsRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/discover': {
@@ -360,8 +420,11 @@ const rootRouteChildren: RootRouteChildren = {
   AdminRoute: AdminRoute,
   DashboardRoute: DashboardRoute,
   DiscoverRoute: DiscoverRoute,
+  InvestorsRoute: InvestorsRoute,
   MatchesRoute: MatchesRoute,
   OnboardingRoute: OnboardingRoute,
+  RolesRoute: RolesRoute,
+  TalentRoute: TalentRoute,
   AuthCallbackRoute: AuthCallbackRoute,
   AuthLoginRoute: AuthLoginRoute,
   AuthResetPasswordRoute: AuthResetPasswordRoute,

@@ -802,39 +802,107 @@ export type Database = {
           },
         ]
       }
+      investor_pitches: {
+        Row: {
+          created_at: string
+          deck_url: string | null
+          from_user: string
+          id: string
+          investor_profile_id: string
+          message: string
+          status: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          deck_url?: string | null
+          from_user: string
+          id?: string
+          investor_profile_id: string
+          message: string
+          status?: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          deck_url?: string | null
+          from_user?: string
+          id?: string
+          investor_profile_id?: string
+          message?: string
+          status?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "investor_pitches_investor_profile_id_fkey"
+            columns: ["investor_profile_id"]
+            isOneToOne: false
+            referencedRelation: "investor_profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       investor_profiles: {
         Row: {
+          avatar_url: string | null
+          bio: string | null
           check_size_max: number | null
           check_size_min: number | null
           created_at: string
           fund_name: string | null
+          headline: string | null
           id: string
           industries: string[] | null
+          is_public: boolean
+          linkedin_url: string | null
+          location: string | null
+          stages: string[] | null
           thesis: string | null
+          updated_at: string
           user_id: string | null
           verified: boolean | null
+          website_url: string | null
         }
         Insert: {
+          avatar_url?: string | null
+          bio?: string | null
           check_size_max?: number | null
           check_size_min?: number | null
           created_at?: string
           fund_name?: string | null
+          headline?: string | null
           id?: string
           industries?: string[] | null
+          is_public?: boolean
+          linkedin_url?: string | null
+          location?: string | null
+          stages?: string[] | null
           thesis?: string | null
+          updated_at?: string
           user_id?: string | null
           verified?: boolean | null
+          website_url?: string | null
         }
         Update: {
+          avatar_url?: string | null
+          bio?: string | null
           check_size_max?: number | null
           check_size_min?: number | null
           created_at?: string
           fund_name?: string | null
+          headline?: string | null
           id?: string
           industries?: string[] | null
+          is_public?: boolean
+          linkedin_url?: string | null
+          location?: string | null
+          stages?: string[] | null
           thesis?: string | null
+          updated_at?: string
           user_id?: string | null
           verified?: boolean | null
+          website_url?: string | null
         }
         Relationships: [
           {
@@ -907,6 +975,74 @@ export type Database = {
           },
         ]
       }
+      open_roles: {
+        Row: {
+          apply_url: string | null
+          comp_max: number | null
+          comp_min: number | null
+          company_name: string | null
+          created_at: string
+          description: string
+          equity_note: string | null
+          founder_id: string | null
+          id: string
+          location: string | null
+          posted_by: string
+          remote_pref: string
+          role_type: string
+          skills: string[]
+          status: string
+          title: string
+          updated_at: string
+        }
+        Insert: {
+          apply_url?: string | null
+          comp_max?: number | null
+          comp_min?: number | null
+          company_name?: string | null
+          created_at?: string
+          description: string
+          equity_note?: string | null
+          founder_id?: string | null
+          id?: string
+          location?: string | null
+          posted_by: string
+          remote_pref?: string
+          role_type?: string
+          skills?: string[]
+          status?: string
+          title: string
+          updated_at?: string
+        }
+        Update: {
+          apply_url?: string | null
+          comp_max?: number | null
+          comp_min?: number | null
+          company_name?: string | null
+          created_at?: string
+          description?: string
+          equity_note?: string | null
+          founder_id?: string | null
+          id?: string
+          location?: string | null
+          posted_by?: string
+          remote_pref?: string
+          role_type?: string
+          skills?: string[]
+          status?: string
+          title?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "open_roles_founder_id_fkey"
+            columns: ["founder_id"]
+            isOneToOne: false
+            referencedRelation: "founders"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       past_ventures: {
         Row: {
           company_name: string | null
@@ -966,6 +1102,113 @@ export type Database = {
           id?: string
           is_pro?: boolean
           role?: Database["public"]["Enums"]["user_role"]
+        }
+        Relationships: []
+      }
+      role_applications: {
+        Row: {
+          applicant_id: string
+          created_at: string
+          id: string
+          note: string | null
+          role_id: string
+          status: string
+          updated_at: string
+        }
+        Insert: {
+          applicant_id: string
+          created_at?: string
+          id?: string
+          note?: string | null
+          role_id: string
+          status?: string
+          updated_at?: string
+        }
+        Update: {
+          applicant_id?: string
+          created_at?: string
+          id?: string
+          note?: string | null
+          role_id?: string
+          status?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "role_applications_role_id_fkey"
+            columns: ["role_id"]
+            isOneToOne: false
+            referencedRelation: "open_roles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      talent_profiles: {
+        Row: {
+          availability: string | null
+          avatar_url: string | null
+          bio: string | null
+          created_at: string
+          desired_role: string | null
+          experience_years: number
+          full_name: string | null
+          headline: string | null
+          id: string
+          is_public: boolean
+          linkedin_url: string | null
+          location: string | null
+          open_to_equity: boolean
+          portfolio_url: string | null
+          remote_pref: string
+          resume_url: string | null
+          skills: string[]
+          updated_at: string
+          user_id: string
+          work_type: string
+        }
+        Insert: {
+          availability?: string | null
+          avatar_url?: string | null
+          bio?: string | null
+          created_at?: string
+          desired_role?: string | null
+          experience_years?: number
+          full_name?: string | null
+          headline?: string | null
+          id?: string
+          is_public?: boolean
+          linkedin_url?: string | null
+          location?: string | null
+          open_to_equity?: boolean
+          portfolio_url?: string | null
+          remote_pref?: string
+          resume_url?: string | null
+          skills?: string[]
+          updated_at?: string
+          user_id: string
+          work_type?: string
+        }
+        Update: {
+          availability?: string | null
+          avatar_url?: string | null
+          bio?: string | null
+          created_at?: string
+          desired_role?: string | null
+          experience_years?: number
+          full_name?: string | null
+          headline?: string | null
+          id?: string
+          is_public?: boolean
+          linkedin_url?: string | null
+          location?: string | null
+          open_to_equity?: boolean
+          portfolio_url?: string | null
+          remote_pref?: string
+          resume_url?: string | null
+          skills?: string[]
+          updated_at?: string
+          user_id?: string
+          work_type?: string
         }
         Relationships: []
       }
