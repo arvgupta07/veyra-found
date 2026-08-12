@@ -235,14 +235,14 @@ function Onboarding() {
                   <span>{f.bio.length}/280</span>
                 </div>
               </div>
-              <div className="grid grid-cols-3 gap-3">
-                <Input label="Location" required placeholder="Mumbai" value={f.location} onChange={(v) => setF({ ...f, location: v })} />
+              <div className="grid gap-3 sm:grid-cols-3">
                 <div>
-                  <label className="text-xs font-semibold text-muted-text">Age <span className="text-red">*</span></label>
-                  <input type="number" min={16} max={100} value={f.age}
-                    onChange={(e) => setF({ ...f, age: +e.target.value || 0 })}
-                    className="mt-1 w-full rounded-lg border-2 border-ink bg-white px-3 py-2 text-sm" />
+                  <label className="text-xs font-semibold text-muted-text">Location <span className="text-red">*</span></label>
+                  <div className="mt-1">
+                    <LocationInput value={f.location} onChange={(v) => setF({ ...f, location: v })} placeholder="Start typing a city…" />
+                  </div>
                 </div>
+                <AgeField value={f.age} onChange={(v) => setF({ ...f, age: v })} required />
                 <div>
                   <label className="text-xs font-semibold text-muted-text">Years of experience</label>
                   <select value={f.years_experience} onChange={(e) => setF({ ...f, years_experience: +e.target.value })} className="mt-1 w-full rounded-lg border px-3 py-2 text-sm">
