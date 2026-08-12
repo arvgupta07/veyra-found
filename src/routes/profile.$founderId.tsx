@@ -11,7 +11,7 @@ import { ProfileLinkChips } from "@/components/ProfileLinkChips";
 import { parseLinks } from "@/lib/profile-links";
 import { useMyVerification } from "@/hooks/useVerification";
 import { VerifiedTick, VerifyRequiredCard } from "@/components/VerifyGate";
-import { ArrowLeft, MapPin, Briefcase, Loader2, Send, X, Ban, ShieldCheck, EyeOff } from "lucide-react";
+import { ArrowLeft, MapPin, Briefcase, Loader2, Send, X, Ban, ShieldCheck, EyeOff, UserMinus } from "lucide-react";
 
 import { toast } from "sonner";
 
