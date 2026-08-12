@@ -8,7 +8,7 @@ export const deleteMyAccount = createServerFn({ method: "POST" })
     const userId = context.userId;
 
     // Clear rows that may block the auth user delete (no ON DELETE CASCADE).
-    const cleanup: Array<Promise<unknown>> = [
+    const cleanup = [
       supabaseAdmin.from("messages").delete().eq("sender_id", userId),
       supabaseAdmin.from("founders").delete().eq("user_id", userId),
       supabaseAdmin.from("talent_profiles").delete().eq("user_id", userId),
