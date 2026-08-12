@@ -396,6 +396,12 @@ function Inbox() {
                     className={`shrink-0 rounded-md border-2 border-ink p-2 shadow-brutal-sm box-hover ${pinned ? "bg-orange text-white" : "bg-white text-ink"}`}>
                     {pinned ? <PinOff className="h-3.5 w-3.5" /> : <Pin className="h-3.5 w-3.5" />}
                   </button>
+                  <button onClick={() => disconnect(other.id)}
+                    title="Remove connection"
+                    className="shrink-0 rounded-md border-2 border-ink bg-white p-2 text-ink shadow-brutal-sm box-hover hover:bg-red hover:text-white">
+                    <UserMinus className="h-3.5 w-3.5" />
+                  </button>
+
                 </div>
                 <div className="mt-3 flex flex-wrap items-center gap-1.5">
                   {labels.map((l) => (
