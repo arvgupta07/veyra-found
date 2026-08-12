@@ -1,5 +1,5 @@
 import { createFileRoute, Link, useRouter } from "@tanstack/react-router";
-import { Landmark, Rocket, GraduationCap, ArrowRight } from "lucide-react";
+import { Landmark, Rocket, GraduationCap, Briefcase, ArrowRight } from "lucide-react";
 import { VeyraMark } from "@/components/VeyraLogo";
 import { ACCOUNT_TYPES, setPendingAccountType, type AccountType } from "@/lib/account-types";
 
@@ -20,8 +20,10 @@ export const Route = createFileRoute("/auth/role")({
 const ICONS: Record<AccountType, typeof Rocket> = {
   founder: Rocket,
   investor: Landmark,
-  talent: GraduationCap,
+  intern: GraduationCap,
+  talent: Briefcase,
 };
+
 
 function RolePicker() {
   const router = useRouter();
