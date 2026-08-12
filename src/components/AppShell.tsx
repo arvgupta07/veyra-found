@@ -20,9 +20,13 @@ const founderNav: NavItem[] = [
   { to: "/discover", label: "Discover", icon: Compass },
   { to: "/matches", label: "Matches", icon: Heart },
   { to: "/inbox", label: "Inbox", icon: Inbox },
+  { to: "/investors", label: "Investors", icon: Landmark },
+  { to: "/roles", label: "Roles", icon: Briefcase },
+  { to: "/talent", label: "Talent", icon: GraduationCap },
   { to: "/forum", label: "Forum", icon: MessagesSquare },
   { to: "/profile/me", label: "Profile", icon: User },
 ];
+
 
 export function AppShell({ children }: { children: React.ReactNode }) {
   const router = useRouter();
