@@ -27,11 +27,45 @@ const ICONS: Record<AccountType, typeof Rocket> = {
 
 function RolePicker() {
   const router = useRouter();
+  const [checking, setChecking] = useState(true);
+
+  // An account type is chosen once and then frozen — signed-in members who
+  // already have one never see this picker again.
+  useEffect(() => {
+    let alive = true;
+    (async () => {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) { if (alive) setChecking(false); return; }
+      const { data } = await supabase
+        .from("profiles")
+        .select("account_type, account_type_locked_at")
+        .eq("id", user.id)
+        .maybeSingle();
+      if (!alive) return;
+      if (data?.account_type_locked_at) {
+        clearPendingAccountType();
+        toast.info(`You're signed in as ${accountLabel(data.account_type)} — account type can't be changed.`);
+        router.navigate({ to: "/dashboard" });
+        return;
+      }
+      setChecking(false);
+    })();
+    return () => { alive = false; };
+  }, [router]);
 
   function pick(t: AccountType) {
     setPendingAccountType(t);
     router.navigate({ to: "/auth/signup" });
   }
+
+  if (checking) {
+    return (
+      <div className="grid min-h-screen place-items-center bg-surface">
+        <Loader2 className="h-6 w-6 animate-spin" />
+      </div>
+    );
+  }
+
 
   return (
     <div className="relative min-h-screen overflow-hidden bg-surface">
