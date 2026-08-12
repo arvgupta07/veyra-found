@@ -1,5 +1,7 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, useRouter } from "@tanstack/react-router";
+import { useEffect } from "react";
 import { AuthScreen } from "@/components/AuthScreen";
+import { getPendingAccountType } from "@/lib/account-types";
 
 export const Route = createFileRoute("/auth/signup")({
   component: Signup,
