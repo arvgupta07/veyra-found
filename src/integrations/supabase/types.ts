@@ -419,6 +419,45 @@ export type Database = {
           },
         ]
       }
+      forum_poll_votes: {
+        Row: {
+          created_at: string
+          founder_id: string
+          id: string
+          option_index: number
+          post_id: string
+        }
+        Insert: {
+          created_at?: string
+          founder_id: string
+          id?: string
+          option_index: number
+          post_id: string
+        }
+        Update: {
+          created_at?: string
+          founder_id?: string
+          id?: string
+          option_index?: number
+          post_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "forum_poll_votes_founder_id_fkey"
+            columns: ["founder_id"]
+            isOneToOne: false
+            referencedRelation: "founders"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "forum_poll_votes_post_id_fkey"
+            columns: ["post_id"]
+            isOneToOne: false
+            referencedRelation: "forum_posts"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       forum_posts: {
         Row: {
           author_id: string
@@ -431,10 +470,13 @@ export type Database = {
           image_url: string | null
           industry_tag: string | null
           is_pinned: boolean | null
+          poll_options: string[]
+          poll_question: string | null
           seeking_feedback: boolean
           title: string
           updated_at: string
           upvotes: number | null
+          video_url: string | null
         }
         Insert: {
           author_id: string
@@ -447,10 +489,13 @@ export type Database = {
           image_url?: string | null
           industry_tag?: string | null
           is_pinned?: boolean | null
+          poll_options?: string[]
+          poll_question?: string | null
           seeking_feedback?: boolean
           title: string
           updated_at?: string
           upvotes?: number | null
+          video_url?: string | null
         }
         Update: {
           author_id?: string
@@ -463,10 +508,13 @@ export type Database = {
           image_url?: string | null
           industry_tag?: string | null
           is_pinned?: boolean | null
+          poll_options?: string[]
+          poll_question?: string | null
           seeking_feedback?: boolean
           title?: string
           updated_at?: string
           upvotes?: number | null
+          video_url?: string | null
         }
         Relationships: [
           {
