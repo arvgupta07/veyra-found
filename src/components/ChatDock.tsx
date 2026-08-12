@@ -33,6 +33,8 @@ export function ChatDock() {
   const [size, setSize] = useState({ w: 352, h: 416 });
   const [resizing, setResizing] = useState(false);
   const dragRef = useRef<{ x: number; y: number; w: number; h: number; axis: "both" | "x" | "y" } | null>(null);
+  const sizeRef = useRef(size);
+  sizeRef.current = size;
 
   useEffect(() => { setSize(loadSize()); }, []);
 
@@ -49,7 +51,7 @@ export function ChatDock() {
     function onUp() {
       setResizing(false);
       dragRef.current = null;
-      try { window.localStorage.setItem(STORAGE_KEY, JSON.stringify(size)); } catch { /* ignore */ }
+      try { window.localStorage.setItem(STORAGE_KEY, JSON.stringify(sizeRef.current)); } catch { /* ignore */ }
     }
     window.addEventListener("mousemove", onMove);
     window.addEventListener("mouseup", onUp);
@@ -57,7 +59,9 @@ export function ChatDock() {
       window.removeEventListener("mousemove", onMove);
       window.removeEventListener("mouseup", onUp);
     };
-  }, [resizing, size]);
+    // Listeners are attached once per drag; the live size is read from a ref so
+    // the handlers aren't torn down and re-added on every mouse move.
+  }, [resizing]);
 
   function startResize(axis: "both" | "x" | "y") {
     return (e: React.MouseEvent) => {
@@ -66,6 +70,7 @@ export function ChatDock() {
       setResizing(true);
     };
   }
+
 
   if (!conversationId) return null;
 
