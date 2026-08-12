@@ -5,6 +5,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { sendConnectionRequest } from "@/lib/connect-requests";
 import { useMyFounder } from "@/hooks/useMyFounder";
 import { AppShell } from "@/components/AppShell";
+import { RoleBadge } from "@/components/RoleBadge";
 import { useRequireAuth } from "@/hooks/useRequireAuth";
 import { SkillTag, TierBadge, VerifiedBadges } from "@/components/FounderBits";
 import { founderAvatar } from "@/lib/founder-types";
@@ -192,6 +193,7 @@ function FounderProfile() {
               <div className="flex-1">
                 <div className="flex flex-wrap items-center gap-2">
                   <h1 className="text-2xl font-black text-ink">{name}</h1>
+                  <RoleBadge type={(data as { account_type?: string | null }).account_type} />
                   {(data as { verified?: boolean }).verified && <VerifiedTick />}
                 </div>
                 <div className="mt-1 text-sm font-semibold text-ink/80">{data.headline}</div>
