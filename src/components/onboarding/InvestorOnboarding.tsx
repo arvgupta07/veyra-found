@@ -21,12 +21,16 @@ const FIRM_TYPES = [
   { v: "other", label: "Other" },
 ] as const;
 
-/** Investor onboarding — profile only. No compatibility assessment, no prompts. */
+const STEPS = ["Firm", "Thesis & cheque", "Portfolio & links"];
+
+/** Investor onboarding — a 3-step profile. No compatibility assessment, no prompts. */
 export function InvestorOnboarding({ fullName }: { fullName: string }) {
   const router = useRouter();
   const qc = useQueryClient();
   const { session } = useSession();
+  const [step, setStep] = useState(1);
   const [saving, setSaving] = useState(false);
+
   const [f, setF] = useState({
     full_name: fullName,
     fund_name: "",
