@@ -419,6 +419,12 @@ function Inbox() {
                     {pinned ? <PinOff className="h-3.5 w-3.5" /> : <Pin className="h-3.5 w-3.5" />}
                   </button>
                   <button onClick={() => disconnect(other.id)}
+                  <button onClick={() => clearChat(c.id)}
+                    title="Delete chat (keeps connection)"
+                    className="shrink-0 rounded-md border-2 border-ink bg-white p-2 text-ink shadow-brutal-sm box-hover hover:bg-red hover:text-white">
+                    <Trash2 className="h-3.5 w-3.5" />
+                  </button>
+                  <button onClick={() => disconnect(other.id)}
                     title="Remove connection"
                     className="shrink-0 rounded-md border-2 border-ink bg-white p-2 text-ink shadow-brutal-sm box-hover hover:bg-red hover:text-white">
                     <UserMinus className="h-3.5 w-3.5" />
