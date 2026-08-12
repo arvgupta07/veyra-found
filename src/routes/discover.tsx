@@ -2,6 +2,7 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
+import { RoleBadge } from "@/components/RoleBadge";
 import { sendConnectionRequest } from "@/lib/connect-requests";
 import { useAccountType } from "@/hooks/useAccountType";
 import { useMyFounder } from "@/hooks/useMyFounder";
@@ -210,7 +211,10 @@ function FounderCard({
       {/* Hero band */}
       <div className="relative bg-ink px-5 pt-5 pb-14 text-cream">
         <div className="flex items-start justify-between gap-3">
-          <div className="text-[10px] font-black uppercase tracking-[0.2em] text-cream/70">Founder · {founder.trust_tier ?? "Builder"}</div>
+          <div className="flex flex-wrap items-center gap-2">
+            <RoleBadge type={founder.account_type ?? "founder"} size="xs" />
+            <span className="text-[10px] font-black uppercase tracking-[0.2em] text-cream/70">{founder.trust_tier ?? "Builder"}</span>
+          </div>
           <div className="rounded-md border-2 border-cream bg-orange px-2 py-0.5 text-[10px] font-black uppercase tracking-wider text-white">
             {commitmentLabel}
           </div>
