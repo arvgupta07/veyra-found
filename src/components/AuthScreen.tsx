@@ -1,7 +1,9 @@
+import { useEffect, useState } from "react";
 import { Link } from "@tanstack/react-router";
 import { VeyraMark } from "@/components/VeyraLogo";
 import { GoogleButton } from "@/components/GoogleButton";
 import { EmailAuthBox } from "@/components/EmailAuthBox";
+import { accountLabel, getPendingAccountType } from "@/lib/account-types";
 
 /** Shared Google + email auth screen. */
 export function AuthScreen({

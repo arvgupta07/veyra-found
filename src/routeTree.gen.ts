@@ -25,6 +25,7 @@ import { Route as ProfileFounderIdRouteImport } from './routes/profile.$founderI
 import { Route as InboxConversationIdRouteImport } from './routes/inbox.$conversationId'
 import { Route as ForumPostIdRouteImport } from './routes/forum.$postId'
 import { Route as AuthSignupRouteImport } from './routes/auth.signup'
+import { Route as AuthRoleRouteImport } from './routes/auth.role'
 import { Route as AuthResetPasswordRouteImport } from './routes/auth.reset-password'
 import { Route as AuthLoginRouteImport } from './routes/auth.login'
 import { Route as AuthCallbackRouteImport } from './routes/auth.callback'
@@ -109,6 +110,11 @@ const AuthSignupRoute = AuthSignupRouteImport.update({
   path: '/auth/signup',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AuthRoleRoute = AuthRoleRouteImport.update({
+  id: '/auth/role',
+  path: '/auth/role',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const AuthResetPasswordRoute = AuthResetPasswordRouteImport.update({
   id: '/auth/reset-password',
   path: '/auth/reset-password',
@@ -138,6 +144,7 @@ export interface FileRoutesByFullPath {
   '/auth/callback': typeof AuthCallbackRoute
   '/auth/login': typeof AuthLoginRoute
   '/auth/reset-password': typeof AuthResetPasswordRoute
+  '/auth/role': typeof AuthRoleRoute
   '/auth/signup': typeof AuthSignupRoute
   '/forum/$postId': typeof ForumPostIdRoute
   '/inbox/$conversationId': typeof InboxConversationIdRoute
@@ -159,6 +166,7 @@ export interface FileRoutesByTo {
   '/auth/callback': typeof AuthCallbackRoute
   '/auth/login': typeof AuthLoginRoute
   '/auth/reset-password': typeof AuthResetPasswordRoute
+  '/auth/role': typeof AuthRoleRoute
   '/auth/signup': typeof AuthSignupRoute
   '/forum/$postId': typeof ForumPostIdRoute
   '/inbox/$conversationId': typeof InboxConversationIdRoute
@@ -181,6 +189,7 @@ export interface FileRoutesById {
   '/auth/callback': typeof AuthCallbackRoute
   '/auth/login': typeof AuthLoginRoute
   '/auth/reset-password': typeof AuthResetPasswordRoute
+  '/auth/role': typeof AuthRoleRoute
   '/auth/signup': typeof AuthSignupRoute
   '/forum/$postId': typeof ForumPostIdRoute
   '/inbox/$conversationId': typeof InboxConversationIdRoute
@@ -204,6 +213,7 @@ export interface FileRouteTypes {
     | '/auth/callback'
     | '/auth/login'
     | '/auth/reset-password'
+    | '/auth/role'
     | '/auth/signup'
     | '/forum/$postId'
     | '/inbox/$conversationId'
@@ -225,6 +235,7 @@ export interface FileRouteTypes {
     | '/auth/callback'
     | '/auth/login'
     | '/auth/reset-password'
+    | '/auth/role'
     | '/auth/signup'
     | '/forum/$postId'
     | '/inbox/$conversationId'
@@ -246,6 +257,7 @@ export interface FileRouteTypes {
     | '/auth/callback'
     | '/auth/login'
     | '/auth/reset-password'
+    | '/auth/role'
     | '/auth/signup'
     | '/forum/$postId'
     | '/inbox/$conversationId'
@@ -268,6 +280,7 @@ export interface RootRouteChildren {
   AuthCallbackRoute: typeof AuthCallbackRoute
   AuthLoginRoute: typeof AuthLoginRoute
   AuthResetPasswordRoute: typeof AuthResetPasswordRoute
+  AuthRoleRoute: typeof AuthRoleRoute
   AuthSignupRoute: typeof AuthSignupRoute
   ForumPostIdRoute: typeof ForumPostIdRoute
   InboxConversationIdRoute: typeof InboxConversationIdRoute
@@ -391,6 +404,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthSignupRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/auth/role': {
+      id: '/auth/role'
+      path: '/auth/role'
+      fullPath: '/auth/role'
+      preLoaderRoute: typeof AuthRoleRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/auth/reset-password': {
       id: '/auth/reset-password'
       path: '/auth/reset-password'
@@ -428,6 +448,7 @@ const rootRouteChildren: RootRouteChildren = {
   AuthCallbackRoute: AuthCallbackRoute,
   AuthLoginRoute: AuthLoginRoute,
   AuthResetPasswordRoute: AuthResetPasswordRoute,
+  AuthRoleRoute: AuthRoleRoute,
   AuthSignupRoute: AuthSignupRoute,
   ForumPostIdRoute: ForumPostIdRoute,
   InboxConversationIdRoute: InboxConversationIdRoute,
