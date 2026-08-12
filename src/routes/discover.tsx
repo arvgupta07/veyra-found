@@ -415,7 +415,7 @@ function ConnectModal({ founder, myFounderId, onClose }: { founder: any; myFound
     const { error } = await sendConnectionRequest({
       fromFounderId: myFounderId,
       toFounderId: founder.id,
-      promptQuestion: selectedPrompt,
+      promptQuestion: isFounderAccount ? selectedPrompt : "Direct note",
       message: message.trim(),
     });
     setSending(false);
