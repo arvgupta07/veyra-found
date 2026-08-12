@@ -8,7 +8,7 @@ import { AppShell } from "@/components/AppShell";
 import { VerifyBanner } from "@/components/VerifyGate";
 import { useRequireAuth } from "@/hooks/useRequireAuth";
 import { founderAvatar } from "@/lib/founder-types";
-import { Check, X, Loader2, MessageSquare, Tag, Plus, Pin, PinOff } from "lucide-react";
+import { Check, X, Loader2, MessageSquare, Tag, Plus, Pin, PinOff, UserMinus } from "lucide-react";
 import { useUnreadConversations } from "@/hooks/useLiveInbox";
 import { toast } from "sonner";
 
@@ -129,6 +129,18 @@ function Inbox() {
       toast.success("Pinned");
     }
     qc.invalidateQueries({ queryKey: ["conv-pins", me.id] });
+  }
+
+  async function disconnect(otherFounderId: string) {
+    if (!me) return;
+    if (!window.confirm("Remove this connection? The chat history is deleted and you'll both need to send a new request to reconnect.")) return;
+    const { error } = await supabase.rpc("disconnect_founder", { _other_founder_id: otherFounderId });
+    if (error) return toast.error(error.message);
+    toast.success("Connection removed");
+    qc.invalidateQueries({ queryKey: ["inbox-convos"] });
+    qc.invalidateQueries({ queryKey: ["inbox-requests"] });
+    qc.invalidateQueries({ queryKey: ["connected-ids"] });
+    qc.invalidateQueries({ queryKey: ["matches-pool"] });
   }
 
   const labelsByConv = useMemo(() => {
@@ -396,6 +408,12 @@ function Inbox() {
                     className={`shrink-0 rounded-md border-2 border-ink p-2 shadow-brutal-sm box-hover ${pinned ? "bg-orange text-white" : "bg-white text-ink"}`}>
                     {pinned ? <PinOff className="h-3.5 w-3.5" /> : <Pin className="h-3.5 w-3.5" />}
                   </button>
+                  <button onClick={() => disconnect(other.id)}
+                    title="Remove connection"
+                    className="shrink-0 rounded-md border-2 border-ink bg-white p-2 text-ink shadow-brutal-sm box-hover hover:bg-red hover:text-white">
+                    <UserMinus className="h-3.5 w-3.5" />
+                  </button>
+
                 </div>
                 <div className="mt-3 flex flex-wrap items-center gap-1.5">
                   {labels.map((l) => (

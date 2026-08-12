@@ -11,7 +11,7 @@ import { ProfileLinkChips } from "@/components/ProfileLinkChips";
 import { parseLinks } from "@/lib/profile-links";
 import { useMyVerification } from "@/hooks/useVerification";
 import { VerifiedTick, VerifyRequiredCard } from "@/components/VerifyGate";
-import { ArrowLeft, MapPin, Briefcase, Loader2, Send, X, Ban, ShieldCheck, EyeOff } from "lucide-react";
+import { ArrowLeft, MapPin, Briefcase, Loader2, Send, X, Ban, ShieldCheck, EyeOff, UserMinus } from "lucide-react";
 
 import { toast } from "sonner";
 
@@ -75,6 +75,7 @@ function FounderProfile() {
   const { data: me } = useMyFounder();
   const qc = useQueryClient();
   const [connectOpen, setConnectOpen] = useState(false);
+  const [removing, setRemoving] = useState(false);
 
   useEffect(() => {
     if (typeof window !== "undefined" && window.location.hash === "#connect") setConnectOpen(true);
@@ -102,24 +103,58 @@ function FounderProfile() {
     },
   });
 
+  // Are we connected (a conversation exists between us)?
+  const { data: connection } = useQuery({
+    queryKey: ["connection", me?.id, founderId],
+    enabled: !!me?.id && me?.id !== founderId,
+    queryFn: async () => {
+      const { data } = await supabase.from("conversations")
+        .select("id")
+        .or(`and(founder_a_id.eq.${me!.id},founder_b_id.eq.${founderId}),and(founder_a_id.eq.${founderId},founder_b_id.eq.${me!.id})`)
+        .maybeSingle();
+      return data;
+    },
+  });
+
+  function refreshRelationship() {
+    if (!me) return;
+    qc.invalidateQueries({ queryKey: ["block", me.id, founderId] });
+    qc.invalidateQueries({ queryKey: ["connection", me.id, founderId] });
+    qc.invalidateQueries({ queryKey: ["connected-ids"] });
+    qc.invalidateQueries({ queryKey: ["discover-feed"] });
+    qc.invalidateQueries({ queryKey: ["matches-pool"] });
+    qc.invalidateQueries({ queryKey: ["inbox-convos"] });
+    qc.invalidateQueries({ queryKey: ["inbox-requests"] });
+  }
+
+  async function disconnect() {
+    if (!me) return;
+    if (!window.confirm("Remove this connection? Your chat history will be deleted and you'll both need to send a new request to reconnect.")) return;
+    setRemoving(true);
+    const { error } = await supabase.rpc("disconnect_founder", { _other_founder_id: founderId });
+    setRemoving(false);
+    if (error) return toast.error(error.message);
+    toast.success("Connection removed");
+    refreshRelationship();
+  }
+
   async function toggleBlock() {
     if (!me) return;
     if (block?.blocker_id === me.id) {
       const { error } = await supabase.from("blocks").delete().eq("id", block.id);
       if (error) return toast.error(error.message);
-      toast.success("Unblocked");
+      toast.success("Unblocked. Send a new request if you want to reconnect.");
     } else if (block) {
       return toast.error("This user has blocked you.");
     } else {
+      if (!window.confirm("Block this founder? This also removes your connection and chat history — you'd need to send a new request to reconnect later.")) return;
       const { error } = await supabase.from("blocks").insert({ blocker_id: me.id, blocked_id: founderId });
       if (error) return toast.error(error.message);
-      toast.success("Blocked. They can no longer message you.");
+      toast.success("Blocked. Your connection and chat history were removed.");
     }
-    qc.invalidateQueries({ queryKey: ["block", me.id, founderId] });
-    qc.invalidateQueries({ queryKey: ["discover-feed"] });
-    qc.invalidateQueries({ queryKey: ["inbox-convos"] });
-    qc.invalidateQueries({ queryKey: ["inbox-requests"] });
+    refreshRelationship();
   }
+
 
   if (!ready) return null;
   if (isLoading) return <AppShell><div className="grid place-items-center py-24"><Loader2 className="h-6 w-6 animate-spin" /></div></AppShell>;
@@ -169,12 +204,25 @@ function FounderProfile() {
             </div>
             {!isMe && me && (
               <div className="mt-4 flex flex-wrap items-center gap-2">
-                {!block && (
+                {!block && !connection && (
                   <button onClick={() => setConnectOpen(true)}
                     className="inline-flex items-center gap-2 rounded-lg border-2 border-ink bg-orange px-4 py-2 text-xs font-black text-white shadow-brutal-sm box-hover">
                     <Send className="h-3 w-3" /> Send message
                   </button>
                 )}
+                {!block && connection && (
+                  <>
+                    <Link to="/inbox/$conversationId" params={{ conversationId: connection.id }}
+                      className="inline-flex items-center gap-2 rounded-lg border-2 border-ink bg-orange px-4 py-2 text-xs font-black text-white shadow-brutal-sm box-hover">
+                      <Send className="h-3 w-3" /> Open chat
+                    </Link>
+                    <button onClick={disconnect} disabled={removing}
+                      className="inline-flex items-center gap-2 rounded-lg border-2 border-ink bg-white px-4 py-2 text-xs font-black text-ink shadow-brutal-sm box-hover disabled:opacity-50">
+                      {removing ? <Loader2 className="h-3 w-3 animate-spin" /> : <UserMinus className="h-3 w-3" />} Remove connection
+                    </button>
+                  </>
+                )}
+
                 {block?.blocker_id === me.id && (
                   <button onClick={toggleBlock}
                     className="inline-flex items-center gap-2 rounded-lg border-2 border-ink bg-sage px-4 py-2 text-xs font-black text-ink shadow-brutal-sm box-hover">

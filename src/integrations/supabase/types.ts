@@ -1091,6 +1091,10 @@ export type Database = {
     }
     Functions: {
       current_founder_id: { Args: never; Returns: string }
+      disconnect_founder: {
+        Args: { _other_founder_id: string }
+        Returns: undefined
+      }
       has_role: {
         Args: {
           _role: Database["public"]["Enums"]["app_role"]
@@ -1101,6 +1105,10 @@ export type Database = {
       is_admin: { Args: never; Returns: boolean }
       is_blocked_between: { Args: { a: string; b: string }; Returns: boolean }
       is_verified_founder: { Args: never; Returns: boolean }
+      purge_connection_between: {
+        Args: { _a: string; _b: string }
+        Returns: undefined
+      }
     }
     Enums: {
       app_role: "admin" | "user"
