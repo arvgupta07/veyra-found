@@ -11,6 +11,7 @@ import {
 } from "@/lib/marketplace";
 import { Banknote, Building2, Globe, Linkedin, Loader2, MapPin, Send, Save, Sparkles } from "lucide-react";
 import { toast } from "sonner";
+import { LocationInput } from "@/components/LocationInput";
 
 export const Route = createFileRoute("/investors")({
   component: InvestorsPage,
@@ -370,7 +371,7 @@ function InvestorForm({ mine, userId, onSaved }: { mine: Investor | null; userId
             <input className={inputCls} value={f.fund_name} onChange={(e) => setF({ ...f, fund_name: e.target.value })} placeholder="e.g. Anand Angels" />
           </Field>
           <Field label="Location">
-            <input className={inputCls} value={f.location} onChange={(e) => setF({ ...f, location: e.target.value })} placeholder="Bengaluru" />
+            <LocationInput value={f.location} onChange={(v) => setF({ ...f, location: v })} placeholder="Bengaluru" />
           </Field>
           <div className="md:col-span-2">
             <Field label="Headline">

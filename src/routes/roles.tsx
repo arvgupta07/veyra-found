@@ -12,6 +12,7 @@ import {
 } from "@/lib/marketplace";
 import { Briefcase, Building2, Loader2, MapPin, Plus, Save, Send, Trash2, Users } from "lucide-react";
 import { toast } from "sonner";
+import { LocationInput } from "@/components/LocationInput";
 
 export const Route = createFileRoute("/roles")({
   component: RolesPage,
@@ -317,7 +318,7 @@ function RoleComposer({ userId, founderId, onClose, onSaved }: { userId?: string
             {REMOTE_PREFS.map((t) => <option key={t.v} value={t.v}>{t.label}</option>)}
           </select>
         </Field>
-        <Field label="Location"><input className={inputCls} value={f.location} onChange={(e) => setF({ ...f, location: e.target.value })} placeholder="Mumbai" /></Field>
+        <Field label="Location"><LocationInput value={f.location} onChange={(v) => setF({ ...f, location: v })} placeholder="Mumbai" /></Field>
         <Field label="Equity / stipend note"><input className={inputCls} value={f.equity_note} onChange={(e) => setF({ ...f, equity_note: e.target.value })} placeholder="0.5–1% ESOP" /></Field>
         <Field label="Pay from (₹ / month)"><input type="number" className={inputCls} value={f.comp_min} onChange={(e) => setF({ ...f, comp_min: e.target.value })} placeholder="15000" /></Field>
         <Field label="Pay up to (₹ / month)"><input type="number" className={inputCls} value={f.comp_max} onChange={(e) => setF({ ...f, comp_max: e.target.value })} placeholder="60000" /></Field>

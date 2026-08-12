@@ -12,6 +12,7 @@ import {
 } from "@/lib/marketplace";
 import { GraduationCap, Loader2, MapPin, Save } from "lucide-react";
 import { toast } from "sonner";
+import { LocationInput } from "@/components/LocationInput";
 
 export const Route = createFileRoute("/talent")({
   component: TalentPage,
@@ -237,7 +238,7 @@ function TalentForm({ mine, userId, defaultName, onSaved }: {
         <h2 className="text-sm font-black uppercase tracking-wider">About you</h2>
         <div className="mt-3 grid gap-3 md:grid-cols-2">
           <Field label="Full name"><input className={inputCls} value={f.full_name} onChange={(e) => setF({ ...f, full_name: e.target.value })} /></Field>
-          <Field label="Location"><input className={inputCls} value={f.location} onChange={(e) => setF({ ...f, location: e.target.value })} placeholder="Pune" /></Field>
+          <Field label="Location"><LocationInput value={f.location} onChange={(v) => setF({ ...f, location: v })} placeholder="Pune" /></Field>
           <div className="md:col-span-2">
             <Field label="Headline"><input className={inputCls} value={f.headline} onChange={(e) => setF({ ...f, headline: e.target.value })} placeholder="3rd-year CS student shipping React products" /></Field>
           </div>
