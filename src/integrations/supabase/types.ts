@@ -576,6 +576,7 @@ export type Database = {
       founders: {
         Row: {
           aadhaar_verified: boolean | null
+          account_type: string
           active_status: Database["public"]["Enums"]["founder_active"] | null
           age: number | null
           assessment_public: boolean
@@ -617,6 +618,7 @@ export type Database = {
         }
         Insert: {
           aadhaar_verified?: boolean | null
+          account_type?: string
           active_status?: Database["public"]["Enums"]["founder_active"] | null
           age?: number | null
           assessment_public?: boolean
@@ -658,6 +660,7 @@ export type Database = {
         }
         Update: {
           aadhaar_verified?: boolean | null
+          account_type?: string
           active_status?: Database["public"]["Enums"]["founder_active"] | null
           age?: number | null
           assessment_public?: boolean
