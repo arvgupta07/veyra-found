@@ -131,6 +131,18 @@ function Inbox() {
     qc.invalidateQueries({ queryKey: ["conv-pins", me.id] });
   }
 
+  async function disconnect(otherFounderId: string) {
+    if (!me) return;
+    if (!window.confirm("Remove this connection? The chat history is deleted and you'll both need to send a new request to reconnect.")) return;
+    const { error } = await supabase.rpc("disconnect_founder", { _other_founder_id: otherFounderId });
+    if (error) return toast.error(error.message);
+    toast.success("Connection removed");
+    qc.invalidateQueries({ queryKey: ["inbox-convos"] });
+    qc.invalidateQueries({ queryKey: ["inbox-requests"] });
+    qc.invalidateQueries({ queryKey: ["connected-ids"] });
+    qc.invalidateQueries({ queryKey: ["matches-pool"] });
+  }
+
   const labelsByConv = useMemo(() => {
     const m = new Map<string, { id: string; label: string; color: string }[]>();
     (myLabels ?? []).forEach((l) => {
