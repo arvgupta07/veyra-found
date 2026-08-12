@@ -408,6 +408,7 @@ function ConnectModal({ founder, myFounderId, onClose }: { founder: any; myFound
   const { verified } = useMyVerification();
   const { accountType } = useAccountType();
   const isFounderAccount = accountType === "founder";
+  const limit = isFounderAccount ? 400 : 300;
 
   async function send() {
     if (message.trim().length < 20) return toast.error("Add a bit more context (20+ chars).");
@@ -459,10 +460,10 @@ function ConnectModal({ founder, myFounderId, onClose }: { founder: any; myFound
           <div className="text-[10px] font-black uppercase tracking-wider text-muted-text">
             {isFounderAccount ? "Your message" : "Your note"}
           </div>
-          <textarea rows={5} maxLength={400} value={message} onChange={(e) => setMessage(e.target.value)}
+          <textarea rows={5} maxLength={limit} value={message} onChange={(e) => setMessage(e.target.value)}
             placeholder="Say something specific about what resonates. Vague opens get ignored."
             className="mt-1 w-full rounded-lg border-2 border-ink bg-white px-3 py-2 text-sm outline-none focus:shadow-brutal-sm" />
-          <div className="mt-1 text-right text-[10px] font-semibold text-muted-text">{message.length}/400</div>
+          <div className="mt-1 text-right text-[10px] font-semibold text-muted-text">{message.length}/{limit}</div>
         </div>
         <button onClick={send} disabled={sending} className="mt-4 flex w-full items-center justify-center gap-2 rounded-lg border-2 border-ink bg-orange py-3 text-sm font-black uppercase text-white shadow-brutal-sm box-hover disabled:opacity-50">
           {sending ? <Loader2 className="h-4 w-4 animate-spin" /> : <Send className="h-4 w-4" />} Send request
