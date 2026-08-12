@@ -2,14 +2,15 @@ import { useState } from "react";
 import { useRouter } from "@tanstack/react-router";
 import { useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
-import { Loader2, Landmark } from "lucide-react";
+import { Loader2, Landmark, ArrowLeft, ArrowRight } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useSession } from "@/hooks/useSession";
 import { LocationInput } from "@/components/LocationInput";
 import { Chip, Field, inputCls } from "@/components/MarketBits";
 import { INDUSTRIES, INVEST_STAGES, normalizeUrl, toggleIn } from "@/lib/marketplace";
 import { clearPendingAccountType } from "@/lib/account-types";
-import { OnboardShell, isValidLinkedIn } from "./OnboardShell";
+import { OnboardShell, StepBar, isValidLinkedIn } from "./OnboardShell";
+
 
 const FIRM_TYPES = [
   { v: "angel", label: "Angel" },
