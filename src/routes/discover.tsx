@@ -409,15 +409,14 @@ function ConnectModal({ founder, myFounderId, onClose }: { founder: any; myFound
   async function send() {
     if (message.trim().length < 20) return toast.error("Add a bit more context (20+ chars).");
     setSending(true);
-    const { error } = await supabase.from("connection_requests").insert({
-      from_founder_id: myFounderId,
-      to_founder_id: founder.id,
-      prompt_question: selectedPrompt,
+    const { error } = await sendConnectionRequest({
+      fromFounderId: myFounderId,
+      toFounderId: founder.id,
+      promptQuestion: selectedPrompt,
       message: message.trim(),
-      status: "pending",
     });
     setSending(false);
-    if (error) return toast.error(error.message);
+    if (error) return toast.error(error);
     toast.success(`Request sent to ${name}!`);
     onClose();
   }

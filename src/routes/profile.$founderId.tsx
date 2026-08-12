@@ -331,6 +331,8 @@ function ConnectModal({ founder, myFounderId, onClose }: {
   const [sending, setSending] = useState(false);
   const name = founder.profiles?.full_name ?? founder.seed_name ?? "them";
   const { verified } = useMyVerification();
+  const qc = useQueryClient();
+
 
   async function send() {
     if (message.trim().length < 20) return toast.error("Add a bit more context (20+ chars).");
