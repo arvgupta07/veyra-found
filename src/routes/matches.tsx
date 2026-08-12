@@ -46,7 +46,7 @@ function MatchesPage() {
     queryFn: async () => {
       const { data } = await supabase.from("founders")
         .select("*, profiles(full_name), assessments(*), founder_prompts(prompt_question, prompt_answer, display_order)")
-        .eq("profile_complete", true).neq("id", me!.id).limit(60);
+        .eq("profile_complete", true).eq("account_type", "founder").neq("id", me!.id).limit(60);
       return data ?? [];
     },
   });

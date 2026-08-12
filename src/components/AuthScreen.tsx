@@ -1,7 +1,9 @@
+import { useEffect, useState } from "react";
 import { Link } from "@tanstack/react-router";
 import { VeyraMark } from "@/components/VeyraLogo";
 import { GoogleButton } from "@/components/GoogleButton";
 import { EmailAuthBox } from "@/components/EmailAuthBox";
+import { accountLabel, getPendingAccountType } from "@/lib/account-types";
 
 /** Shared Google + email auth screen. */
 export function AuthScreen({
@@ -15,7 +17,11 @@ export function AuthScreen({
   googleLabel?: string;
   mode: "login" | "signup";
 }) {
+  const [pending, setPending] = useState<string | null>(null);
+  useEffect(() => setPending(getPendingAccountType()), []);
+
   return (
+
     <div className="relative min-h-screen overflow-hidden bg-surface">
       {/* Animated background layer */}
       <div className="pointer-events-none absolute inset-0 z-0 overflow-hidden">
@@ -45,9 +51,16 @@ export function AuthScreen({
 
         <div className="mx-auto flex max-w-md flex-col gap-6 px-6 py-12 animate-page-in">
           <div>
+            {mode === "signup" && pending && (
+              <div className="mb-3 inline-flex items-center gap-2 border-[3px] border-ink bg-orange px-3 py-1.5 text-[10px] font-black uppercase tracking-wider shadow-brutal-sm">
+                Joining as {accountLabel(pending)}
+                <Link to="/auth/role" className="underline">Change</Link>
+              </div>
+            )}
             <h1 className="text-3xl font-black tracking-tight">{title}</h1>
             <p className="mt-1 text-sm text-muted-text">{subtitle}</p>
           </div>
+
 
           <div className="space-y-3">
             <GoogleButton label={googleLabel} />

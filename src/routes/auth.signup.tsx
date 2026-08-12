@@ -1,5 +1,7 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, useRouter } from "@tanstack/react-router";
+import { useEffect } from "react";
 import { AuthScreen } from "@/components/AuthScreen";
+import { getPendingAccountType } from "@/lib/account-types";
 
 export const Route = createFileRoute("/auth/signup")({
   component: Signup,
@@ -16,7 +18,13 @@ export const Route = createFileRoute("/auth/signup")({
 });
 
 function Signup() {
+  const router = useRouter();
+  useEffect(() => {
+    if (!getPendingAccountType()) router.navigate({ to: "/auth/role" });
+  }, [router]);
+
   return (
+
     <AuthScreen
       mode="signup"
       title="Join Veyra Found"

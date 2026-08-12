@@ -7,9 +7,15 @@ import { supabase } from "@/integrations/supabase/client";
 import { useSession } from "@/hooks/useSession";
 import { useMyFounder, useMyProfile } from "@/hooks/useMyFounder";
 import { PROMPT_GROUPS, SKILLS_LIST, INDUSTRIES, ASSESSMENT_QUESTIONS, LOOKING_FOR_OPTIONS } from "@/lib/founder-types";
+import { LocationInput } from "@/components/LocationInput";
+import { AgeField } from "@/components/AgeField";
+import { clearPendingAccountType } from "@/lib/account-types";
+import { useAccountType } from "@/hooks/useAccountType";
+import { InvestorOnboarding } from "@/components/onboarding/InvestorOnboarding";
+import { TalentOnboarding } from "@/components/onboarding/TalentOnboarding";
 
 export const Route = createFileRoute("/onboarding")({
-  component: Onboarding,
+  component: OnboardingRouter,
   head: () => ({
     meta: [
       { title: "Build Your Founder Profile — Veyra Found" },
@@ -30,6 +36,31 @@ const BACKGROUNDS = [
   { v: "design",    label: "Design",    icon: Palette },
   { v: "other",     label: "Other",     icon: Rocket },
 ] as const;
+
+/** Sends each account type to the onboarding built for it. */
+function OnboardingRouter() {
+  const router = useRouter();
+  const { session, loading: sLoading } = useSession();
+  const { data: profile } = useMyProfile();
+  const { accountType, loaded } = useAccountType();
+
+  useEffect(() => {
+    if (!sLoading && !session) router.navigate({ to: "/auth/login" });
+  }, [sLoading, session, router]);
+
+  if (sLoading || !session || !loaded) {
+    return (
+      <div className="grid min-h-screen place-items-center bg-surface">
+        <Loader2 className="h-6 w-6 animate-spin" />
+      </div>
+    );
+  }
+
+  const name = profile?.full_name ?? "";
+  if (accountType === "investor") return <InvestorOnboarding fullName={name} />;
+  if (accountType === "talent") return <TalentOnboarding fullName={name} />;
+  return <Onboarding />;
+}
 
 function Onboarding() {
   const router = useRouter();
@@ -197,6 +228,7 @@ function Onboarding() {
     // /discover still sees profile_complete=false and bounces back here.
     await queryClient.invalidateQueries({ queryKey: ["me-founder", session!.user.id] });
     await queryClient.refetchQueries({ queryKey: ["me-founder", session!.user.id] });
+    clearPendingAccountType();
     setGenerating(false);
     toast.success("Profile complete!");
     router.navigate({ to: "/discover" });
@@ -235,14 +267,14 @@ function Onboarding() {
                   <span>{f.bio.length}/280</span>
                 </div>
               </div>
-              <div className="grid grid-cols-3 gap-3">
-                <Input label="Location" required placeholder="Mumbai" value={f.location} onChange={(v) => setF({ ...f, location: v })} />
+              <div className="grid gap-3 sm:grid-cols-3">
                 <div>
-                  <label className="text-xs font-semibold text-muted-text">Age <span className="text-red">*</span></label>
-                  <input type="number" min={16} max={100} value={f.age}
-                    onChange={(e) => setF({ ...f, age: +e.target.value || 0 })}
-                    className="mt-1 w-full rounded-lg border-2 border-ink bg-white px-3 py-2 text-sm" />
+                  <label className="text-xs font-semibold text-muted-text">Location <span className="text-red">*</span></label>
+                  <div className="mt-1">
+                    <LocationInput value={f.location} onChange={(v) => setF({ ...f, location: v })} placeholder="Start typing a city…" />
+                  </div>
                 </div>
+                <AgeField value={f.age} onChange={(v) => setF({ ...f, age: v })} required />
                 <div>
                   <label className="text-xs font-semibold text-muted-text">Years of experience</label>
                   <select value={f.years_experience} onChange={(e) => setF({ ...f, years_experience: +e.target.value })} className="mt-1 w-full rounded-lg border px-3 py-2 text-sm">

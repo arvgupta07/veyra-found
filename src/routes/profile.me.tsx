@@ -9,6 +9,8 @@ import { useRequireAuth } from "@/hooks/useRequireAuth";
 import { SkillTag, TierBadge, VerifiedBadges } from "@/components/FounderBits";
 import { founderAvatar, SKILLS_LIST, AVATAR_PRESETS, PROMPT_GROUPS, LOOKING_FOR_OPTIONS, INDUSTRIES } from "@/lib/founder-types";
 import { uploadImage } from "@/lib/uploads";
+import { LocationInput } from "@/components/LocationInput";
+import { AgeField } from "@/components/AgeField";
 import { ProfileLinkChips } from "@/components/ProfileLinkChips";
 import { LINK_TYPES, parseLinks, type ProfileLink, type ProfileLinkType } from "@/lib/profile-links";
 import { MapPin, Briefcase, Pencil, X, Loader2, Save, LogOut, Trash2, ImagePlus, Linkedin, Github, Eye, EyeOff, Plus, MessageSquareQuote, Trash, Rocket, Zap, BarChart3, Users, type LucideIcon } from "lucide-react";
@@ -472,14 +474,14 @@ function EditPanel({ initial, founderId, userId, onClose, onSaved }: {
               </Section>
 
               <Section title="Details" icon={MapPin}>
-                <div className="grid grid-cols-2 gap-3">
-                  <Field label="Location" v={form.location} onChange={(v) => setForm({ ...form, location: v })} placeholder="Bangalore" />
+                <div className="grid gap-3">
                   <div>
-                    <label className="text-[11px] font-black uppercase text-muted-text">Age</label>
-                    <input type="number" min={16} max={100} value={form.age || ""}
-                      onChange={(e) => setForm({ ...form, age: +e.target.value || 0 })}
-                      className="mt-1.5 w-full rounded-lg border-2 border-ink bg-white px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-orange" />
+                    <label className="text-[11px] font-black uppercase text-muted-text">Location</label>
+                    <div className="mt-1.5">
+                      <LocationInput value={form.location} onChange={(v) => setForm({ ...form, location: v })} placeholder="Start typing a city…" />
+                    </div>
                   </div>
+                  <AgeField value={form.age} onChange={(v) => setForm({ ...form, age: v })} />
                 </div>
                 <div className="mt-3 grid grid-cols-2 gap-3">
                   <div>

@@ -576,6 +576,7 @@ export type Database = {
       founders: {
         Row: {
           aadhaar_verified: boolean | null
+          account_type: string
           active_status: Database["public"]["Enums"]["founder_active"] | null
           age: number | null
           assessment_public: boolean
@@ -617,6 +618,7 @@ export type Database = {
         }
         Insert: {
           aadhaar_verified?: boolean | null
+          account_type?: string
           active_status?: Database["public"]["Enums"]["founder_active"] | null
           age?: number | null
           assessment_public?: boolean
@@ -658,6 +660,7 @@ export type Database = {
         }
         Update: {
           aadhaar_verified?: boolean | null
+          account_type?: string
           active_status?: Database["public"]["Enums"]["founder_active"] | null
           age?: number | null
           assessment_public?: boolean
@@ -849,7 +852,9 @@ export type Database = {
           bio: string | null
           check_size_max: number | null
           check_size_min: number | null
+          companies_invested: number | null
           created_at: string
+          firm_type: string | null
           fund_name: string | null
           headline: string | null
           id: string
@@ -857,6 +862,7 @@ export type Database = {
           is_public: boolean
           linkedin_url: string | null
           location: string | null
+          notable_investments: string | null
           stages: string[] | null
           thesis: string | null
           updated_at: string
@@ -869,7 +875,9 @@ export type Database = {
           bio?: string | null
           check_size_max?: number | null
           check_size_min?: number | null
+          companies_invested?: number | null
           created_at?: string
+          firm_type?: string | null
           fund_name?: string | null
           headline?: string | null
           id?: string
@@ -877,6 +885,7 @@ export type Database = {
           is_public?: boolean
           linkedin_url?: string | null
           location?: string | null
+          notable_investments?: string | null
           stages?: string[] | null
           thesis?: string | null
           updated_at?: string
@@ -889,7 +898,9 @@ export type Database = {
           bio?: string | null
           check_size_max?: number | null
           check_size_min?: number | null
+          companies_invested?: number | null
           created_at?: string
+          firm_type?: string | null
           fund_name?: string | null
           headline?: string | null
           id?: string
@@ -897,6 +908,7 @@ export type Database = {
           is_public?: boolean
           linkedin_url?: string | null
           location?: string | null
+          notable_investments?: string | null
           stages?: string[] | null
           thesis?: string | null
           updated_at?: string
@@ -1080,6 +1092,7 @@ export type Database = {
       }
       profiles: {
         Row: {
+          account_type: string
           avatar_url: string | null
           created_at: string
           full_name: string | null
@@ -1088,6 +1101,7 @@ export type Database = {
           role: Database["public"]["Enums"]["user_role"]
         }
         Insert: {
+          account_type?: string
           avatar_url?: string | null
           created_at?: string
           full_name?: string | null
@@ -1096,6 +1110,7 @@ export type Database = {
           role?: Database["public"]["Enums"]["user_role"]
         }
         Update: {
+          account_type?: string
           avatar_url?: string | null
           created_at?: string
           full_name?: string | null
@@ -1150,6 +1165,7 @@ export type Database = {
           bio: string | null
           created_at: string
           desired_role: string | null
+          education: string | null
           experience_years: number
           full_name: string | null
           headline: string | null
@@ -1172,6 +1188,7 @@ export type Database = {
           bio?: string | null
           created_at?: string
           desired_role?: string | null
+          education?: string | null
           experience_years?: number
           full_name?: string | null
           headline?: string | null
@@ -1194,6 +1211,7 @@ export type Database = {
           bio?: string | null
           created_at?: string
           desired_role?: string | null
+          education?: string | null
           experience_years?: number
           full_name?: string | null
           headline?: string | null

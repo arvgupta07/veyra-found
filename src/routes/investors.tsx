@@ -1,4 +1,4 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, useRouter } from "@tanstack/react-router";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useMemo, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
@@ -11,6 +11,9 @@ import {
 } from "@/lib/marketplace";
 import { Banknote, Building2, Globe, Linkedin, Loader2, MapPin, Send, Save, Sparkles } from "lucide-react";
 import { toast } from "sonner";
+import { LocationInput } from "@/components/LocationInput";
+import { useAccountType } from "@/hooks/useAccountType";
+import { useEffect } from "react";
 
 export const Route = createFileRoute("/investors")({
   component: InvestorsPage,
@@ -53,6 +56,16 @@ type Investor = {
 function InvestorsPage() {
   const { ready } = useRequireAuth({ requireOnboarded: true });
   const { user } = useSession();
+  const router = useRouter();
+  const { accountType, loaded } = useAccountType();
+
+  // Talent / interns don't get access to the investor directory.
+  useEffect(() => {
+    if (loaded && accountType === "talent") {
+      toast.error("The investor directory is for founders and investors.");
+      router.navigate({ to: "/discover" });
+    }
+  }, [loaded, accountType, router]);
   const qc = useQueryClient();
   const [tab, setTab] = useState<Tab>("browse");
   const [stage, setStage] = useState<string>("all");
@@ -370,7 +383,7 @@ function InvestorForm({ mine, userId, onSaved }: { mine: Investor | null; userId
             <input className={inputCls} value={f.fund_name} onChange={(e) => setF({ ...f, fund_name: e.target.value })} placeholder="e.g. Anand Angels" />
           </Field>
           <Field label="Location">
-            <input className={inputCls} value={f.location} onChange={(e) => setF({ ...f, location: e.target.value })} placeholder="Bengaluru" />
+            <LocationInput value={f.location} onChange={(v) => setF({ ...f, location: v })} placeholder="Bengaluru" />
           </Field>
           <div className="md:col-span-2">
             <Field label="Headline">

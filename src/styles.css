@@ -457,3 +457,25 @@ html {
 @media (prefers-reduced-motion: reduce) {
   html { scroll-behavior: auto; }
 }
+
+/* Age / range slider — neo-brutalist thumb */
+.age-range::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  height: 20px;
+  width: 20px;
+  border-radius: 9999px;
+  background: var(--orange);
+  border: 3px solid var(--ink);
+  cursor: grab;
+  transition: transform 0.12s ease;
+}
+.age-range::-webkit-slider-thumb:active { cursor: grabbing; transform: scale(1.12); }
+.age-range::-moz-range-thumb {
+  height: 20px;
+  width: 20px;
+  border-radius: 9999px;
+  background: var(--orange);
+  border: 3px solid var(--ink);
+  cursor: grab;
+}
