@@ -1,7 +1,10 @@
 import { createFileRoute, Link, useRouter } from "@tanstack/react-router";
-import { Landmark, Rocket, GraduationCap, Briefcase, ArrowRight } from "lucide-react";
+import { useEffect, useState } from "react";
+import { toast } from "sonner";
+import { Landmark, Rocket, GraduationCap, Briefcase, ArrowRight, Loader2 } from "lucide-react";
+import { supabase } from "@/integrations/supabase/client";
 import { VeyraMark } from "@/components/VeyraLogo";
-import { ACCOUNT_TYPES, setPendingAccountType, type AccountType } from "@/lib/account-types";
+import { ACCOUNT_TYPES, setPendingAccountType, clearPendingAccountType, accountLabel, type AccountType } from "@/lib/account-types";
 
 export const Route = createFileRoute("/auth/role")({
   component: RolePicker,
