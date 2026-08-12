@@ -204,12 +204,25 @@ function FounderProfile() {
             </div>
             {!isMe && me && (
               <div className="mt-4 flex flex-wrap items-center gap-2">
-                {!block && (
+                {!block && !connection && (
                   <button onClick={() => setConnectOpen(true)}
                     className="inline-flex items-center gap-2 rounded-lg border-2 border-ink bg-orange px-4 py-2 text-xs font-black text-white shadow-brutal-sm box-hover">
                     <Send className="h-3 w-3" /> Send message
                   </button>
                 )}
+                {!block && connection && (
+                  <>
+                    <Link to="/inbox/$conversationId" params={{ conversationId: connection.id }}
+                      className="inline-flex items-center gap-2 rounded-lg border-2 border-ink bg-orange px-4 py-2 text-xs font-black text-white shadow-brutal-sm box-hover">
+                      <Send className="h-3 w-3" /> Open chat
+                    </Link>
+                    <button onClick={disconnect} disabled={removing}
+                      className="inline-flex items-center gap-2 rounded-lg border-2 border-ink bg-white px-4 py-2 text-xs font-black text-ink shadow-brutal-sm box-hover disabled:opacity-50">
+                      {removing ? <Loader2 className="h-3 w-3 animate-spin" /> : <UserMinus className="h-3 w-3" />} Remove connection
+                    </button>
+                  </>
+                )}
+
                 {block?.blocker_id === me.id && (
                   <button onClick={toggleBlock}
                     className="inline-flex items-center gap-2 rounded-lg border-2 border-ink bg-sage px-4 py-2 text-xs font-black text-ink shadow-brutal-sm box-hover">
