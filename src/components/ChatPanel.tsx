@@ -5,7 +5,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { useMyFounder } from "@/hooks/useMyFounder";
 import { founderAvatar } from "@/lib/founder-types";
 import { clearUnread } from "@/lib/unread-store";
-import { Send, ArrowLeft, Pencil, Trash2, Smile, Check, X, Minus, ShieldAlert } from "lucide-react";
+import { Send, ArrowLeft, Pencil, Trash2, Smile, Check, X, Minus, ShieldAlert, Loader2 } from "lucide-react";
 import { useMyVerification } from "@/hooks/useVerification";
 import { openVerifyModal } from "@/components/VerifyModal";
 import { toast } from "sonner";
@@ -65,6 +65,19 @@ export function ChatPanel({
   const [activeMsg, setActiveMsg] = useState<string | null>(null);
   const [editingId, setEditingId] = useState<string | null>(null);
   const [editText, setEditText] = useState("");
+  const [clearing, setClearing] = useState(false);
+
+  async function clearChat() {
+    if (!window.confirm("Delete this chat? Every message will be removed for both of you. You'll stay connected.")) return;
+    setClearing(true);
+    const { error } = await supabase.rpc("clear_conversation", { _conversation_id: conversationId });
+    setClearing(false);
+    if (error) return toast.error(error.message);
+    toast.success("Chat deleted");
+    qc.invalidateQueries({ queryKey: ["messages", conversationId] });
+    qc.invalidateQueries({ queryKey: ["inbox-convos"] });
+  }
+
   const dock = variant === "dock";
 
   const { data: convo } = useQuery({
@@ -182,6 +195,10 @@ export function ChatPanel({
         {!dock && (
           <span className="rounded-md border-2 border-ink bg-cream px-2 py-1 text-[10px] font-black uppercase tracking-wider">{convo.stage?.replace("_", " ")}</span>
         )}
+        <button onClick={clearChat} disabled={clearing} title="Delete all messages in this chat"
+          className="grid h-7 w-7 shrink-0 place-items-center rounded-md border-2 border-ink bg-white text-ink shadow-brutal-sm hover:bg-red hover:text-white disabled:opacity-60">
+          {clearing ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <Trash2 className="h-3.5 w-3.5" />}
+        </button>
         <Link to="/profile/$founderId" params={{ founderId: other.id }}
           className="rounded-md border-2 border-ink bg-white px-2 py-1 text-[10px] font-black uppercase tracking-wider text-ink shadow-brutal-sm hover:bg-cream"
           title="Open profile to block">

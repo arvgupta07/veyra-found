@@ -1090,6 +1090,10 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      clear_conversation: {
+        Args: { _conversation_id: string }
+        Returns: undefined
+      }
       current_founder_id: { Args: never; Returns: string }
       disconnect_founder: {
         Args: { _other_founder_id: string }

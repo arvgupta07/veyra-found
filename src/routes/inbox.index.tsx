@@ -8,7 +8,7 @@ import { AppShell } from "@/components/AppShell";
 import { VerifyBanner } from "@/components/VerifyGate";
 import { useRequireAuth } from "@/hooks/useRequireAuth";
 import { founderAvatar } from "@/lib/founder-types";
-import { Check, X, Loader2, MessageSquare, Tag, Plus, Pin, PinOff, UserMinus } from "lucide-react";
+import { Check, X, Loader2, MessageSquare, Tag, Plus, Pin, PinOff, UserMinus, Trash2 } from "lucide-react";
 import { useUnreadConversations } from "@/hooks/useLiveInbox";
 import { toast } from "sonner";
 
@@ -142,6 +142,16 @@ function Inbox() {
     qc.invalidateQueries({ queryKey: ["connected-ids"] });
     qc.invalidateQueries({ queryKey: ["matches-pool"] });
   }
+
+  async function clearChat(convId: string) {
+    if (!window.confirm("Delete this chat? Every message will be removed for both of you. You'll stay connected.")) return;
+    const { error } = await supabase.rpc("clear_conversation", { _conversation_id: convId });
+    if (error) return toast.error(error.message);
+    toast.success("Chat deleted");
+    qc.invalidateQueries({ queryKey: ["inbox-convos"] });
+    qc.invalidateQueries({ queryKey: ["messages", convId] });
+  }
+
 
   const labelsByConv = useMemo(() => {
     const m = new Map<string, { id: string; label: string; color: string }[]>();
@@ -407,6 +417,11 @@ function Inbox() {
                     title={pinned ? "Unpin" : "Pin to top"}
                     className={`shrink-0 rounded-md border-2 border-ink p-2 shadow-brutal-sm box-hover ${pinned ? "bg-orange text-white" : "bg-white text-ink"}`}>
                     {pinned ? <PinOff className="h-3.5 w-3.5" /> : <Pin className="h-3.5 w-3.5" />}
+                  </button>
+                  <button onClick={() => clearChat(c.id)}
+                    title="Delete chat (keeps connection)"
+                    className="shrink-0 rounded-md border-2 border-ink bg-white p-2 text-ink shadow-brutal-sm box-hover hover:bg-red hover:text-white">
+                    <Trash2 className="h-3.5 w-3.5" />
                   </button>
                   <button onClick={() => disconnect(other.id)}
                     title="Remove connection"
