@@ -17,7 +17,11 @@ export function AuthScreen({
   googleLabel?: string;
   mode: "login" | "signup";
 }) {
+  const [pending, setPending] = useState<string | null>(null);
+  useEffect(() => setPending(getPendingAccountType()), []);
+
   return (
+
     <div className="relative min-h-screen overflow-hidden bg-surface">
       {/* Animated background layer */}
       <div className="pointer-events-none absolute inset-0 z-0 overflow-hidden">
