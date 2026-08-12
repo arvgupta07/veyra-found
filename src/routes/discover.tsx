@@ -329,15 +329,14 @@ function PromptCard({
     if (!myFounderId) return toast.error("Loading your profile…");
     if (reply.trim().length < 20) return toast.error("Add a bit more context (20+ chars).");
     setSending(true);
-    const { error } = await supabase.from("connection_requests").insert({
-      from_founder_id: myFounderId,
-      to_founder_id: toFounderId,
-      prompt_question: question,
+    const { error } = await sendConnectionRequest({
+      fromFounderId: myFounderId,
+      toFounderId: toFounderId,
+      promptQuestion: question,
       message: reply.trim(),
-      status: "pending",
     });
     setSending(false);
-    if (error) return toast.error(error.message);
+    if (error) return toast.error(error);
     toast.success(`Request sent to ${toName}!`);
     setReply("");
     setOpen(false);
