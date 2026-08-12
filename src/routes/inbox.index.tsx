@@ -143,6 +143,16 @@ function Inbox() {
     qc.invalidateQueries({ queryKey: ["matches-pool"] });
   }
 
+  async function clearChat(convId: string) {
+    if (!window.confirm("Delete this chat? Every message will be removed for both of you. You'll stay connected.")) return;
+    const { error } = await supabase.rpc("clear_conversation", { _conversation_id: convId });
+    if (error) return toast.error(error.message);
+    toast.success("Chat deleted");
+    qc.invalidateQueries({ queryKey: ["inbox-convos"] });
+    qc.invalidateQueries({ queryKey: ["messages", convId] });
+  }
+
+
   const labelsByConv = useMemo(() => {
     const m = new Map<string, { id: string; label: string; color: string }[]>();
     (myLabels ?? []).forEach((l) => {
