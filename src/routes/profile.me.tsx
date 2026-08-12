@@ -9,6 +9,8 @@ import { useRequireAuth } from "@/hooks/useRequireAuth";
 import { SkillTag, TierBadge, VerifiedBadges } from "@/components/FounderBits";
 import { founderAvatar, SKILLS_LIST, AVATAR_PRESETS, PROMPT_GROUPS, LOOKING_FOR_OPTIONS, INDUSTRIES } from "@/lib/founder-types";
 import { uploadImage } from "@/lib/uploads";
+import { LocationInput } from "@/components/LocationInput";
+import { AgeField } from "@/components/AgeField";
 import { ProfileLinkChips } from "@/components/ProfileLinkChips";
 import { LINK_TYPES, parseLinks, type ProfileLink, type ProfileLinkType } from "@/lib/profile-links";
 import { MapPin, Briefcase, Pencil, X, Loader2, Save, LogOut, Trash2, ImagePlus, Linkedin, Github, Eye, EyeOff, Plus, MessageSquareQuote, Trash, Rocket, Zap, BarChart3, Users, type LucideIcon } from "lucide-react";
