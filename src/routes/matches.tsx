@@ -26,13 +26,10 @@ export const Route = createFileRoute("/matches")({
   }),
 });
 
-const FREE_LIMIT = 2;
-
 function MatchesPage() {
   const { ready } = useRequireAuth({ requireOnboarded: true });
   const { data: me } = useMyFounder();
-  const { data: profile } = useMyProfile();
-  const isPro = !!(profile as { is_pro?: boolean } | null)?.is_pro;
+
 
   const { data: myAssessment } = useQuery({
     queryKey: ["my-assessment", me?.id],
