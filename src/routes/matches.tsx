@@ -66,9 +66,6 @@ function MatchesPage() {
 
   if (!ready) return null;
 
-  const visible = isPro ? ranked : ranked.slice(0, FREE_LIMIT);
-  const locked = isPro ? [] : ranked.slice(FREE_LIMIT);
-
   return (
     <AppShell>
       <div className="mx-auto max-w-3xl px-4 py-6 md:py-10">
@@ -78,11 +75,6 @@ function MatchesPage() {
             <h1 className="text-3xl font-black tracking-tight">Your matches</h1>
             <p className="mt-1 text-sm text-muted-text">Ranked by compatibility with your assessment.</p>
           </div>
-          {!isPro && (
-            <div className="rounded-lg border-2 border-ink bg-orange px-3 py-1 text-xs font-black text-white shadow-brutal-sm">
-              Free · Top {FREE_LIMIT}
-            </div>
-          )}
         </div>
 
         {ranked.length === 0 && (
@@ -92,35 +84,12 @@ function MatchesPage() {
         )}
 
         <div className="mt-6 space-y-3">
-          {visible.map(({ f, score }, i) => (
+          {ranked.map(({ f, score }, i) => (
             <MatchRow key={(f as { id: string }).id} f={f as never} score={score} rank={i + 1} />
           ))}
         </div>
-
-        {locked.length > 0 && (
-          <div className="mt-8 rounded-2xl border-2 border-ink bg-cream p-6 shadow-brutal">
-            <div className="flex items-center gap-2 text-xs font-black uppercase tracking-wider text-orange">
-              <Lock className="h-4 w-4" /> {locked.length} more matches locked
-            </div>
-            <h3 className="mt-2 text-xl font-black">Unlock every match with Pro</h3>
-            <p className="mt-1 text-sm text-muted-text">
-              See all founders ranked by compatibility. Send voice notes, share decks, and stay top of mind.
-            </p>
-            <div className="mt-4 space-y-2">
-              {locked.slice(0, 5).map(({ f, score }) => (
-                <div key={(f as { id: string }).id} className="flex items-center gap-3 rounded-lg border-2 border-ink bg-white/70 p-3 blur-[2px]">
-                  <div className="grid h-10 w-10 place-items-center rounded-md border-2 border-ink bg-cream font-black">?</div>
-                  <div className="flex-1 text-sm font-bold">Hidden founder</div>
-                  <div className="rounded-md border-2 border-ink bg-sage px-2 py-0.5 text-xs font-black">{score}%</div>
-                </div>
-              ))}
-            </div>
-            <button className="mt-4 inline-flex items-center gap-2 rounded-lg border-2 border-ink bg-orange px-4 py-2 text-sm font-black text-white shadow-brutal-sm box-hover">
-              <Sparkles className="h-4 w-4" /> Upgrade to Pro (coming soon)
-            </button>
-          </div>
-        )}
       </div>
+
     </AppShell>
   );
 }
