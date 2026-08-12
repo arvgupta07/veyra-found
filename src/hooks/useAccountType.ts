@@ -2,18 +2,16 @@ import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { useSession } from "./useSession";
 import { useMyProfile } from "./useMyFounder";
-import { getPendingAccountType, type AccountType } from "@/lib/account-types";
+import { getPendingAccountType, isAccountType, type AccountType } from "@/lib/account-types";
 
-/** The signed-in member's account type (founder / investor / talent). */
+/** The signed-in member's account type (founder / investor / intern / talent). */
 export function useAccountType(): { accountType: AccountType; loaded: boolean } {
   const { data: profile, isFetched } = useMyProfile();
   const fromProfile = (profile as { account_type?: string } | null | undefined)?.account_type;
-  const t =
-    fromProfile === "investor" || fromProfile === "talent" || fromProfile === "founder"
-      ? (fromProfile as AccountType)
-      : null;
+  const t = isAccountType(fromProfile) ? fromProfile : null;
   return { accountType: t ?? getPendingAccountType() ?? "founder", loaded: isFetched };
 }
+
 
 /** Investor firm profile for the signed-in user, if any. */
 export function useMyInvestor() {
