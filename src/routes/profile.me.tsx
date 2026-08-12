@@ -11,7 +11,7 @@ import { founderAvatar, SKILLS_LIST, AVATAR_PRESETS, PROMPT_GROUPS, LOOKING_FOR_
 import { uploadImage } from "@/lib/uploads";
 import { ProfileLinkChips } from "@/components/ProfileLinkChips";
 import { LINK_TYPES, parseLinks, type ProfileLink, type ProfileLinkType } from "@/lib/profile-links";
-import { MapPin, Briefcase, Pencil, X, Loader2, Save, LogOut, Trash2, ImagePlus, Linkedin, Github, Eye, EyeOff, Plus, MessageSquareQuote, Trash } from "lucide-react";
+import { MapPin, Briefcase, Pencil, X, Loader2, Save, LogOut, Trash2, ImagePlus, Linkedin, Github, Eye, EyeOff, Plus, MessageSquareQuote, Trash, Rocket, Zap, BarChart3, Users, type LucideIcon } from "lucide-react";
 
 
 export const Route = createFileRoute("/profile/me")({
@@ -393,224 +393,260 @@ function EditPanel({ initial, founderId, userId, onClose, onSaved }: {
   }
 
   return (
-    <div className="fixed inset-0 z-40 grid place-items-center bg-ink/60 p-4" onClick={onClose}>
-      <div onClick={(e) => e.stopPropagation()} className="max-h-[85vh] w-full max-w-lg overflow-y-auto rounded-2xl border-2 border-ink bg-cream p-6 shadow-brutal">
-        <div className="flex items-start justify-between">
-          <div className="text-xl font-black">Customize profile</div>
-          <button onClick={onClose}><X className="h-5 w-5" /></button>
+    <div className="fixed inset-0 z-40 grid place-items-center bg-ink/70 p-3 sm:p-6" onClick={onClose}>
+      <div
+        onClick={(e) => e.stopPropagation()}
+        className="flex max-h-[92vh] w-full max-w-5xl flex-col overflow-hidden rounded-2xl border-2 border-ink bg-cream shadow-brutal-lg"
+      >
+        {/* Header */}
+        <div className="flex items-start justify-between border-b-2 border-ink bg-white p-5 sm:p-6">
+          <div>
+            <div className="text-2xl font-black sm:text-3xl">Customize profile</div>
+            <div className="mt-1 text-xs font-bold text-muted-text">Edit what founders see. Changes publish instantly.</div>
+          </div>
+          <button
+            onClick={onClose}
+            className="grid h-10 w-10 place-items-center rounded-lg border-2 border-ink bg-cream shadow-brutal-sm box-hover"
+            aria-label="Close"
+          >
+            <X className="h-5 w-5" />
+          </button>
         </div>
-        <div className="mt-4 space-y-3">
-          <div>
-            <label className="text-[11px] font-black uppercase text-muted-text">Avatar</label>
-            <div className="mt-2 flex items-center gap-3">
-              <img src={form.seed_avatar} alt="" className="h-14 w-14 rounded-xl border-2 border-ink object-cover" />
-              <label className={`inline-flex cursor-pointer items-center gap-2 rounded-lg border-2 border-ink bg-white px-3 py-2 text-xs font-black shadow-brutal-sm box-hover ${uploading ? "opacity-50" : ""}`}>
-                {uploading ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <ImagePlus className="h-3.5 w-3.5" />}
-                Upload photo
-                <input type="file" accept="image/*" className="hidden" disabled={uploading}
-                  onChange={async (e) => {
-                    const file = e.target.files?.[0];
-                    e.target.value = "";
-                    if (!file) return;
-                    setUploading(true);
-                    try {
-                      const url = await uploadImage(file, "avatars");
-                      setForm((f) => ({ ...f, seed_avatar: url }));
-                      toast.success("Photo ready — hit save");
-                    } catch (err) {
-                      toast.error(err instanceof Error ? err.message : "Upload failed");
-                    } finally {
-                      setUploading(false);
-                    }
-                  }} />
-              </label>
-              <span className="text-[10px] font-bold text-muted-text">PNG/JPG · max 5 MB</span>
-            </div>
-            <div className="mt-2 text-[10px] font-black uppercase text-muted-text">Or pick a preset</div>
-            <div className="mt-2 grid grid-cols-6 gap-2">
-              {AVATAR_PRESETS.map((url) => {
-                const on = form.seed_avatar === url;
-                return (
-                  <button key={url} type="button" onClick={() => setForm({ ...form, seed_avatar: url })}
-                    className={`relative aspect-square overflow-hidden rounded-xl border-2 border-ink transition ${on ? "shadow-brutal -translate-x-0.5 -translate-y-0.5" : "shadow-brutal-sm hover:-translate-y-0.5"}`}>
-                    <img src={url} alt="" className="h-full w-full object-cover" />
-                    {on && <div className="absolute inset-0 bg-orange/60" />}
-                  </button>
-                );
-              })}
-            </div>
-          </div>
-          <Field label="Full name" v={form.full_name} onChange={(v) => setForm({ ...form, full_name: v })} />
-          <Field label="Headline" v={form.headline} onChange={(v) => setForm({ ...form, headline: v })} />
-          <div>
-            <label className="text-[11px] font-black uppercase text-muted-text">Bio</label>
-            <textarea rows={3} maxLength={280} value={form.bio} onChange={(e) => setForm({ ...form, bio: e.target.value })}
-              className="mt-1 w-full rounded-lg border-2 border-ink bg-white px-3 py-2 text-sm" />
-          </div>
-          <div className="grid grid-cols-2 gap-3">
-            <Field label="Location" v={form.location} onChange={(v) => setForm({ ...form, location: v })} />
-            <div>
-              <label className="text-[11px] font-black uppercase text-muted-text">Age</label>
-              <input type="number" min={16} max={100} value={form.age || ""}
-                onChange={(e) => setForm({ ...form, age: +e.target.value || 0 })}
-                className="mt-1 w-full rounded-lg border-2 border-ink bg-white px-3 py-2 text-sm" />
-            </div>
-          </div>
-          <div className="grid grid-cols-2 gap-3">
-            <div>
-              <label className="text-[11px] font-black uppercase text-muted-text">Years of experience</label>
-              <input type="number" min={0} max={60} value={form.years_experience || ""}
-                onChange={(e) => setForm({ ...form, years_experience: +e.target.value || 0 })}
-                className="mt-1 w-full rounded-lg border-2 border-ink bg-white px-3 py-2 text-sm" />
-            </div>
-            <Field label="Education" v={form.education} onChange={(v) => setForm({ ...form, education: v })} />
-          </div>
 
-          {/* Links */}
-          <div className="rounded-xl border-2 border-ink bg-white p-3">
-            <div className="text-[11px] font-black uppercase text-muted-text">Links</div>
-            <div className="mt-2 space-y-2">
-              <div>
-                <label className="flex items-center gap-1 text-[10px] font-black uppercase text-muted-text"><Linkedin className="h-3 w-3" /> LinkedIn URL</label>
-                <input value={form.linkedin_url} placeholder="linkedin.com/in/yourname"
-                  onChange={(e) => setForm({ ...form, linkedin_url: e.target.value })}
-                  className="mt-1 w-full rounded-lg border-2 border-ink bg-white px-3 py-2 text-sm" />
-              </div>
-              <div>
-                <label className="flex items-center gap-1 text-[10px] font-black uppercase text-muted-text"><Github className="h-3 w-3" /> GitHub URL</label>
-                <input value={form.github_url} placeholder="github.com/yourhandle"
-                  onChange={(e) => setForm({ ...form, github_url: e.target.value })}
-                  className="mt-1 w-full rounded-lg border-2 border-ink bg-white px-3 py-2 text-sm" />
-              </div>
-            </div>
-
-            <div className="mt-3 border-t-2 border-dashed border-ink/30 pt-3">
-              <div className="text-[10px] font-black uppercase text-muted-text">More links · email, WhatsApp, X, Calendly…</div>
-              <div className="mt-2 space-y-2">
-                {form.links.map((l, i) => {
-                  const meta = LINK_TYPES.find((t) => t.type === l.type);
-                  return (
-                    <div key={i} className="rounded-lg border-2 border-ink bg-cream p-2">
-                      <div className="flex items-center gap-2">
-                        <select value={l.type}
-                          onChange={(e) => setForm((f) => ({
-                            ...f,
-                            links: f.links.map((x, j) => j === i ? { ...x, type: e.target.value as ProfileLinkType } : x),
-                          }))}
-                          className="rounded-md border-2 border-ink bg-white px-2 py-1 text-xs font-black">
-                          {LINK_TYPES.map((t) => <option key={t.type} value={t.type}>{t.label}</option>)}
-                        </select>
-                        <input value={l.value} placeholder={meta?.placeholder ?? "https://..."}
-                          onChange={(e) => setForm((f) => ({
-                            ...f,
-                            links: f.links.map((x, j) => j === i ? { ...x, value: e.target.value } : x),
-                          }))}
-                          className="min-w-0 flex-1 rounded-md border-2 border-ink bg-white px-2 py-1 text-sm" />
-                        <button type="button" title="Remove link"
-                          onClick={() => setForm((f) => ({ ...f, links: f.links.filter((_, j) => j !== i) }))}
-                          className="rounded-md border-2 border-ink bg-red px-1.5 py-1 text-white shadow-brutal-sm">
-                          <Trash className="h-3.5 w-3.5" />
-                        </button>
-                      </div>
-                      <input value={l.label ?? ""} placeholder="Custom label (optional)"
-                        onChange={(e) => setForm((f) => ({
-                          ...f,
-                          links: f.links.map((x, j) => j === i ? { ...x, label: e.target.value } : x),
-                        }))}
-                        className="mt-2 w-full rounded-md border-2 border-ink bg-white px-2 py-1 text-xs" />
-                      {meta && <div className="mt-1 text-[10px] font-bold text-muted-text">{meta.hint}</div>}
-                    </div>
-                  );
-                })}
-              </div>
-              {form.links.length < 12 && (
-                <button type="button"
-                  onClick={() => setForm((f) => ({ ...f, links: [...f.links, { type: "email", value: "" }] }))}
-                  className="mt-2 inline-flex items-center gap-1 rounded-md border-2 border-ink bg-sage px-2 py-1 text-[11px] font-black shadow-brutal-sm box-hover">
-                  <Plus className="h-3 w-3" /> Add link
-                </button>
-              )}
-            </div>
-          </div>
-
-
-          {/* Preferences */}
-          <div className="grid grid-cols-3 gap-3">
-            <Select label="Commitment" v={form.commitment} onChange={(v) => setForm({ ...form, commitment: v })}
-              opts={[["full_time", "Full time"], ["part_time", "Part time"], ["exploring", "Exploring"]]} />
-            <Select label="Work setup" v={form.remote_pref} onChange={(v) => setForm({ ...form, remote_pref: v })}
-              opts={[["onsite", "On-site"], ["hybrid", "Hybrid"], ["remote", "Remote"]]} />
-            <Select label="Status" v={form.active_status} onChange={(v) => setForm({ ...form, active_status: v })}
-              opts={[["active", "Actively looking"], ["open", "Open to chats"], ["paused", "Paused"]]} />
-          </div>
-
-          {/* Idea */}
-          <div className="rounded-xl border-2 border-ink bg-white p-3">
-            <label className="flex items-center gap-2 text-sm font-black">
-              <input type="checkbox" checked={form.has_idea} onChange={(e) => setForm({ ...form, has_idea: e.target.checked })} className="h-4 w-4" />
-              I have an idea I'm building
-            </label>
-            {form.has_idea && (
-              <div className="mt-3 space-y-2">
-                <textarea rows={3} maxLength={400} value={form.idea_description} placeholder="What are you building?"
-                  onChange={(e) => setForm({ ...form, idea_description: e.target.value })}
-                  className="w-full rounded-lg border-2 border-ink bg-white px-3 py-2 text-sm" />
-                <div className="grid grid-cols-2 gap-2">
-                  <Select label="Industry" v={form.idea_industry || INDUSTRIES[0]} onChange={(v) => setForm({ ...form, idea_industry: v })}
-                    opts={INDUSTRIES.map((i) => [i, i] as [string, string])} />
-                  <Select label="Stage" v={form.idea_stage} onChange={(v) => setForm({ ...form, idea_stage: v })}
-                    opts={[["idea", "Idea"], ["mvp", "MVP"], ["revenue", "Revenue"], ["funded", "Funded"]]} />
+        {/* Scrollable body */}
+        <div className="flex-1 overflow-y-auto p-4 sm:p-6">
+          <div className="grid gap-5 lg:grid-cols-3">
+            {/* Left column — identity */}
+            <div className="space-y-5 lg:col-span-1">
+              <Section title="Photo" icon={ImagePlus}>
+                <div className="flex items-center gap-4">
+                  <img src={form.seed_avatar} alt="" className="h-20 w-20 rounded-xl border-2 border-ink object-cover shadow-brutal-sm" />
+                  <label className={`inline-flex cursor-pointer items-center gap-2 rounded-lg border-2 border-ink bg-white px-4 py-2.5 text-xs font-black shadow-brutal-sm box-hover ${uploading ? "opacity-50" : ""}`}>
+                    {uploading ? <Loader2 className="h-4 w-4 animate-spin" /> : <ImagePlus className="h-4 w-4" />}
+                    Upload photo
+                    <input type="file" accept="image/*" className="hidden" disabled={uploading}
+                      onChange={async (e) => {
+                        const file = e.target.files?.[0];
+                        e.target.value = "";
+                        if (!file) return;
+                        setUploading(true);
+                        try {
+                          const url = await uploadImage(file, "avatars");
+                          setForm((f) => ({ ...f, seed_avatar: url }));
+                          toast.success("Photo ready — hit save");
+                        } catch (err) {
+                          toast.error(err instanceof Error ? err.message : "Upload failed");
+                        } finally {
+                          setUploading(false);
+                        }
+                      }} />
+                  </label>
                 </div>
+                <div className="mt-3 grid grid-cols-5 gap-2">
+                  {AVATAR_PRESETS.map((url) => {
+                    const on = form.seed_avatar === url;
+                    return (
+                      <button key={url} type="button" onClick={() => setForm({ ...form, seed_avatar: url })}
+                        className={`relative aspect-square overflow-hidden rounded-lg border-2 border-ink transition ${on ? "shadow-brutal -translate-x-0.5 -translate-y-0.5 ring-2 ring-orange" : "shadow-brutal-sm hover:-translate-y-0.5"}`}>
+                        <img src={url} alt="" className="h-full w-full object-cover" />
+                        {on && <div className="absolute inset-0 bg-orange/40" />}
+                      </button>
+                    );
+                  })}
+                </div>
+                <div className="mt-2 text-[10px] font-bold text-muted-text">PNG/JPG · max 5 MB</div>
+              </Section>
+
+              <Section title="Basics" icon={Pencil}>
+                <div className="space-y-3">
+                  <Field label="Full name" v={form.full_name} onChange={(v) => setForm({ ...form, full_name: v })} />
+                  <Field label="Headline" v={form.headline} onChange={(v) => setForm({ ...form, headline: v })} placeholder="e.g. Ex-Flipkart PM building in fintech" />
+                  <div>
+                    <label className="text-[11px] font-black uppercase text-muted-text">Bio</label>
+                    <textarea rows={4} maxLength={280} value={form.bio} placeholder="What should a potential co-founder know about you?"
+                      onChange={(e) => setForm({ ...form, bio: e.target.value })}
+                      className="mt-1.5 w-full rounded-lg border-2 border-ink bg-white px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-orange" />
+                    <div className="mt-1 text-right text-[10px] font-bold text-muted-text">{form.bio.length}/280</div>
+                  </div>
+                </div>
+              </Section>
+
+              <Section title="Details" icon={MapPin}>
+                <div className="grid grid-cols-2 gap-3">
+                  <Field label="Location" v={form.location} onChange={(v) => setForm({ ...form, location: v })} placeholder="Bangalore" />
+                  <div>
+                    <label className="text-[11px] font-black uppercase text-muted-text">Age</label>
+                    <input type="number" min={16} max={100} value={form.age || ""}
+                      onChange={(e) => setForm({ ...form, age: +e.target.value || 0 })}
+                      className="mt-1.5 w-full rounded-lg border-2 border-ink bg-white px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-orange" />
+                  </div>
+                </div>
+                <div className="mt-3 grid grid-cols-2 gap-3">
+                  <div>
+                    <label className="text-[11px] font-black uppercase text-muted-text">Experience</label>
+                    <input type="number" min={0} max={60} value={form.years_experience || ""}
+                      onChange={(e) => setForm({ ...form, years_experience: +e.target.value || 0 })}
+                      className="mt-1.5 w-full rounded-lg border-2 border-ink bg-white px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-orange" />
+                  </div>
+                  <Field label="Education" v={form.education} onChange={(v) => setForm({ ...form, education: v })} placeholder="College / degree" />
+                </div>
+              </Section>
+            </div>
+
+            {/* Right column — links, preferences, skills */}
+            <div className="space-y-5 lg:col-span-2">
+              <Section title="Links" icon={Linkedin}>
+                <div className="grid gap-4 sm:grid-cols-2">
+                  <div>
+                    <label className="flex items-center gap-1.5 text-[11px] font-black uppercase text-muted-text"><Linkedin className="h-3.5 w-3.5" /> LinkedIn URL</label>
+                    <input value={form.linkedin_url} placeholder="linkedin.com/in/yourname"
+                      onChange={(e) => setForm({ ...form, linkedin_url: e.target.value })}
+                      className="mt-1.5 w-full rounded-lg border-2 border-ink bg-white px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-orange" />
+                  </div>
+                  <div>
+                    <label className="flex items-center gap-1.5 text-[11px] font-black uppercase text-muted-text"><Github className="h-3.5 w-3.5" /> GitHub URL</label>
+                    <input value={form.github_url} placeholder="github.com/yourhandle"
+                      onChange={(e) => setForm({ ...form, github_url: e.target.value })}
+                      className="mt-1.5 w-full rounded-lg border-2 border-ink bg-white px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-orange" />
+                  </div>
+                </div>
+
+                <div className="mt-5 border-t-2 border-dashed border-ink/30 pt-4">
+                  <div className="text-[11px] font-black uppercase text-muted-text">More links · email, WhatsApp, X, Calendly…</div>
+                  <div className="mt-3 space-y-3">
+                    {form.links.map((l, i) => {
+                      const meta = LINK_TYPES.find((t) => t.type === l.type);
+                      return (
+                        <div key={i} className="rounded-xl border-2 border-ink bg-cream p-3 shadow-brutal-sm">
+                          <div className="flex items-center gap-2">
+                            <select value={l.type}
+                              onChange={(e) => setForm((f) => ({
+                                ...f,
+                                links: f.links.map((x, j) => j === i ? { ...x, type: e.target.value as ProfileLinkType } : x),
+                              }))}
+                              className="rounded-md border-2 border-ink bg-white px-2 py-1.5 text-xs font-black focus:outline-none focus:ring-2 focus:ring-orange">
+                              {LINK_TYPES.map((t) => <option key={t.type} value={t.type}>{t.label}</option>)}
+                            </select>
+                            <input value={l.value} placeholder={meta?.placeholder ?? "https://..."}
+                              onChange={(e) => setForm((f) => ({
+                                ...f,
+                                links: f.links.map((x, j) => j === i ? { ...x, value: e.target.value } : x),
+                              }))}
+                              className="min-w-0 flex-1 rounded-md border-2 border-ink bg-white px-2 py-1.5 text-sm focus:outline-none focus:ring-2 focus:ring-orange" />
+                            <button type="button" title="Remove link"
+                              onClick={() => setForm((f) => ({ ...f, links: f.links.filter((_, j) => j !== i) }))}
+                              className="rounded-md border-2 border-ink bg-red px-2 py-1.5 text-white shadow-brutal-sm box-hover">
+                              <Trash className="h-4 w-4" />
+                            </button>
+                          </div>
+                          <input value={l.label ?? ""} placeholder="Custom label (optional)"
+                            onChange={(e) => setForm((f) => ({
+                              ...f,
+                              links: f.links.map((x, j) => j === i ? { ...x, label: e.target.value } : x),
+                            }))}
+                            className="mt-2 w-full rounded-md border-2 border-ink bg-white px-2 py-1.5 text-xs focus:outline-none focus:ring-2 focus:ring-orange" />
+                          {meta && <div className="mt-1.5 text-[10px] font-bold text-muted-text">{meta.hint}</div>}
+                        </div>
+                      );
+                    })}
+                  </div>
+                  {form.links.length < 12 && (
+                    <button type="button"
+                      onClick={() => setForm((f) => ({ ...f, links: [...f.links, { type: "email", value: "" }] }))}
+                      className="mt-3 inline-flex items-center gap-1.5 rounded-lg border-2 border-ink bg-sage px-3 py-2 text-xs font-black shadow-brutal-sm box-hover">
+                      <Plus className="h-3.5 w-3.5" /> Add link
+                    </button>
+                  )}
+                </div>
+              </Section>
+
+              <div className="grid gap-5 md:grid-cols-2">
+                <Section title="Preferences" icon={Briefcase}>
+                  <div className="space-y-3">
+                    <Select label="Commitment" v={form.commitment} onChange={(v) => setForm({ ...form, commitment: v })}
+                      opts={[["full_time", "Full time"], ["part_time", "Part time"], ["exploring", "Exploring"]]} />
+                    <Select label="Work setup" v={form.remote_pref} onChange={(v) => setForm({ ...form, remote_pref: v })}
+                      opts={[["onsite", "On-site"], ["hybrid", "Hybrid"], ["remote", "Remote"]]} />
+                    <Select label="Status" v={form.active_status} onChange={(v) => setForm({ ...form, active_status: v })}
+                      opts={[["active", "Actively looking"], ["open", "Open to chats"], ["paused", "Paused"]]} />
+                  </div>
+                </Section>
+
+                <Section title="Idea" icon={Rocket}>
+                  <label className="flex items-center gap-2.5 text-sm font-black">
+                    <input type="checkbox" checked={form.has_idea} onChange={(e) => setForm({ ...form, has_idea: e.target.checked })} className="h-4 w-4" />
+                    I have an idea I'm building
+                  </label>
+                  {form.has_idea && (
+                    <div className="mt-3 space-y-3">
+                      <textarea rows={3} maxLength={400} value={form.idea_description} placeholder="What are you building?"
+                        onChange={(e) => setForm({ ...form, idea_description: e.target.value })}
+                        className="w-full rounded-lg border-2 border-ink bg-white px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-orange" />
+                      <div className="grid grid-cols-2 gap-3">
+                        <Select label="Industry" v={form.idea_industry || INDUSTRIES[0]} onChange={(v) => setForm({ ...form, idea_industry: v })}
+                          opts={INDUSTRIES.map((i) => [i, i] as [string, string])} />
+                        <Select label="Stage" v={form.idea_stage} onChange={(v) => setForm({ ...form, idea_stage: v })}
+                          opts={[["idea", "Idea"], ["mvp", "MVP"], ["revenue", "Revenue"], ["funded", "Funded"]]} />
+                      </div>
+                    </div>
+                  )}
+                </Section>
               </div>
-            )}
-          </div>
 
-          <div>
-            <label className="text-[11px] font-black uppercase text-muted-text">Skills</label>
-            <div className="mt-2 flex flex-wrap gap-1.5">
-              {[...new Set([...SKILLS_LIST, ...form.skills])].map((s) => {
-                const on = form.skills.includes(s);
-                return <button key={s} type="button" onClick={() => toggleSkill(s)}
-                  className={`rounded-md border-2 border-ink px-2 py-1 text-xs font-black ${on ? "bg-orange text-white" : "bg-white"}`}>{s}</button>;
-              })}
-            </div>
-            <div className="mt-2 flex gap-2">
-              <input value={custom} onChange={(e) => setCustom(e.target.value)} placeholder="Add a custom skill"
-                onKeyDown={(e) => { if (e.key === "Enter") { e.preventDefault();
-                  const s = custom.trim(); if (!s) return;
-                  setForm((f) => ({ ...f, skills: [...new Set([...f.skills, s])] })); setCustom("");
-                } }}
-                className="flex-1 rounded-lg border-2 border-ink bg-white px-3 py-2 text-sm" />
-              <button type="button" onClick={() => {
-                const s = custom.trim(); if (!s) return;
-                setForm((f) => ({ ...f, skills: [...new Set([...f.skills, s])] })); setCustom("");
-              }} className="rounded-lg border-2 border-ink bg-ink px-4 py-2 text-sm font-black text-white">Add</button>
-            </div>
-          </div>
+              <Section title="Skills" icon={Zap}>
+                <div className="flex flex-wrap gap-2">
+                  {[...new Set([...SKILLS_LIST, ...form.skills])].map((s) => {
+                    const on = form.skills.includes(s);
+                    return <button key={s} type="button" onClick={() => toggleSkill(s)}
+                      className={`rounded-md border-2 border-ink px-3 py-1.5 text-xs font-black transition hover:-translate-y-0.5 ${on ? "bg-orange text-white shadow-brutal-sm" : "bg-white shadow-brutal-sm hover:shadow-brutal"}`}>{s}</button>;
+                  })}
+                </div>
+                <div className="mt-4 flex gap-2">
+                  <input value={custom} onChange={(e) => setCustom(e.target.value)} placeholder="Add a custom skill"
+                    onKeyDown={(e) => { if (e.key === "Enter") { e.preventDefault();
+                      const s = custom.trim(); if (!s) return;
+                      setForm((f) => ({ ...f, skills: [...new Set([...f.skills, s])] })); setCustom("");
+                    } }}
+                    className="flex-1 rounded-lg border-2 border-ink bg-white px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-orange" />
+                  <button type="button" onClick={() => {
+                    const s = custom.trim(); if (!s) return;
+                    setForm((f) => ({ ...f, skills: [...new Set([...f.skills, s])] })); setCustom("");
+                  }} className="rounded-lg border-2 border-ink bg-ink px-5 py-2.5 text-sm font-black text-white shadow-brutal-sm box-hover">Add</button>
+                </div>
+              </Section>
 
-          <div>
-            <label className="text-[11px] font-black uppercase text-muted-text">Industry focus</label>
-            <div className="mt-2 flex flex-wrap gap-1.5">
-              {INDUSTRIES.map((i) => (
-                <button key={i} type="button" onClick={() => toggleIn("industry_focus", i)}
-                  className={`rounded-md border-2 border-ink px-2 py-1 text-xs font-black ${form.industry_focus.includes(i) ? "bg-sage text-ink" : "bg-white"}`}>{i}</button>
-              ))}
-            </div>
-          </div>
+              <div className="grid gap-5 md:grid-cols-2">
+                <Section title="Industry focus" icon={BarChart3}>
+                  <div className="flex flex-wrap gap-2">
+                    {INDUSTRIES.map((i) => (
+                      <button key={i} type="button" onClick={() => toggleIn("industry_focus", i)}
+                        className={`rounded-md border-2 border-ink px-3 py-1.5 text-xs font-black transition hover:-translate-y-0.5 ${form.industry_focus.includes(i) ? "bg-sage text-ink shadow-brutal-sm" : "bg-white shadow-brutal-sm hover:shadow-brutal"}`}>{i}</button>
+                    ))}
+                  </div>
+                </Section>
 
-          <div>
-            <label className="text-[11px] font-black uppercase text-muted-text">What I'm looking for</label>
-            <div className="mt-2 flex flex-wrap gap-1.5">
-              {LOOKING_FOR_OPTIONS.map((i) => (
-                <button key={i} type="button" onClick={() => toggleIn("looking_for", i)}
-                  className={`rounded-md border-2 border-ink px-2 py-1 text-xs font-black ${form.looking_for.includes(i) ? "bg-orange text-white" : "bg-white"}`}>{i}</button>
-              ))}
+                <Section title="Looking for" icon={Users}>
+                  <div className="flex flex-wrap gap-2">
+                    {LOOKING_FOR_OPTIONS.map((i) => (
+                      <button key={i} type="button" onClick={() => toggleIn("looking_for", i)}
+                        className={`rounded-md border-2 border-ink px-3 py-1.5 text-xs font-black transition hover:-translate-y-0.5 ${form.looking_for.includes(i) ? "bg-orange text-white shadow-brutal-sm" : "bg-white shadow-brutal-sm hover:shadow-brutal"}`}>{i}</button>
+                    ))}
+                  </div>
+                </Section>
+              </div>
             </div>
           </div>
         </div>
-        <button onClick={save} disabled={saving} className="mt-5 flex w-full items-center justify-center gap-2 rounded-lg border-2 border-ink bg-orange py-2.5 text-sm font-black text-white shadow-brutal-sm disabled:opacity-50">
-          {saving ? <Loader2 className="h-4 w-4 animate-spin" /> : <Save className="h-4 w-4" />} Save changes
-        </button>
+
+        {/* Footer */}
+        <div className="flex items-center justify-between border-t-2 border-ink bg-white p-4 sm:p-6">
+          <button onClick={onClose} className="rounded-lg border-2 border-ink bg-cream px-5 py-2.5 text-sm font-black shadow-brutal-sm box-hover">
+            Cancel
+          </button>
+          <button onClick={save} disabled={saving} className="inline-flex items-center gap-2 rounded-lg border-2 border-ink bg-orange px-6 py-2.5 text-sm font-black text-white shadow-brutal box-hover disabled:opacity-50">
+            {saving ? <Loader2 className="h-4 w-4 animate-spin" /> : <Save className="h-4 w-4" />} Save changes
+          </button>
+        </div>
       </div>
     </div>
   );
@@ -658,68 +694,92 @@ function PromptsPanel({ founderId, existing, onClose, onSaved }: {
   }
 
   return (
-    <div className="fixed inset-0 z-40 grid place-items-center bg-ink/60 p-4" onClick={onClose}>
-      <div onClick={(e) => e.stopPropagation()} className="max-h-[85vh] w-full max-w-lg overflow-y-auto rounded-2xl border-2 border-ink bg-cream p-6 shadow-brutal">
-        <div className="flex items-start justify-between">
+    <div className="fixed inset-0 z-40 grid place-items-center bg-ink/70 p-3 sm:p-6" onClick={onClose}>
+      <div
+        onClick={(e) => e.stopPropagation()}
+        className="flex max-h-[92vh] w-full max-w-3xl flex-col overflow-hidden rounded-2xl border-2 border-ink bg-cream shadow-brutal-lg"
+      >
+        {/* Header */}
+        <div className="flex items-start justify-between border-b-2 border-ink bg-white p-5 sm:p-6">
           <div>
-            <div className="text-xl font-black">Your prompts</div>
-            <div className="text-[11px] font-bold text-muted-text">Pick up to 3. Change them any time.</div>
+            <div className="text-2xl font-black sm:text-3xl">Your prompts</div>
+            <div className="mt-1 text-xs font-bold text-muted-text">Pick up to 3 conversation starters. Change them any time.</div>
           </div>
-          <button onClick={onClose}><X className="h-5 w-5" /></button>
+          <button
+            onClick={onClose}
+            className="grid h-10 w-10 place-items-center rounded-lg border-2 border-ink bg-cream shadow-brutal-sm box-hover"
+            aria-label="Close"
+          >
+            <X className="h-5 w-5" />
+          </button>
         </div>
 
-        <div className="mt-4 space-y-4">
-          {rows.map((row, i) => (
-            <div key={i} className="rounded-xl border-2 border-ink bg-white p-3">
-              <div className="flex items-center justify-between">
-                <div className="text-[10px] font-black uppercase text-orange">Prompt {i + 1}</div>
-                {rows.length > 1 && (
-                  <button onClick={() => setRows((r) => r.filter((_, idx) => idx !== i))}
-                    className="inline-flex items-center gap-1 text-[10px] font-black text-red">
-                    <Trash2 className="h-3 w-3" /> Remove
-                  </button>
-                )}
+        {/* Body */}
+        <div className="flex-1 overflow-y-auto p-4 sm:p-6">
+          <div className="space-y-5">
+            {rows.map((row, i) => (
+              <div key={i} className="rounded-2xl border-2 border-ink bg-white p-4 shadow-brutal-sm sm:p-5">
+                <div className="mb-3 flex items-center justify-between">
+                  <div className="inline-flex items-center gap-2 rounded-md border-2 border-ink bg-orange px-2.5 py-1 text-[10px] font-black uppercase text-white">
+                    Prompt {i + 1}
+                  </div>
+                  {rows.length > 1 && (
+                    <button onClick={() => setRows((r) => r.filter((_, idx) => idx !== i))}
+                      className="inline-flex items-center gap-1.5 rounded-md border-2 border-ink bg-red px-2 py-1 text-[10px] font-black text-white shadow-brutal-sm box-hover">
+                      <Trash2 className="h-3 w-3" /> Remove
+                    </button>
+                  )}
+                </div>
+                <label className="text-[11px] font-black uppercase text-muted-text">Question</label>
+                <select value={row.question} onChange={(e) => update(i, { question: e.target.value })}
+                  className="mt-1.5 w-full rounded-lg border-2 border-ink bg-white px-3 py-2.5 text-sm font-semibold focus:outline-none focus:ring-2 focus:ring-orange">
+                  <option value="">Choose a prompt…</option>
+                  {PROMPT_GROUPS.map((g) => (
+                    <optgroup key={g.label} label={g.label}>
+                      {g.prompts.map((p) => <option key={p} value={p}>{p}</option>)}
+                    </optgroup>
+                  ))}
+                  {row.question && !PROMPT_GROUPS.some((g) => g.prompts.includes(row.question)) && (
+                    <option value={row.question}>{row.question}</option>
+                  )}
+                </select>
+                <label className="mt-4 block text-[11px] font-black uppercase text-muted-text">Answer</label>
+                <textarea rows={4} maxLength={300} value={row.answer} placeholder="Your answer…"
+                  onChange={(e) => update(i, { answer: e.target.value })}
+                  className="mt-1.5 w-full rounded-lg border-2 border-ink bg-white px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-orange" />
+                <div className="mt-1 text-right text-[10px] font-bold text-muted-text">{row.answer.length}/300</div>
               </div>
-              <select value={row.question} onChange={(e) => update(i, { question: e.target.value })}
-                className="mt-2 w-full rounded-lg border-2 border-ink bg-white px-3 py-2 text-sm font-semibold">
-                <option value="">Choose a prompt…</option>
-                {PROMPT_GROUPS.map((g) => (
-                  <optgroup key={g.label} label={g.label}>
-                    {g.prompts.map((p) => <option key={p} value={p}>{p}</option>)}
-                  </optgroup>
-                ))}
-                {row.question && !PROMPT_GROUPS.some((g) => g.prompts.includes(row.question)) && (
-                  <option value={row.question}>{row.question}</option>
-                )}
-              </select>
-              <textarea rows={3} maxLength={300} value={row.answer} placeholder="Your answer…"
-                onChange={(e) => update(i, { answer: e.target.value })}
-                className="mt-2 w-full rounded-lg border-2 border-ink bg-white px-3 py-2 text-sm" />
-            </div>
-          ))}
-          {rows.length < 3 && (
-            <button onClick={() => setRows((r) => [...r, { question: "", answer: "" }])}
-              className="inline-flex items-center gap-1.5 rounded-lg border-2 border-ink bg-white px-3 py-2 text-xs font-black shadow-brutal-sm box-hover">
-              <Plus className="h-3.5 w-3.5" /> Add another prompt
-            </button>
-          )}
+            ))}
+            {rows.length < 3 && (
+              <button onClick={() => setRows((r) => [...r, { question: "", answer: "" }])}
+                className="inline-flex w-full items-center justify-center gap-2 rounded-xl border-2 border-dashed border-ink bg-white py-3 text-sm font-black shadow-brutal-sm box-hover">
+                <Plus className="h-4 w-4" /> Add another prompt
+              </button>
+            )}
+          </div>
         </div>
 
-        <button onClick={save} disabled={saving}
-          className="mt-5 flex w-full items-center justify-center gap-2 rounded-lg border-2 border-ink bg-orange py-2.5 text-sm font-black text-white shadow-brutal-sm disabled:opacity-50">
-          {saving ? <Loader2 className="h-4 w-4 animate-spin" /> : <Save className="h-4 w-4" />} Save prompts
-        </button>
+        {/* Footer */}
+        <div className="flex items-center justify-between border-t-2 border-ink bg-white p-4 sm:p-6">
+          <button onClick={onClose} className="rounded-lg border-2 border-ink bg-cream px-5 py-2.5 text-sm font-black shadow-brutal-sm box-hover">
+            Cancel
+          </button>
+          <button onClick={save} disabled={saving}
+            className="inline-flex items-center gap-2 rounded-lg border-2 border-ink bg-orange px-6 py-2.5 text-sm font-black text-white shadow-brutal box-hover disabled:opacity-50">
+            {saving ? <Loader2 className="h-4 w-4 animate-spin" /> : <Save className="h-4 w-4" />} Save prompts
+          </button>
+        </div>
       </div>
     </div>
   );
 }
 
-function Field({ label, v, onChange }: { label: string; v: string; onChange: (v: string) => void }) {
+function Field({ label, v, onChange, placeholder }: { label: string; v: string; onChange: (v: string) => void; placeholder?: string }) {
   return (
     <div>
       <label className="text-[11px] font-black uppercase text-muted-text">{label}</label>
-      <input value={v} onChange={(e) => onChange(e.target.value)}
-        className="mt-1 w-full rounded-lg border-2 border-ink bg-white px-3 py-2 text-sm" />
+      <input value={v} placeholder={placeholder} onChange={(e) => onChange(e.target.value)}
+        className="mt-1.5 w-full rounded-lg border-2 border-ink bg-white px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-orange" />
     </div>
   );
 }
@@ -729,9 +789,23 @@ function Select({ label, v, onChange, opts }: { label: string; v: string; onChan
     <div>
       <label className="text-[11px] font-black uppercase text-muted-text">{label}</label>
       <select value={v} onChange={(e) => onChange(e.target.value)}
-        className="mt-1 w-full rounded-lg border-2 border-ink bg-white px-2 py-2 text-xs font-semibold">
+        className="mt-1.5 w-full rounded-lg border-2 border-ink bg-white px-2 py-2.5 text-xs font-semibold focus:outline-none focus:ring-2 focus:ring-orange">
         {opts.map(([val, lab]) => <option key={val} value={val}>{lab}</option>)}
       </select>
+    </div>
+  );
+}
+
+function Section({ title, icon: Icon, children }: { title: string; icon: LucideIcon; children: React.ReactNode }) {
+  return (
+    <div className="rounded-2xl border-2 border-ink bg-white p-4 shadow-brutal-sm sm:p-5">
+      <div className="mb-4 flex items-center gap-2 border-b-2 border-ink/10 pb-2">
+        <div className="grid h-7 w-7 place-items-center rounded-md border-2 border-ink bg-cream">
+          <Icon className="h-3.5 w-3.5" />
+        </div>
+        <div className="text-xs font-black uppercase tracking-wider text-muted-text">{title}</div>
+      </div>
+      {children}
     </div>
   );
 }
