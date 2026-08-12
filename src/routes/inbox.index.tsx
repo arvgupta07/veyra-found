@@ -83,13 +83,18 @@ function Inbox() {
     queryKey: ["inbox-convos", me?.id],
     enabled: !!me?.id,
     queryFn: async () => {
+      // Only the latest message per conversation is needed for the preview row,
+      // so cap the embedded messages instead of pulling entire chat histories.
       const { data } = await supabase.from("conversations")
         .select("*, a:founders!conversations_founder_a_id_fkey(*, profiles(full_name)), b:founders!conversations_founder_b_id_fkey(*, profiles(full_name)), messages(content, created_at)")
         .or(`founder_a_id.eq.${me!.id},founder_b_id.eq.${me!.id}`)
-        .order("created_at", { ascending: false });
+        .order("created_at", { ascending: false })
+        .order("created_at", { referencedTable: "messages", ascending: false })
+        .limit(1, { referencedTable: "messages" });
       return data ?? [];
     },
   });
+
 
   const { data: myLabels } = useQuery({
     queryKey: ["conv-labels", me?.id],

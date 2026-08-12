@@ -35,33 +35,57 @@ export function useLiveInbox() {
   useEffect(() => {
     if (!myFounderId) return;
 
+    /** Conversation ids that belong to me, read from the inbox cache.
+     * Used to ignore realtime traffic from other people's chats instead of
+     * refetching the whole inbox on every message sent anywhere on Veyra. */
+    function myConversationIds(): Set<string> | null {
+      const entries = qc.getQueriesData({ queryKey: ["inbox-convos"] });
+      const ids = new Set<string>();
+      let found = false;
+      for (const [, data] of entries) {
+        if (!Array.isArray(data)) continue;
+        found = true;
+        for (const c of data as { id?: string }[]) if (c?.id) ids.add(c.id);
+      }
+      return found ? ids : null;
+    }
+
+    function mine(row: Record<string, unknown>) {
+      return row["founder_a_id"] === myFounderId || row["founder_b_id"] === myFounderId;
+    }
+
+    function onRequest(payload: { eventType: string; new?: unknown; old?: unknown }) {
+      const row = (payload.new ?? payload.old ?? {}) as Record<string, unknown>;
+      if (row["to_founder_id"] !== myFounderId && row["from_founder_id"] !== myFounderId) return;
+      qc.invalidateQueries({ queryKey: ["inbox-requests"] });
+      qc.invalidateQueries({ queryKey: ["inbox-sent"] });
+      if (payload.eventType === "INSERT" && row["to_founder_id"] === myFounderId) {
+        toast("New connection request", {
+          description: "Someone just reached out — open your Inbox.",
+        });
+      }
+      if (
+        payload.eventType === "UPDATE" &&
+        row["from_founder_id"] === myFounderId &&
+        row["status"] === "accepted"
+      ) {
+        toast.success("Request accepted", { description: "Chat unlocked in Talking." });
+      }
+    }
+
     const channel = supabase
       .channel(`live-inbox-${myFounderId}`)
       .on(
         "postgres_changes",
         { event: "*", schema: "public", table: "connection_requests" },
-        (payload) => {
-          qc.invalidateQueries({ queryKey: ["inbox-requests"] });
-          qc.invalidateQueries({ queryKey: ["inbox-sent"] });
-          const row = (payload.new ?? {}) as Record<string, unknown>;
-          if (payload.eventType === "INSERT" && row["to_founder_id"] === myFounderId) {
-            toast("New connection request", {
-              description: "Someone just reached out — open your Inbox.",
-            });
-          }
-          if (
-            payload.eventType === "UPDATE" &&
-            row["from_founder_id"] === myFounderId &&
-            row["status"] === "accepted"
-          ) {
-            toast.success("Request accepted", { description: "Chat unlocked in Talking." });
-          }
-        },
+        (payload) => onRequest(payload as never),
       )
       .on(
         "postgres_changes",
         { event: "*", schema: "public", table: "conversations" },
-        () => {
+        (payload) => {
+          const row = (payload.new ?? payload.old ?? {}) as Record<string, unknown>;
+          if (!mine(row)) return;
           qc.invalidateQueries({ queryKey: ["inbox-convos"] });
           qc.invalidateQueries({ queryKey: ["connected-ids"] });
         },
@@ -72,6 +96,8 @@ export function useLiveInbox() {
         (payload) => {
           const row = (payload.new ?? {}) as Record<string, unknown>;
           const conversationId = String(row["conversation_id"] ?? "");
+          const known = myConversationIds();
+          if (known && conversationId && !known.has(conversationId)) return;
           const fromMe =
             (myUserId && row["sender_id"] === myUserId) ||
             row["seed_sender_founder_id"] === myFounderId;
@@ -93,3 +119,4 @@ export function useLiveInbox() {
     };
   }, [myFounderId, myUserId, qc]);
 }
+

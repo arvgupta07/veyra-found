@@ -47,10 +47,12 @@ function Forum() {
       let q = supabase.from("forum_posts")
         .select("*, author:founders!forum_posts_author_id_fkey(*, profiles(full_name)), my_vote:forum_upvotes(value, founder_id)")
         .order("created_at", { ascending: false }).limit(50);
+      // Only my own vote row is needed per post — pulling every voter made the
+      // feed slower with each new upvote in the whole forum.
+      if (me?.id) q = q.eq("my_vote.founder_id", me.id);
       // Cross-posted categories widen a post's reach across domains.
       if (cat !== "all") q = q.or(`category.eq.${cat},cross_categories.cs.{${cat}}`);
       const { data } = await q;
-      // Reduce my_vote array (all voters) to just this user's vote for quick lookup.
       const rows = (data ?? []).map((p: any) => ({
         ...p,
         my_value: (p.my_vote ?? []).find((v: any) => v.founder_id === me?.id)?.value ?? 0,
@@ -58,6 +60,7 @@ function Forum() {
       // Hide shadow-banned spammers from everyone but themselves.
       return visibleToViewer(rows, me?.id);
     },
+
   });
 
 
