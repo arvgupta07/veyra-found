@@ -7,6 +7,8 @@ import { useMyFounder } from "@/hooks/useMyFounder";
 import { AppShell } from "@/components/AppShell";
 import { useRequireAuth } from "@/hooks/useRequireAuth";
 import { founderAvatar } from "@/lib/founder-types";
+import { PostMedia } from "@/components/forum/PostMedia";
+import { PollBlock } from "@/components/forum/PollBlock";
 import {
   deleteForumPost, deleteForumComment, updateForumPost, updateForumComment,
   addForumCollaborator, removeForumCollaborator, visibleToViewer,
@@ -281,8 +283,14 @@ function PostView() {
           {(post as { edited_at?: string | null }).edited_at && (
             <div className="mt-2 text-[10px] font-black uppercase text-muted-text">Edited</div>
           )}
-          {post.image_url && (
-            <img src={post.image_url} alt="" className="mt-4 w-full rounded-xl border-2 border-ink object-cover" />
+          <PostMedia imageUrl={post.image_url} videoUrl={(post as { video_url?: string | null }).video_url} className="mt-4" />
+          {((post as { poll_options?: string[] | null }).poll_options ?? []).length >= 2 && (
+            <div className="mt-4">
+              <PollBlock postId={post.id}
+                question={(post as { poll_question?: string | null }).poll_question}
+                options={(post as { poll_options?: string[] | null }).poll_options ?? []}
+                founderId={me?.id} />
+            </div>
           )}
           <div className="mt-5 flex flex-wrap items-center gap-2">
             <div className="inline-flex items-stretch overflow-hidden rounded-lg border-2 border-ink bg-white shadow-brutal-sm">

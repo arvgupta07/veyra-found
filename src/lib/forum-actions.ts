@@ -3,6 +3,7 @@ import { supabase } from "@/integrations/supabase/client";
 /** Delete a post plus its dependent rows (comments, votes, saves). */
 export async function deleteForumPost(postId: string) {
   // Replies first (self-referencing FK), then top-level comments.
+  await supabase.from("forum_poll_votes").delete().eq("post_id", postId);
   const { data: kids } = await supabase.from("forum_comments")
     .select("id, parent_comment_id").eq("post_id", postId);
   const replyIds = (kids ?? []).filter((c) => c.parent_comment_id).map((c) => c.id);
