@@ -148,7 +148,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
             <button onClick={() => setConfirmSignOut(true)} className="border-2 border-nav-fg bg-orange px-2 py-1 text-[10px] font-black uppercase text-nav">Sign out</button>
           </div>
         </div>
-        <div className="grid grid-cols-5 gap-1 border-t-2 border-nav-fg/25 px-2 py-1.5">
+        <div className="grid grid-cols-4 gap-1 border-t-2 border-nav-fg/25 px-2 py-1.5">
           {nav.map((n) => {
             const active = !!n.to && (pathname === n.to || pathname.startsWith(n.to));
             const dot = dotFor(n.to);
