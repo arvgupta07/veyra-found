@@ -58,6 +58,23 @@ export function InvestorOnboarding({ fullName }: { fullName: string }) {
     isValidLinkedIn(f.linkedin_url) &&
     f.stages.length > 0;
 
+  function next() {
+    if (step === 1) {
+      if (!f.full_name.trim()) return toast.error("Your name is required.");
+      if (!f.fund_name.trim()) return toast.error("Tell us your firm, fund or angel name.");
+      if (!f.headline.trim()) return toast.error("Add a one-line headline.");
+      if (!f.location.trim()) return toast.error("Location is required.");
+      return setStep(2);
+    }
+    if (step === 2) {
+      if (f.bio.trim().length < 30) return toast.error("Add at least 30 characters about your investing.");
+      if (f.stages.length === 0) return toast.error("Pick at least one stage you invest at.");
+      return setStep(3);
+    }
+    void save();
+  }
+
+
   async function save() {
     if (!session) return;
     if (!valid) {
