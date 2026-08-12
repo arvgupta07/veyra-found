@@ -14,7 +14,7 @@ import { InvestorOnboarding } from "@/components/onboarding/InvestorOnboarding";
 import { TalentOnboarding } from "@/components/onboarding/TalentOnboarding";
 
 export const Route = createFileRoute("/onboarding")({
-  component: Onboarding,
+  component: OnboardingRouter,
   head: () => ({
     meta: [
       { title: "Build Your Founder Profile — Veyra Found" },
