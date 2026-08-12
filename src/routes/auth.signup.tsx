@@ -18,7 +18,13 @@ export const Route = createFileRoute("/auth/signup")({
 });
 
 function Signup() {
+  const router = useRouter();
+  useEffect(() => {
+    if (!getPendingAccountType()) router.navigate({ to: "/auth/role" });
+  }, [router]);
+
   return (
+
     <AuthScreen
       mode="signup"
       title="Join Veyra Found"
