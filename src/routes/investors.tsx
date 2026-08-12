@@ -1,4 +1,4 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, useRouter } from "@tanstack/react-router";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useMemo, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
@@ -12,6 +12,8 @@ import {
 import { Banknote, Building2, Globe, Linkedin, Loader2, MapPin, Send, Save, Sparkles } from "lucide-react";
 import { toast } from "sonner";
 import { LocationInput } from "@/components/LocationInput";
+import { useAccountType } from "@/hooks/useAccountType";
+import { useEffect } from "react";
 
 export const Route = createFileRoute("/investors")({
   component: InvestorsPage,
@@ -54,6 +56,16 @@ type Investor = {
 function InvestorsPage() {
   const { ready } = useRequireAuth({ requireOnboarded: true });
   const { user } = useSession();
+  const router = useRouter();
+  const { accountType, loaded } = useAccountType();
+
+  // Talent / interns don't get access to the investor directory.
+  useEffect(() => {
+    if (loaded && accountType === "talent") {
+      toast.error("The investor directory is for founders and investors.");
+      router.navigate({ to: "/discover" });
+    }
+  }, [loaded, accountType, router]);
   const qc = useQueryClient();
   const [tab, setTab] = useState<Tab>("browse");
   const [stage, setStage] = useState<string>("all");
