@@ -75,6 +75,7 @@ function FounderProfile() {
   const { data: me } = useMyFounder();
   const qc = useQueryClient();
   const [connectOpen, setConnectOpen] = useState(false);
+  const [removing, setRemoving] = useState(false);
 
   useEffect(() => {
     if (typeof window !== "undefined" && window.location.hash === "#connect") setConnectOpen(true);
