@@ -4,6 +4,8 @@ import { useEffect, useState } from "react";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { useMyFounder, useMyProfile } from "@/hooks/useMyFounder";
+import { useAccountType } from "@/hooks/useAccountType";
+import { isJobSeeker } from "@/lib/account-types";
 import { AppShell } from "@/components/AppShell";
 import { useRequireAuth } from "@/hooks/useRequireAuth";
 import { SkillTag, TierBadge, VerifiedBadges } from "@/components/FounderBits";
