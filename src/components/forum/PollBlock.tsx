@@ -70,7 +70,7 @@ export function PollBlock({
       {question && <div className="mt-1 text-sm font-black text-ink">{question}</div>}
       <div className="mt-3 space-y-2">
         {options.map((opt, i) => {
-          const count = votes.filter((v) => v.option_index === i).length;
+          const count = counts[i] ?? 0;
           const pct = total ? Math.round((count / total) * 100) : 0;
           const picked = mine === i;
           return (
