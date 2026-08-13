@@ -426,7 +426,7 @@ function Inbox() {
               </div>
             );
           })}
-          {tab === "sent" && (sent?.length ?? 0) === 0 && <Empty label="No requests sent yet." />}
+          {tab === "sent" && shownSent.length === 0 && <Empty label="No requests sent yet." />}
 
           {tab === "talking" && filteredConvos.map((c) => {
             const other = c.founder_a_id === me!.id ? c.b : c.a;
