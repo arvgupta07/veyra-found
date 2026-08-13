@@ -10,6 +10,7 @@ import { useSession } from "@/hooks/useSession";
 import { useDarkMode } from "@/hooks/useDarkMode";
 import { useLiveInbox, useUnreadConversations } from "@/hooks/useLiveInbox";
 import { getSeenSnapshot, isStale, markSeen, subscribeSeen } from "@/lib/nav-activity";
+import { useNewConnectionsAlert, usePendingRequestsAlert, useRolesAlert } from "@/hooks/useNavAlerts";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { VeyraMark } from "@/components/VeyraLogo";
@@ -62,14 +63,26 @@ export function AppShell({ children }: { children: React.ReactNode }) {
     !myFounder.linkedin_url
   );
   const forumStale = isStale("forum", seen);
+  const talentStale = isStale("talent", seen);
+  const investorsStale = isStale("investors", seen);
+  const { data: roleAlerts = 0 } = useRolesAlert();
+  const { data: newConnections = 0 } = useNewConnectionsAlert(myFounder?.id);
+  const { data: pendingRequests = 0 } = usePendingRequestsAlert(myFounder?.id);
 
   useEffect(() => {
     if (pathname.startsWith("/forum")) markSeen("forum");
     if (pathname.startsWith("/matches")) markSeen("matches");
+    if (pathname.startsWith("/roles")) markSeen("roles");
+    if (pathname.startsWith("/talent")) markSeen("talent");
+    if (pathname.startsWith("/investors")) markSeen("investors");
+    if (pathname.startsWith("/inbox")) markSeen("inbox");
   }, [pathname]);
 
   function dotFor(to?: string) {
-    if (to === "/inbox") return hasUnread;
+    if (to === "/inbox") return hasUnread || newConnections > 0 || pendingRequests > 0;
+    if (to === "/roles") return roleAlerts > 0;
+    if (to === "/talent") return talentStale;
+    if (to === "/investors") return investorsStale;
     if (to === "/forum") return forumStale;
     if (to === "/profile/me") return profileIncomplete;
     return false;
