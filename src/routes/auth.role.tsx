@@ -4,7 +4,7 @@ import { toast } from "sonner";
 import { Landmark, Rocket, GraduationCap, Briefcase, ArrowRight, Loader2 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { VeyraMark } from "@/components/VeyraLogo";
-import { ACCOUNT_TYPES, setPendingAccountType, clearPendingAccountType, accountLabel, type AccountType } from "@/lib/account-types";
+import { PICKER_TYPES, setPendingAccountType, clearPendingAccountType, accountLabel, type AccountType } from "@/lib/account-types";
 
 export const Route = createFileRoute("/auth/role")({
   component: RolePicker,
@@ -95,8 +95,8 @@ function RolePicker() {
             This shapes your onboarding and what you see. You can't switch later without asking us, so pick the one that fits.
           </p>
 
-          <div className="mt-8 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-            {ACCOUNT_TYPES.map((a) => {
+          <div className="mt-8 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+            {PICKER_TYPES.map((a) => {
               const Icon = ICONS[a.value];
               return (
                 <button

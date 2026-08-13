@@ -38,12 +38,18 @@ export const ACCOUNT_TYPES: {
   },
   {
     value: "talent",
-    label: "Talent",
-    blurb: "I want a job at an early startup",
+    label: "Talent / Intern",
+    blurb: "I want a job or an internship at an early startup",
     detail: "3-step profile with a mandatory CV. Browse founders and open roles, apply with a note.",
     badge: "bg-orange text-white",
   },
 ];
+
+/**
+ * Cards shown on the pre-sign-in picker. Interns and talent share one card —
+ * the internship-vs-job question is asked inside their onboarding instead.
+ */
+export const PICKER_TYPES = ACCOUNT_TYPES.filter((a) => a.value !== "intern");
 
 const BY_VALUE = new Map(ACCOUNT_TYPES.map((a) => [a.value, a]));
 
