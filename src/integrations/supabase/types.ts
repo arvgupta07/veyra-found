@@ -1411,6 +1411,13 @@ export type Database = {
         Args: { _other_founder_id: string }
         Returns: undefined
       }
+      forum_poll_tallies: {
+        Args: { _post_id: string }
+        Returns: {
+          option_index: number
+          votes: number
+        }[]
+      }
       has_role: {
         Args: {
           _role: Database["public"]["Enums"]["app_role"]
