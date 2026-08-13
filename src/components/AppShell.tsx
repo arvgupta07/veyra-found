@@ -116,7 +116,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
           {nav.map((n) => {
             const active = !!n.to && (pathname === n.to || pathname.startsWith(n.to));
             const dot = dotFor(n.to);
-            const count = n.to === "/inbox" ? unread.length : 0;
+            const count = n.to === "/inbox" ? unread.length + pendingRequests : 0;
             return (
               <NavCell key={n.label} item={n} className={`flex w-full items-center justify-between gap-3 rounded-lg px-4 py-3 text-sm font-black uppercase tracking-wide transition ${active ? "bg-orange text-nav shadow-brutal-sm" : "text-nav-fg/75 hover:bg-nav-fg/10 hover:text-nav-fg"}`}>
                 <span className="flex items-center gap-3">
@@ -170,7 +170,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
           {nav.map((n) => {
             const active = !!n.to && (pathname === n.to || pathname.startsWith(n.to));
             const dot = dotFor(n.to);
-            const count = n.to === "/inbox" ? unread.length : 0;
+            const count = n.to === "/inbox" ? unread.length + pendingRequests : 0;
             return (
               <NavCell key={n.label} item={n}
                 className={`flex items-center justify-center gap-1 border-2 px-1 py-1.5 text-[10px] font-black uppercase tracking-wider ${active ? "border-nav-fg bg-orange text-nav" : "border-nav-fg/40 text-nav-fg/80"}`}>
@@ -197,7 +197,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
         {nav.slice(0, 5).map((n) => {
           const active = !!n.to && (pathname === n.to || pathname.startsWith(n.to));
           const dot = dotFor(n.to);
-            const count = n.to === "/inbox" ? unread.length : 0;
+            const count = n.to === "/inbox" ? unread.length + pendingRequests : 0;
           return (
             <NavCell key={n.label} item={n} className={`relative flex flex-1 flex-col items-center gap-1 py-2 text-[10px] ${active ? "text-indigo" : "text-muted-text"}`}>
               <span className="relative">

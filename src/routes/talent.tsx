@@ -3,14 +3,16 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useMemo, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { useSession } from "@/hooks/useSession";
-import { useMyProfile } from "@/hooks/useMyFounder";
+import { useMyFounder, useMyProfile } from "@/hooks/useMyFounder";
 import { useRequireAuth } from "@/hooks/useRequireAuth";
 import { AppShell } from "@/components/AppShell";
 import { Card, Chip, Empty, Field, PageHeader, Pill, TabBar, inputCls } from "@/components/MarketBits";
 import {
   REMOTE_PREFS, TALENT_SKILLS, WORK_TYPES, initialsAvatar, labelOf, normalizeUrl, toggleIn,
 } from "@/lib/marketplace";
-import { GraduationCap, Loader2, MapPin, Save } from "lucide-react";
+import { GraduationCap, Loader2, MapPin, Save, Send, User, X } from "lucide-react";
+import { Link } from "@tanstack/react-router";
+import { sendConnectionRequest } from "@/lib/connect-requests";
 import { toast } from "sonner";
 import { LocationInput } from "@/components/LocationInput";
 
@@ -57,6 +59,8 @@ function TalentPage() {
   const { ready } = useRequireAuth({ requireOnboarded: true });
   const { user } = useSession();
   const { data: profile } = useMyProfile();
+  const { data: meFounder } = useMyFounder();
+  const [noteTo, setNoteTo] = useState<{ founderId: string; name: string } | null>(null);
   const qc = useQueryClient();
   const [tab, setTab] = useState<Tab>("browse");
   const [work, setWork] = useState("all");
@@ -73,6 +77,23 @@ function TalentPage() {
       return (data ?? []) as unknown as Talent[];
     },
   });
+
+  // Member rows for talent/intern accounts, so their profiles are openable and
+  // they can send each other a note.
+  const { data: founderRows } = useQuery({
+    queryKey: ["talent-member-rows"],
+    enabled: !!user,
+    queryFn: async () => {
+      const { data } = await supabase.from("founders").select("id, user_id")
+        .in("account_type", ["talent", "intern"]).limit(500);
+      return data ?? [];
+    },
+  });
+  const founderIdByUser = useMemo(() => {
+    const m = new Map<string, string>();
+    (founderRows ?? []).forEach((r) => { if (r.user_id) m.set(r.user_id, r.id); });
+    return m;
+  }, [founderRows]);
 
   const mine = useMemo(() => (people ?? []).find((p) => p.user_id === user?.id) ?? null, [people, user?.id]);
 
@@ -124,7 +145,12 @@ function TalentPage() {
 
             {list.length === 0 && <Empty>No one matches this filter yet.</Empty>}
             <div className="mt-5 grid gap-3">
-              {list.map((p) => <TalentCard key={p.id} p={p} isMe={p.user_id === user?.id} />)}
+              {list.map((p) => (
+                <TalentCard key={p.id} p={p} isMe={p.user_id === user?.id}
+                  founderId={founderIdByUser.get(p.user_id) ?? null}
+                  canConnect={!!meFounder?.id}
+                  onConnect={(fid) => setNoteTo({ founderId: fid, name: p.full_name || "them" })} />
+              ))}
             </div>
           </>
         )}
@@ -134,11 +160,56 @@ function TalentPage() {
             onSaved={() => qc.invalidateQueries({ queryKey: ["talent"] })} />
         )}
       </div>
+      {noteTo && meFounder?.id && (
+        <NoteModal toFounderId={noteTo.founderId} name={noteTo.name} fromFounderId={meFounder.id}
+          onClose={() => setNoteTo(null)} />
+      )}
     </AppShell>
   );
 }
 
-function TalentCard({ p, isMe }: { p: Talent; isMe: boolean }) {
+function NoteModal({ toFounderId, fromFounderId, name, onClose }: {
+  toFounderId: string; fromFounderId: string; name: string; onClose: () => void;
+}) {
+  const [message, setMessage] = useState("");
+  const [sending, setSending] = useState(false);
+  async function send() {
+    if (message.trim().length < 20) return toast.error("Add a bit more context (20+ chars).");
+    setSending(true);
+    const { error } = await sendConnectionRequest({
+      fromFounderId, toFounderId, promptQuestion: "Direct note", message: message.trim(),
+    });
+    setSending(false);
+    if (error) return toast.error(error);
+    toast.success(`Note sent to ${name}!`);
+    onClose();
+  }
+  return (
+    <div className="fixed inset-0 z-40 grid place-items-center bg-ink/70 p-4" onClick={onClose}>
+      <div onClick={(e) => e.stopPropagation()} className="w-full max-w-lg border-[3px] border-ink bg-white p-6 shadow-brutal-lg soft-corners">
+        <div className="flex items-start justify-between">
+          <div>
+            <div className="text-[10px] font-black uppercase tracking-[0.2em] text-orange">Send a note</div>
+            <div className="mt-1 text-2xl font-black tracking-tight">Reach out to {name}</div>
+          </div>
+          <button onClick={onClose} aria-label="Close" className="grid h-8 w-8 place-items-center border-2 border-ink bg-cream box-hover"><X className="h-4 w-4" /></button>
+        </div>
+        <textarea rows={5} maxLength={300} value={message} onChange={(e) => setMessage(e.target.value)}
+          placeholder="What you'd like to work on together, and why them."
+          className="mt-4 w-full border-2 border-ink bg-white px-3 py-2 text-sm outline-none soft-corners focus:shadow-brutal-sm" />
+        <div className="mt-1 text-right text-[10px] font-bold text-muted-text">{message.length}/300</div>
+        <button onClick={send} disabled={sending}
+          className="mt-3 inline-flex w-full items-center justify-center gap-2 border-2 border-ink bg-orange px-4 py-2.5 text-sm font-black uppercase tracking-wider text-white shadow-brutal-sm box-hover soft-corners disabled:opacity-60">
+          {sending ? <Loader2 className="h-4 w-4 animate-spin" /> : <Send className="h-4 w-4" />} Send note
+        </button>
+      </div>
+    </div>
+  );
+}
+
+function TalentCard({ p, isMe, founderId, canConnect, onConnect }: {
+  p: Talent; isMe: boolean; founderId?: string | null; canConnect?: boolean; onConnect?: (founderId: string) => void;
+}) {
   const name = p.full_name || "Candidate";
   return (
     <Card>
@@ -168,6 +239,18 @@ function TalentCard({ p, isMe }: { p: Talent; isMe: boolean }) {
             {p.linkedin_url && <a className="border-2 border-ink bg-white px-3 py-1.5 text-xs font-black soft-corners box-hover" href={normalizeUrl(p.linkedin_url)!} target="_blank" rel="noreferrer">LinkedIn</a>}
             {p.portfolio_url && <a className="border-2 border-ink bg-white px-3 py-1.5 text-xs font-black soft-corners box-hover" href={normalizeUrl(p.portfolio_url)!} target="_blank" rel="noreferrer">Portfolio</a>}
             {p.resume_url && <a className="border-2 border-ink bg-white px-3 py-1.5 text-xs font-black soft-corners box-hover" href={normalizeUrl(p.resume_url)!} target="_blank" rel="noreferrer">Resume</a>}
+            {founderId && (
+              <Link to="/profile/$founderId" params={{ founderId }}
+                className="inline-flex items-center gap-1 border-2 border-ink bg-cream px-3 py-1.5 text-xs font-black soft-corners box-hover">
+                <User className="h-3.5 w-3.5" /> View profile
+              </Link>
+            )}
+            {founderId && !isMe && canConnect && (
+              <button onClick={() => onConnect?.(founderId)}
+                className="inline-flex items-center gap-1 border-2 border-ink bg-orange px-3 py-1.5 text-xs font-black text-white soft-corners shadow-brutal-sm box-hover">
+                <Send className="h-3.5 w-3.5" /> Send note
+              </button>
+            )}
           </div>
         </div>
       </div>
