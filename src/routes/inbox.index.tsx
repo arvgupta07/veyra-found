@@ -52,6 +52,8 @@ function Inbox() {
   const qc = useQueryClient();
   const [tab, setTab] = useState<"requests" | "sent" | "talking">("requests");
   const [labelFilter, setLabelFilter] = useState<string | null>(null);
+  // Requests come from every kind of member — founders can narrow the list down.
+  const [roleFilter, setRoleFilter] = useState<"all" | "founder" | "investor" | "talent">("all");
   const unread = useUnreadConversations();
 
 
@@ -226,6 +228,14 @@ function Inbox() {
 
   if (!ready) return null;
 
+  function matchesRole(t?: string | null) {
+    if (roleFilter === "all") return true;
+    if (roleFilter === "talent") return t === "talent" || t === "intern";
+    return (t ?? "founder") === roleFilter;
+  }
+  const shownRequests = (requests ?? []).filter((r: any) => matchesRole(r.founder?.account_type));
+  const shownSent = (sent ?? []).filter((r: any) => matchesRole(r.founder?.account_type));
+
   const filteredConvos = (conversations ?? []).filter((c) => {
     if (!labelFilter) return true;
     const labels = labelsByConv.get(c.id) ?? [];
@@ -270,6 +280,26 @@ function Inbox() {
         </div>
 
 
+        {tab !== "talking" && (
+          <div className="mt-4 flex flex-wrap items-center gap-2">
+            <div className="text-[10px] font-black uppercase text-muted-text">Who:</div>
+            {([
+              { v: "all", label: "Everyone" },
+              { v: "founder", label: "Founders" },
+              { v: "investor", label: "Investors" },
+              { v: "talent", label: "Talent & interns" },
+            ] as const).map((o) => {
+              const on = roleFilter === o.v;
+              return (
+                <button key={o.v} onClick={() => setRoleFilter(o.v)}
+                  className={`rounded-md border-2 border-ink px-2 py-0.5 text-[11px] font-black transition ${on ? "bg-ink text-white shadow-brutal-sm -translate-y-0.5" : "bg-white opacity-80 hover:opacity-100"}`}>
+                  {o.label}
+                </button>
+              );
+            })}
+          </div>
+        )}
+
         {tab === "talking" && (
           <div className="mt-4 flex flex-wrap items-center gap-2">
             <div className="text-[10px] font-black uppercase text-muted-text"><Tag className="inline h-3 w-3" /> Filter:</div>
@@ -295,7 +325,7 @@ function Inbox() {
 
 
         <div className="mt-6 space-y-3">
-          {tab === "requests" && requests?.map((r) => (
+          {tab === "requests" && shownRequests.map((r: any) => (
             <div key={r.id} className="rounded-2xl border-2 border-ink bg-white p-5 shadow-brutal-sm">
               <div className="flex items-start gap-4">
                 <Link to="/profile/$founderId" params={{ founderId: r.from_founder_id }}>
@@ -329,9 +359,9 @@ function Inbox() {
               </div>
             </div>
           ))}
-          {tab === "requests" && (requests?.length ?? 0) === 0 && <Empty label="No pending requests." />}
+          {tab === "requests" && shownRequests.length === 0 && <Empty label="No pending requests." />}
 
-          {tab === "sent" && sent?.map((r) => {
+          {tab === "sent" && shownSent.map((r: any) => {
             const badgeStyle: Record<string, string> = {
               pending:  "bg-cream text-ink border-ink",
               accepted: "bg-sage text-ink border-ink",
