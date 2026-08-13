@@ -109,7 +109,6 @@ function RolePicker() {
                   </span>
                   <span className="text-lg font-black uppercase">{a.label}</span>
                   <span className="text-sm font-bold text-ink/80">{a.blurb}</span>
-                  <span className="text-xs font-bold text-muted-text">{a.detail}</span>
                   <span className="mt-auto flex items-center gap-1 pt-2 text-xs font-black uppercase">
                     Continue <ArrowRight className="h-3.5 w-3.5 transition group-hover:translate-x-1" />
                   </span>
