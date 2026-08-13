@@ -7,7 +7,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { useSession } from "@/hooks/useSession";
 import { LocationInput } from "@/components/LocationInput";
 import { Chip, Field, inputCls } from "@/components/MarketBits";
-import { REMOTE_PREFS, TALENT_SKILLS, WORK_TYPES, normalizeUrl, toggleIn } from "@/lib/marketplace";
+import { EXPERIENCE_BUCKETS, REMOTE_PREFS, TALENT_SKILLS, WORK_TYPES, normalizeUrl, toggleIn } from "@/lib/marketplace";
 import { clearPendingAccountType } from "@/lib/account-types";
 import { uploadDocument } from "@/lib/uploads";
 import { OnboardShell, StepBar, isValidLinkedIn } from "./OnboardShell";
@@ -26,6 +26,7 @@ export function TalentOnboarding({ fullName, kind }: { fullName: string; kind: "
   const [step, setStep] = useState(1);
   const [saving, setSaving] = useState(false);
   const [uploading, setUploading] = useState(false);
+  const [customSkill, setCustomSkill] = useState("");
   const [f, setF] = useState({
     full_name: fullName,
     headline: "",
@@ -80,6 +81,19 @@ export function TalentOnboarding({ fullName, kind }: { fullName: string; kind: "
     void save();
   }
 
+  /** Interns and talent share one sign-up — the answer below decides which they are. */
+  function derivedType() {
+    return f.work_type === "internship" ? "intern" : "talent";
+  }
+
+  function addCustomSkill() {
+    const v = customSkill.trim();
+    if (!v) return;
+    if (f.skills.some((s) => s.toLowerCase() === v.toLowerCase())) return setCustomSkill("");
+    setF((x) => ({ ...x, skills: [...x.skills, v] }));
+    setCustomSkill("");
+  }
+
   async function save() {
     if (!session) return;
     if (!step3Valid) {
@@ -89,12 +103,15 @@ export function TalentOnboarding({ fullName, kind }: { fullName: string; kind: "
     setSaving(true);
     const uid = session.user.id;
 
-    await supabase.from("profiles").update({ full_name: f.full_name, account_type: kind }).eq("id", uid);
+    const type = derivedType();
+    const { error: pErr } = await supabase.from("profiles")
+      .update({ full_name: f.full_name, account_type: type }).eq("id", uid);
+    if (pErr) { setSaving(false); return toast.error(pErr.message); }
 
     const { data: existingFounder } = await supabase.from("founders").select("id").eq("user_id", uid).maybeSingle();
     const memberRow = {
       user_id: uid,
-      account_type: kind,
+      account_type: type,
       headline: f.headline,
       bio: f.bio,
       location: f.location,
@@ -104,8 +121,10 @@ export function TalentOnboarding({ fullName, kind }: { fullName: string; kind: "
       profile_complete: true,
       looking_for: [] as string[],
     };
-    if (existingFounder) await supabase.from("founders").update(memberRow).eq("id", existingFounder.id);
-    else await supabase.from("founders").insert(memberRow);
+    const { error: mErr } = existingFounder
+      ? await supabase.from("founders").update(memberRow).eq("id", existingFounder.id)
+      : await supabase.from("founders").insert(memberRow);
+    if (mErr) { setSaving(false); return toast.error(mErr.message); }
 
     const { data: mine } = await supabase.from("talent_profiles").select("id").eq("user_id", uid).maybeSingle();
     const row = {
@@ -169,13 +188,16 @@ export function TalentOnboarding({ fullName, kind }: { fullName: string; kind: "
           <>
             <div className="grid gap-3 sm:grid-cols-2">
               <Field label="Role you want *"><input className={inputCls} value={f.desired_role} onChange={(e) => setF({ ...f, desired_role: e.target.value })} placeholder={isIntern ? "Frontend engineering intern" : "Senior frontend engineer"} /></Field>
-              <Field label="Years of experience">
-                <input type="number" min={0} max={40} className={inputCls} value={f.experience_years}
-                  onChange={(e) => setF({ ...f, experience_years: Math.max(0, Math.min(40, Number(e.target.value) || 0)) })} />
+              <Field label="Experience">
+                <div className="mt-1 flex flex-wrap gap-2">
+                  {EXPERIENCE_BUCKETS.map((b) => (
+                    <Chip key={b.v} active={f.experience_years === b.v} onClick={() => setF({ ...f, experience_years: b.v })}>{b.label}</Chip>
+                  ))}
+                </div>
               </Field>
             </div>
 
-            <Field label="Looking for *">
+            <Field label="Are you here for a job or an internship? *">
               <div className="flex flex-wrap gap-2">
                 {WORK_TYPES.map((t) => (
                   <Chip key={t.v} active={f.work_type === t.v} onClick={() => setF({ ...f, work_type: t.v })}>{t.label}</Chip>
@@ -193,9 +215,16 @@ export function TalentOnboarding({ fullName, kind }: { fullName: string; kind: "
 
             <Field label="Skills *">
               <div className="flex flex-wrap gap-2">
-                {TALENT_SKILLS.map((s) => (
+                {[...TALENT_SKILLS, ...f.skills.filter((s) => !TALENT_SKILLS.includes(s as never))].map((s) => (
                   <Chip key={s} active={f.skills.includes(s)} onClick={() => setF({ ...f, skills: toggleIn(f.skills, s) })}>{s}</Chip>
                 ))}
+              </div>
+              <div className="mt-2 flex gap-2">
+                <input className={inputCls} value={customSkill} placeholder="Add your own skill"
+                  onChange={(e) => setCustomSkill(e.target.value)}
+                  onKeyDown={(e) => { if (e.key === "Enter") { e.preventDefault(); addCustomSkill(); } }} />
+                <button type="button" onClick={addCustomSkill}
+                  className="mt-1 shrink-0 border-[3px] border-ink bg-ink px-4 text-xs font-black uppercase text-white shadow-brutal-sm box-hover">Add</button>
               </div>
             </Field>
 
