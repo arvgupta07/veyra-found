@@ -8,7 +8,7 @@ import { useRequireAuth } from "@/hooks/useRequireAuth";
 import { AppShell } from "@/components/AppShell";
 import { Card, Chip, Empty, Field, PageHeader, Pill, TabBar, inputCls } from "@/components/MarketBits";
 import {
-  REMOTE_PREFS, TALENT_SKILLS, WORK_TYPES, initialsAvatar, labelOf, normalizeUrl, toggleIn,
+  EXPERIENCE_BUCKETS, REMOTE_PREFS, TALENT_SKILLS, WORK_TYPES, initialsAvatar, labelOf, normalizeUrl, toggleIn,
 } from "@/lib/marketplace";
 import { GraduationCap, Loader2, MapPin, Save, Send, User, X } from "lucide-react";
 import { Link } from "@tanstack/react-router";
@@ -279,6 +279,14 @@ function TalentForm({ mine, userId, defaultName, onSaved }: {
     skills: mine?.skills ?? [],
   }));
 
+  const [extraSkill, setExtraSkill] = useState("");
+  function addExtraSkill() {
+    const v = extraSkill.trim();
+    if (!v) return;
+    if (!f.skills.some((s) => s.toLowerCase() === v.toLowerCase())) setF((x) => ({ ...x, skills: [...x.skills, v] }));
+    setExtraSkill("");
+  }
+
   const save = useMutation({
     mutationFn: async () => {
       if (!userId) throw new Error("Sign in first");
@@ -348,7 +356,11 @@ function TalentForm({ mine, userId, defaultName, onSaved }: {
             </select>
           </Field>
           <Field label="Desired role"><input className={inputCls} value={f.desired_role} onChange={(e) => setF({ ...f, desired_role: e.target.value })} placeholder="Frontend intern / growth associate" /></Field>
-          <Field label="Years of experience"><input type="number" min={0} className={inputCls} value={f.experience_years} onChange={(e) => setF({ ...f, experience_years: e.target.value })} /></Field>
+          <Field label="Experience">
+            <select className={inputCls} value={f.experience_years} onChange={(e) => setF({ ...f, experience_years: e.target.value })}>
+              {EXPERIENCE_BUCKETS.map((b) => <option key={b.v} value={String(b.v)}>{b.label}</option>)}
+            </select>
+          </Field>
           <Field label="When can you start"><input className={inputCls} value={f.availability} onChange={(e) => setF({ ...f, availability: e.target.value })} placeholder="Immediately / from June" /></Field>
           <label className="mt-6 flex items-center gap-2 text-sm font-bold">
             <input type="checkbox" checked={f.open_to_equity} onChange={(e) => setF({ ...f, open_to_equity: e.target.checked })} className="h-4 w-4 border-2 border-ink" />
@@ -358,9 +370,16 @@ function TalentForm({ mine, userId, defaultName, onSaved }: {
         <div className="mt-4">
           <span className="text-[11px] font-black uppercase tracking-wider text-muted-text">Skills</span>
           <div className="mt-2 flex flex-wrap gap-2">
-            {TALENT_SKILLS.map((s) => (
+            {[...TALENT_SKILLS, ...f.skills.filter((s) => !TALENT_SKILLS.includes(s as never))].map((s) => (
               <Chip key={s} active={f.skills.includes(s)} onClick={() => setF({ ...f, skills: toggleIn(f.skills, s) })}>{s}</Chip>
             ))}
+          </div>
+          <div className="mt-2 flex gap-2">
+            <input className={inputCls} value={extraSkill} placeholder="Add your own skill"
+              onChange={(e) => setExtraSkill(e.target.value)}
+              onKeyDown={(e) => { if (e.key === "Enter") { e.preventDefault(); addExtraSkill(); } }} />
+            <button type="button" onClick={addExtraSkill}
+              className="mt-1 shrink-0 border-2 border-ink bg-ink px-4 text-xs font-black uppercase text-white shadow-brutal-sm box-hover soft-corners">Add</button>
           </div>
         </div>
       </Card>
