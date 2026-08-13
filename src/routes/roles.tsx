@@ -310,7 +310,7 @@ function RoleComposer({ userId, founderId, onClose, onSaved }: { userId?: string
         <Field label="Role title"><input className={inputCls} value={f.title} onChange={(e) => setF({ ...f, title: e.target.value })} placeholder="Founding frontend engineer" /></Field>
         <Field label="Startup name"><input className={inputCls} value={f.company_name} onChange={(e) => setF({ ...f, company_name: e.target.value })} placeholder="Veyra" /></Field>
         <div className="md:col-span-2">
-          <Field label="What they'll do">
+          <Field label="Job description — what they'll do">
             <textarea rows={5} className={inputCls} value={f.description} onChange={(e) => setF({ ...f, description: e.target.value })}
               placeholder="The problem, the first 90 days, who you want, how you work." />
           </Field>

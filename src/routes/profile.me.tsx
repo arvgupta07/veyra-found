@@ -4,6 +4,8 @@ import { useEffect, useState } from "react";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { useMyFounder, useMyProfile } from "@/hooks/useMyFounder";
+import { useAccountType } from "@/hooks/useAccountType";
+import { isJobSeeker } from "@/lib/account-types";
 import { AppShell } from "@/components/AppShell";
 import { useRequireAuth } from "@/hooks/useRequireAuth";
 import { SkillTag, TierBadge, VerifiedBadges } from "@/components/FounderBits";
@@ -338,6 +340,9 @@ function EditPanel({ initial, founderId, userId, onClose, onSaved }: {
   onSaved: () => void;
 }) {
   const [form, setForm] = useState<EditForm>(initial);
+  const { accountType } = useAccountType();
+  // Interns and talent aren't looking for a co-founder, so those pickers are hidden.
+  const jobSeeker = isJobSeeker(accountType);
   const [custom, setCustom] = useState("");
   const [saving, setSaving] = useState(false);
   const [uploading, setUploading] = useState(false);
@@ -617,6 +622,7 @@ function EditPanel({ initial, founderId, userId, onClose, onSaved }: {
                 </div>
               </Section>
 
+              {!jobSeeker && (
               <div className="grid gap-5 md:grid-cols-2">
                 <Section title="Industry focus" icon={BarChart3}>
                   <div className="flex flex-wrap gap-2">
@@ -636,6 +642,7 @@ function EditPanel({ initial, founderId, userId, onClose, onSaved }: {
                   </div>
                 </Section>
               </div>
+              )}
             </div>
           </div>
         </div>

@@ -7,7 +7,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { useSession } from "@/hooks/useSession";
 import { LocationInput } from "@/components/LocationInput";
 import { Chip, Field, inputCls } from "@/components/MarketBits";
-import { INDUSTRIES, INVEST_STAGES, normalizeUrl, toggleIn } from "@/lib/marketplace";
+import { INDUSTRIES, INVEST_STAGES, INVESTED_BUCKETS, normalizeUrl, toggleIn } from "@/lib/marketplace";
 import { clearPendingAccountType } from "@/lib/account-types";
 import { OnboardShell, StepBar, isValidLinkedIn } from "./OnboardShell";
 
@@ -88,7 +88,9 @@ export function InvestorOnboarding({ fullName }: { fullName: string }) {
     setSaving(true);
     const uid = session.user.id;
 
-    await supabase.from("profiles").update({ full_name: f.full_name, account_type: "investor" }).eq("id", uid);
+    const { error: pErr } = await supabase.from("profiles")
+      .update({ full_name: f.full_name, account_type: "investor" }).eq("id", uid);
+    if (pErr) { setSaving(false); return toast.error(pErr.message); }
 
     // Lightweight member record so investors can message and request founders,
     // without showing up in the co-founder discovery feed.
@@ -103,8 +105,10 @@ export function InvestorOnboarding({ fullName }: { fullName: string }) {
       profile_complete: true,
       looking_for: [] as string[],
     };
-    if (existingFounder) await supabase.from("founders").update(memberRow).eq("id", existingFounder.id);
-    else await supabase.from("founders").insert(memberRow);
+    const { error: mErr } = existingFounder
+      ? await supabase.from("founders").update(memberRow).eq("id", existingFounder.id)
+      : await supabase.from("founders").insert(memberRow);
+    if (mErr) { setSaving(false); return toast.error(mErr.message); }
 
     const { data: mine } = await supabase.from("investor_profiles").select("id").eq("user_id", uid).maybeSingle();
     const row = {
@@ -203,8 +207,11 @@ export function InvestorOnboarding({ fullName }: { fullName: string }) {
         {step === 3 && (
           <>
             <Field label="Companies invested in">
-              <input type="number" min={0} max={999} className={inputCls} value={f.companies_invested}
-                onChange={(e) => setF({ ...f, companies_invested: Math.max(0, Math.min(999, Number(e.target.value) || 0)) })} />
+              <div className="mt-1 flex flex-wrap gap-2">
+                {INVESTED_BUCKETS.map((b) => (
+                  <Chip key={b.v} active={f.companies_invested === b.v} onClick={() => setF({ ...f, companies_invested: b.v })}>{b.label}</Chip>
+                ))}
+              </div>
             </Field>
 
             <Field label="Notable investments">

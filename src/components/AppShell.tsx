@@ -10,6 +10,7 @@ import { useSession } from "@/hooks/useSession";
 import { useDarkMode } from "@/hooks/useDarkMode";
 import { useLiveInbox, useUnreadConversations } from "@/hooks/useLiveInbox";
 import { getSeenSnapshot, isStale, markSeen, subscribeSeen } from "@/lib/nav-activity";
+import { useNewConnectionsAlert, usePendingRequestsAlert, useRolesAlert } from "@/hooks/useNavAlerts";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { VeyraMark } from "@/components/VeyraLogo";
@@ -62,14 +63,26 @@ export function AppShell({ children }: { children: React.ReactNode }) {
     !myFounder.linkedin_url
   );
   const forumStale = isStale("forum", seen);
+  const talentStale = isStale("talent", seen);
+  const investorsStale = isStale("investors", seen);
+  const { data: roleAlerts = 0 } = useRolesAlert();
+  const { data: newConnections = 0 } = useNewConnectionsAlert(myFounder?.id);
+  const { data: pendingRequests = 0 } = usePendingRequestsAlert(myFounder?.id);
 
   useEffect(() => {
     if (pathname.startsWith("/forum")) markSeen("forum");
     if (pathname.startsWith("/matches")) markSeen("matches");
+    if (pathname.startsWith("/roles")) markSeen("roles");
+    if (pathname.startsWith("/talent")) markSeen("talent");
+    if (pathname.startsWith("/investors")) markSeen("investors");
+    if (pathname.startsWith("/inbox")) markSeen("inbox");
   }, [pathname]);
 
   function dotFor(to?: string) {
-    if (to === "/inbox") return hasUnread;
+    if (to === "/inbox") return hasUnread || newConnections > 0 || pendingRequests > 0;
+    if (to === "/roles") return roleAlerts > 0;
+    if (to === "/talent") return talentStale;
+    if (to === "/investors") return investorsStale;
     if (to === "/forum") return forumStale;
     if (to === "/profile/me") return profileIncomplete;
     return false;
@@ -103,7 +116,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
           {nav.map((n) => {
             const active = !!n.to && (pathname === n.to || pathname.startsWith(n.to));
             const dot = dotFor(n.to);
-            const count = n.to === "/inbox" ? unread.length : 0;
+            const count = n.to === "/inbox" ? unread.length + pendingRequests : 0;
             return (
               <NavCell key={n.label} item={n} className={`flex w-full items-center justify-between gap-3 rounded-lg px-4 py-3 text-sm font-black uppercase tracking-wide transition ${active ? "bg-orange text-nav shadow-brutal-sm" : "text-nav-fg/75 hover:bg-nav-fg/10 hover:text-nav-fg"}`}>
                 <span className="flex items-center gap-3">
@@ -157,7 +170,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
           {nav.map((n) => {
             const active = !!n.to && (pathname === n.to || pathname.startsWith(n.to));
             const dot = dotFor(n.to);
-            const count = n.to === "/inbox" ? unread.length : 0;
+            const count = n.to === "/inbox" ? unread.length + pendingRequests : 0;
             return (
               <NavCell key={n.label} item={n}
                 className={`flex items-center justify-center gap-1 border-2 px-1 py-1.5 text-[10px] font-black uppercase tracking-wider ${active ? "border-nav-fg bg-orange text-nav" : "border-nav-fg/40 text-nav-fg/80"}`}>
@@ -184,7 +197,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
         {nav.slice(0, 5).map((n) => {
           const active = !!n.to && (pathname === n.to || pathname.startsWith(n.to));
           const dot = dotFor(n.to);
-            const count = n.to === "/inbox" ? unread.length : 0;
+            const count = n.to === "/inbox" ? unread.length + pendingRequests : 0;
           return (
             <NavCell key={n.label} item={n} className={`relative flex flex-1 flex-col items-center gap-1 py-2 text-[10px] ${active ? "text-indigo" : "text-muted-text"}`}>
               <span className="relative">

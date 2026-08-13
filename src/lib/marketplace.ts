@@ -41,6 +41,32 @@ export const TALENT_SKILLS = [
   "Operations", "Finance", "Legal", "HR / Recruiting", "Community",
 ] as const;
 
+/** Experience is picked from buckets — the stored number is the bucket's floor. */
+export const EXPERIENCE_BUCKETS = [
+  { v: 0, label: "No experience yet" },
+  { v: 1, label: "Under 1 year" },
+  { v: 2, label: "1–2 years" },
+  { v: 3, label: "3–5 years" },
+  { v: 6, label: "6–9 years" },
+  { v: 10, label: "10+ years" },
+] as const;
+
+/** How many companies an investor has backed, as buckets. */
+export const INVESTED_BUCKETS = [
+  { v: 0, label: "None yet" },
+  { v: 1, label: "1–3" },
+  { v: 3, label: "3–5" },
+  { v: 5, label: "5–10" },
+  { v: 10, label: "10+" },
+] as const;
+
+export function bucketLabel(list: ReadonlyArray<{ v: number; label: string }>, n?: number | null) {
+  if (n === null || n === undefined) return "—";
+  let best = list[0]!;
+  for (const b of list) if (n >= b.v) best = b;
+  return best.label;
+}
+
 export function labelOf(list: ReadonlyArray<{ v: string; label: string }>, v?: string | null) {
   return list.find((x) => x.v === v)?.label ?? "—";
 }
