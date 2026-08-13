@@ -114,7 +114,7 @@ function Landing() {
             >
               {dark ? <Sun className="h-4 w-4" /> : <Moon className="h-4 w-4" />}
             </button>
-            <Link to="/auth/login" className="hidden border-[3px] border-ink bg-cream px-3 py-2 text-sm font-black uppercase box-hover sm:inline-block">
+            <Link to="/auth/signup" className="hidden border-[3px] border-ink bg-cream px-3 py-2 text-sm font-black uppercase box-hover sm:inline-block">
               Sign in
             </Link>
             <Link to="/auth/role" className="border-[3px] border-ink bg-red px-3 py-2 text-sm font-black uppercase text-cream box-hover">
@@ -153,7 +153,7 @@ function Landing() {
               <Link to="/auth/role" className="inline-flex items-center gap-2 border-[3px] border-ink bg-red px-6 py-3.5 text-sm font-black uppercase text-cream box-press">
                 Find my co-founder <ArrowRight className="h-4 w-4" strokeWidth={3} />
               </Link>
-              <Link to="/auth/login" className="inline-flex items-center gap-2 border-[3px] border-ink bg-cream px-6 py-3.5 text-sm font-black uppercase box-press">
+              <Link to="/auth/signup" className="inline-flex items-center gap-2 border-[3px] border-ink bg-cream px-6 py-3.5 text-sm font-black uppercase box-press">
                 Sign in <Zap className="h-4 w-4" strokeWidth={3} />
               </Link>
             </div>
@@ -198,7 +198,7 @@ function Landing() {
                   <span className="animate-blink">▍</span>"
                 </div>
                 <Link
-                  to="/auth/login"
+                  to="/auth/signup"
                   className="mt-3 inline-flex items-center gap-1 border-2 border-ink bg-red px-3 py-1.5 text-xs font-black uppercase text-cream box-press"
                 >
                   Text about this <ArrowRight className="h-3 w-3" strokeWidth={3} />
