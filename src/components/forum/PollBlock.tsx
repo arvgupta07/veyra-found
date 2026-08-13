@@ -20,18 +20,28 @@ export function PollBlock({
 }) {
   const qc = useQueryClient();
   const { data, isLoading } = useQuery({
-    queryKey: ["poll", postId],
+    queryKey: ["poll", postId, founderId],
     queryFn: async () => {
-      const { data: rows, error } = await supabase.from("forum_poll_votes")
-        .select("founder_id, option_index").eq("post_id", postId);
+      const { data: tallies, error } = await supabase.rpc("forum_poll_tallies", { _post_id: postId });
       if (error) throw new Error(error.message);
-      return rows ?? [];
+      let mine: number | null = null;
+      if (founderId) {
+        const { data: own } = await supabase.from("forum_poll_votes")
+          .select("option_index").eq("post_id", postId).eq("founder_id", founderId).maybeSingle();
+        mine = own?.option_index ?? null;
+      }
+      const counts: Record<number, number> = {};
+      for (const row of (tallies ?? []) as { option_index: number; votes: number }[]) {
+        counts[row.option_index] = Number(row.votes);
+      }
+      return { counts, mine };
     },
   });
 
-  const votes = data ?? [];
-  const total = votes.length;
-  const mine = founderId ? votes.find((v) => v.founder_id === founderId)?.option_index ?? null : null;
+  const counts = data?.counts ?? {};
+  const total = Object.values(counts).reduce((a, b) => a + b, 0);
+  const mine = data?.mine ?? null;
+
 
   async function cast(index: number) {
     if (!founderId) return toast.error("Sign in to vote");
