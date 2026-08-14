@@ -102,10 +102,7 @@ export function clearPendingAccountType() {
 export function canSee(type: AccountType, path: string): boolean {
   if (isJobSeeker(type)) {
     // Interns and talent don't get the investor directory or co-founder matching.
-    if (path.startsWith("/investors") || path.startsWith("/matches")) return false;
-  }
-  if (type === "investor") {
-    if (path.startsWith("/matches")) return false;
+    if (path.startsWith("/investors")) return false;
   }
   return true;
 }
