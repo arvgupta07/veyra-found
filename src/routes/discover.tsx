@@ -16,6 +16,7 @@ import { useConnectedIds } from "@/hooks/useConnectedIds";
 import { useMyVerification } from "@/hooks/useVerification";
 import { VerifyBanner, VerifyRequiredCard } from "@/components/VerifyGate";
 import { getDiscoverCursor, setDiscoverCursor } from "@/lib/discover-cursor";
+import { FilterBar, type FilterValues } from "@/components/FilterPanel";
 
 
 export const Route = createFileRoute("/discover")({
@@ -39,6 +40,8 @@ function Discover() {
   const [index, setIndex] = useState(() => getDiscoverCursor().index);
   const [skipped, setSkipped] = useState(() => getDiscoverCursor().skipped);
   const [openPrompt, setOpenPrompt] = useState<{ founderId: string; question: string } | null>(null);
+  const [filters, setFilters] = useState<FilterValues>({ background: "all", stage: "all", commitment: "all", remote: "all" });
+  const [q, setQ] = useState("");
 
   useEffect(() => {
     setDiscoverCursor({ index, skipped });
@@ -53,15 +56,30 @@ function Discover() {
     queryFn: async () => {
       const { data: fs } = await supabase.from("founders")
         .select("*, founder_prompts(prompt_question, prompt_answer, display_order), profiles(full_name)")
-        .eq("profile_complete", true).eq("account_type", "founder").neq("id", me!.id).limit(20);
+        .eq("profile_complete", true).eq("account_type", "founder").neq("id", me!.id).limit(60);
       return fs ?? [];
     },
   });
 
-  const founders = useMemo(
-    () => (allFounders ?? []).filter((f) => !connectedIds.has(f.id)),
-    [allFounders, connectedIds],
-  );
+  const founders = useMemo(() => {
+    const needle = q.trim().toLowerCase();
+    return (allFounders ?? [])
+      .filter((f) => !connectedIds.has(f.id))
+      .filter((f) => filters.background === "all" || f.background === filters.background)
+      .filter((f) => filters.stage === "all" || f.idea_stage === filters.stage)
+      .filter((f) => filters.commitment === "all" || f.commitment === filters.commitment)
+      .filter((f) => filters.remote === "all" || f.remote_pref === filters.remote)
+      .filter((f) => {
+        if (!needle) return true;
+        const hay = [
+          f.headline, f.bio, f.location, f.idea_industry,
+          (f.skills ?? []).join(" "),
+          (f as { profiles?: { full_name?: string | null } | null }).profiles?.full_name,
+          f.seed_name,
+        ].filter(Boolean).join(" ").toLowerCase();
+        return hay.includes(needle);
+      });
+  }, [allFounders, connectedIds, filters, q]);
 
   const current = founders?.[index];
   const atEnd = !!founders && founders.length > 0 && index >= founders.length;
@@ -99,6 +117,12 @@ function Discover() {
     setOpenPrompt(null);
   }, [index]);
 
+  // A new filter set is a new deck — start from the top of it.
+  useEffect(() => {
+    setIndex(0);
+    setSkipped(0);
+  }, [filters, q]);
+
   if (!ready) return null;
 
   return (
@@ -115,6 +139,33 @@ function Discover() {
               {index + 1} / {founders.length}
             </div>
           )}
+        </div>
+
+        <div className="-mt-2 mb-6">
+          <FilterBar
+            resultCount={founders.length}
+            resultNoun="founders"
+            search={{ value: q, onChange: setQ, placeholder: "Search idea, skill, city…" }}
+            values={filters}
+            onChange={setFilters}
+            groups={[
+              { key: "background", label: "Background", options: [
+                { v: "technical", label: "Technical" }, { v: "business", label: "Business" },
+                { v: "design", label: "Design" }, { v: "other", label: "Other" },
+              ] },
+              { key: "stage", label: "Idea stage", options: [
+                { v: "idea", label: "Idea" }, { v: "mvp", label: "MVP" },
+                { v: "revenue", label: "Revenue" }, { v: "funded", label: "Funded" },
+              ] },
+              { key: "commitment", label: "Commitment", options: [
+                { v: "full_time", label: "Full time" }, { v: "part_time", label: "Part time" },
+                { v: "exploring", label: "Exploring" },
+              ] },
+              { key: "remote", label: "Work setup", options: [
+                { v: "onsite", label: "Onsite" }, { v: "hybrid", label: "Hybrid" }, { v: "remote", label: "Remote" },
+              ] },
+            ]}
+          />
         </div>
 
         {isLoading && (
