@@ -1,5 +1,5 @@
 import { Link, useRouter, useRouterState } from "@tanstack/react-router";
-import { Compass, Inbox, MessagesSquare, User, LogOut, Heart, Moon, Sun, ShieldCheck, Landmark, Briefcase, GraduationCap } from "lucide-react";
+import { Compass, Inbox, MessagesSquare, User, LogOut, Moon, Sun, ShieldCheck, Landmark, Briefcase, GraduationCap } from "lucide-react";
 import { useEffect, useState, useSyncExternalStore } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { useMyProfile, useMyFounder } from "@/hooks/useMyFounder";
@@ -22,7 +22,6 @@ type NavItem = { to?: string; label: string; icon: typeof Compass; onClick?: () 
 
 const founderNav: NavItem[] = [
   { to: "/discover", label: "Discover", icon: Compass },
-  { to: "/matches", label: "Matches", icon: Heart },
   { to: "/inbox", label: "Inbox", icon: Inbox },
   { to: "/investors", label: "Investors", icon: Landmark },
   { to: "/roles", label: "Opportunities", icon: Briefcase },
@@ -71,7 +70,6 @@ export function AppShell({ children }: { children: React.ReactNode }) {
 
   useEffect(() => {
     if (pathname.startsWith("/forum")) markSeen("forum");
-    if (pathname.startsWith("/matches")) markSeen("matches");
     if (pathname.startsWith("/roles")) markSeen("roles");
     if (pathname.startsWith("/talent")) markSeen("talent");
     if (pathname.startsWith("/investors")) markSeen("investors");

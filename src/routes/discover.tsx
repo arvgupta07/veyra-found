@@ -56,7 +56,7 @@ function Discover() {
     queryFn: async () => {
       const { data: fs } = await supabase.from("founders")
         .select("*, founder_prompts(prompt_question, prompt_answer, display_order), profiles(full_name)")
-        .eq("profile_complete", true).eq("account_type", "founder").neq("id", me!.id).limit(20);
+        .eq("profile_complete", true).eq("account_type", "founder").neq("id", me!.id).limit(60);
       return fs ?? [];
     },
   });
