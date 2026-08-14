@@ -6,7 +6,7 @@ import { toast } from "sonner";
 import {
   Trash2, MessageSquare, Users, FileText, ArrowLeft, ShieldCheck, BarChart3,
   Ban, Pin, PinOff, Search, Shield, ShieldOff, Link2, MessageCircle,
-  RefreshCw, Sparkles, UserX, BadgeCheck,
+  RefreshCw, Sparkles, UserX, BadgeCheck, Store, Briefcase, Landmark, GraduationCap, Power,
 } from "lucide-react";
 import { AppShell } from "@/components/AppShell";
 import { useRequireAuth } from "@/hooks/useRequireAuth";
@@ -16,8 +16,10 @@ import {
   adminDeleteUser, adminDeletePost, adminStats, adminSetShadowBan, adminSetAdminRole,
   adminSetPostPinned, adminListComments, adminDeleteComment,
   adminDeleteMessage, adminDeleteConversation, adminListBlocks, adminDeleteBlock,
-  adminListRequests,
+  adminListRequests, adminListMarketplace, adminDeleteMarketRow,
+  adminSetInvestorVerified, adminSetRoleStatus,
 } from "@/lib/admin.functions";
+import { RoleBadge } from "@/components/RoleBadge";
 
 export const Route = createFileRoute("/admin")({
   component: AdminPage,
@@ -34,12 +36,13 @@ export const Route = createFileRoute("/admin")({
   }),
 });
 
-type Tab = "overview" | "users" | "verify" | "posts" | "comments" | "dms" | "requests" | "blocks";
+type Tab = "overview" | "users" | "verify" | "market" | "posts" | "comments" | "dms" | "requests" | "blocks";
 
 const TABS: { id: Tab; label: string; icon: any }[] = [
   { id: "overview", label: "Overview", icon: BarChart3 },
   { id: "users", label: "Users", icon: Users },
   { id: "verify", label: "Verification", icon: BadgeCheck },
+  { id: "market", label: "Marketplace", icon: Store },
   { id: "posts", label: "Posts", icon: FileText },
   { id: "comments", label: "Comments", icon: MessageCircle },
   { id: "dms", label: "Conversations", icon: MessageSquare },
@@ -98,6 +101,7 @@ function AdminPage() {
         {tab === "overview" && <OverviewPanel onJump={setTab} />}
         {tab === "users" && <UsersPanel meId={session!.user.id} />}
         {tab === "verify" && <VerificationPanel />}
+        {tab === "market" && <MarketPanel />}
         {tab === "posts" && <PostsPanel />}
         {tab === "comments" && <CommentsPanel />}
         {tab === "dms" && <DmsPanel />}
@@ -169,6 +173,10 @@ function OverviewPanel({ onJump }: { onJump: (t: Tab) => void }) {
     { label: "Requests", value: s.requests, tone: "bg-cream", tab: "requests" },
     { label: "Pending requests", value: s.pending, tone: "bg-orange text-white", tab: "requests" },
     { label: "Blocks", value: s.blocks, tone: "bg-cream", tab: "blocks" },
+    { label: "Investor profiles", value: s.investors, tone: "bg-sage", tab: "market" },
+    { label: "Talent profiles", value: s.talent, tone: "bg-sage", tab: "market" },
+    { label: "Open roles", value: s.openRoles, tone: "bg-cream", tab: "market" },
+    { label: "Applications", value: s.applications, tone: "bg-cream", tab: "market" },
   ];
 
   return (
@@ -201,7 +209,7 @@ function UsersPanel({ meId }: { meId: string }) {
   const ban = useServerFn(adminSetShadowBan);
   const role = useServerFn(adminSetAdminRole);
   const [q, setQ] = useState("");
-  const [filter, setFilter] = useState<"all" | "banned" | "incomplete" | "admins">("all");
+  const [filter, setFilter] = useState<"all" | "banned" | "incomplete" | "admins" | "founder" | "investor" | "talent">("all");
 
   const { data, isLoading } = useQuery({ queryKey: ["admin-users"], queryFn: () => list() });
 
@@ -215,6 +223,9 @@ function UsersPanel({ meId }: { meId: string }) {
       if (filter === "banned" && !u.shadow_banned) return false;
       if (filter === "incomplete" && u.profile_complete) return false;
       if (filter === "admins" && !u.is_admin) return false;
+      if (filter === "founder" && u.account_type !== "founder") return false;
+      if (filter === "investor" && u.account_type !== "investor") return false;
+      if (filter === "talent" && u.account_type !== "talent" && u.account_type !== "intern") return false;
       if (!needle) return true;
       return [u.email, u.phone, u.full_name, u.id].some((v: any) => (v ?? "").toString().toLowerCase().includes(needle));
     });
@@ -230,7 +241,7 @@ function UsersPanel({ meId }: { meId: string }) {
           <input value={q} onChange={(e) => setQ(e.target.value)} placeholder="Search email, phone, name or id"
             className="w-full bg-transparent text-sm font-bold outline-none placeholder:text-muted-text" />
         </div>
-        {(["all", "banned", "incomplete", "admins"] as const).map((f) => (
+        {(["all", "founder", "investor", "talent", "banned", "incomplete", "admins"] as const).map((f) => (
           <button key={f} onClick={() => setFilter(f)}
             className={`border-2 border-ink px-2 py-1.5 text-xs font-black uppercase shadow-brutal-sm ${filter === f ? "bg-ink text-cream" : "bg-white"}`}>
             {f}
@@ -248,6 +259,7 @@ function UsersPanel({ meId }: { meId: string }) {
               <div className="min-w-0 flex-1">
                 <div className="flex flex-wrap items-center gap-2">
                   <span className="truncate font-black">{u.full_name ?? "Unnamed"}</span>
+                  <RoleBadge type={u.account_type} size="xs" />
                   {u.is_admin && <Badge tone="bg-ink text-cream">admin</Badge>}
                   {u.shadow_banned && <Badge tone="bg-red text-white">shadow-banned</Badge>}
                   {!u.profile_complete && <Badge tone="bg-cream">incomplete</Badge>}
@@ -614,6 +626,136 @@ function VerificationPanel() {
             </Card>
           );
         })
+      )}
+    </div>
+  );
+}
+
+/* ------------------------------- marketplace ------------------------------ */
+
+function MarketPanel() {
+  const refresh = useRefresher(["admin-market", "admin-stats"]);
+  const list = useServerFn(adminListMarketplace);
+  const del = useServerFn(adminDeleteMarketRow);
+  const verify = useServerFn(adminSetInvestorVerified);
+  const setStatus = useServerFn(adminSetRoleStatus);
+  const [sub, setSub] = useState<"investors" | "talent" | "roles">("investors");
+
+  const { data, isLoading } = useQuery({ queryKey: ["admin-market"], queryFn: () => list() });
+
+  const mDel = useMutation({
+    mutationFn: (v: { table: "investor_profiles" | "talent_profiles" | "open_roles"; id: string }) => del({ data: v }),
+    onSuccess: () => { toast.success("Deleted"); refresh(); },
+    onError: (e: any) => toast.error(e.message),
+  });
+  const mVerify = useMutation({
+    mutationFn: (v: { id: string; verified: boolean }) => verify({ data: v }),
+    onSuccess: () => { toast.success("Updated"); refresh(); },
+    onError: (e: any) => toast.error(e.message),
+  });
+  const mStatus = useMutation({
+    mutationFn: (v: { id: string; status: "open" | "closed" }) => setStatus({ data: v }),
+    onSuccess: () => { toast.success("Updated"); refresh(); },
+    onError: (e: any) => toast.error(e.message),
+  });
+
+  if (isLoading) return <div className="text-sm text-muted-text">Loading marketplace…</div>;
+  const d = data!;
+
+  return (
+    <div className="space-y-3">
+      <div className="flex flex-wrap gap-2">
+        {([
+          { v: "investors", label: `Investors (${d.investors.length})`, icon: Landmark },
+          { v: "talent", label: `Talent (${d.talent.length})`, icon: GraduationCap },
+          { v: "roles", label: `Roles (${d.roles.length})`, icon: Briefcase },
+        ] as const).map((t) => (
+          <TabBtn key={t.v} active={sub === t.v} onClick={() => setSub(t.v)} icon={t.icon} label={t.label} />
+        ))}
+      </div>
+
+      {sub === "investors" && (
+        <div className="space-y-2">
+          {d.investors.length === 0 && <Empty>No investor profiles yet.</Empty>}
+          {d.investors.map((i: any) => (
+            <Card key={i.id}>
+              <div className="flex flex-wrap items-start justify-between gap-3">
+                <div className="min-w-0">
+                  <div className="flex flex-wrap items-center gap-2">
+                    <span className="truncate font-black">{i.fund_name ?? i.profiles?.full_name ?? "Unnamed fund"}</span>
+                    {i.is_demo && <Badge tone="bg-orange text-white">demo</Badge>}
+                    {i.verified && <Badge tone="bg-sage">verified</Badge>}
+                    {!i.is_public && <Badge tone="bg-cream">hidden</Badge>}
+                  </div>
+                  <div className="mt-1 text-xs text-muted-text">
+                    {i.firm_type ?? "—"} · {i.location ?? "no location"} · added {new Date(i.created_at).toLocaleDateString()}
+                  </div>
+                </div>
+                <div className="flex gap-1.5">
+                  <IconBtn onClick={() => mVerify.mutate({ id: i.id, verified: !i.verified })}
+                    icon={BadgeCheck} tone={i.verified ? "ink" : "white"} label={i.verified ? "Unverify" : "Verify"} />
+                  <IconBtn onClick={() => { if (confirm("Delete this investor profile?")) mDel.mutate({ table: "investor_profiles", id: i.id }); }}
+                    icon={Trash2} tone="red" label="Delete" />
+                </div>
+              </div>
+            </Card>
+          ))}
+        </div>
+      )}
+
+      {sub === "talent" && (
+        <div className="space-y-2">
+          {d.talent.length === 0 && <Empty>No talent profiles yet.</Empty>}
+          {d.talent.map((t: any) => (
+            <Card key={t.id}>
+              <div className="flex flex-wrap items-start justify-between gap-3">
+                <div className="min-w-0">
+                  <div className="flex flex-wrap items-center gap-2">
+                    <span className="truncate font-black">{t.full_name ?? "Unnamed"}</span>
+                    {t.is_demo && <Badge tone="bg-orange text-white">demo</Badge>}
+                    <Badge tone="bg-cream">{t.work_type}</Badge>
+                    {!t.is_public && <Badge tone="bg-cream">hidden</Badge>}
+                  </div>
+                  <div className="mt-1 truncate text-xs text-muted-text">
+                    {t.headline ?? "no headline"} · {t.location ?? "no location"}
+                  </div>
+                </div>
+                <IconBtn onClick={() => { if (confirm("Delete this talent profile?")) mDel.mutate({ table: "talent_profiles", id: t.id }); }}
+                  icon={Trash2} tone="red" label="Delete" />
+              </div>
+            </Card>
+          ))}
+        </div>
+      )}
+
+      {sub === "roles" && (
+        <div className="space-y-2">
+          {d.roles.length === 0 && <Empty>No roles posted yet.</Empty>}
+          {d.roles.map((r: any) => (
+            <Card key={r.id}>
+              <div className="flex flex-wrap items-start justify-between gap-3">
+                <div className="min-w-0">
+                  <div className="flex flex-wrap items-center gap-2">
+                    <span className="truncate font-black">{r.title}</span>
+                    {r.is_demo && <Badge tone="bg-orange text-white">demo</Badge>}
+                    <Badge tone="bg-cream">{r.role_type}</Badge>
+                    <Badge tone={r.status === "open" ? "bg-sage" : "bg-red text-white"}>{r.status}</Badge>
+                    <Badge tone="bg-cream">{r.applications} applicant(s)</Badge>
+                  </div>
+                  <div className="mt-1 text-xs text-muted-text">
+                    {r.company_name ?? "no company"} · posted {new Date(r.created_at).toLocaleDateString()}
+                  </div>
+                </div>
+                <div className="flex gap-1.5">
+                  <IconBtn onClick={() => mStatus.mutate({ id: r.id, status: r.status === "open" ? "closed" : "open" })}
+                    icon={Power} tone={r.status === "open" ? "orange" : "sage"} label={r.status === "open" ? "Close" : "Reopen"} />
+                  <IconBtn onClick={() => { if (confirm("Delete this role and its applications?")) mDel.mutate({ table: "open_roles", id: r.id }); }}
+                    icon={Trash2} tone="red" label="Delete" />
+                </div>
+              </div>
+            </Card>
+          ))}
+        </div>
       )}
     </div>
   );
