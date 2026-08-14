@@ -53,7 +53,7 @@ export const adminListUsers = createServerFn({ method: "GET" })
     const { data: list } = await supabaseAdmin.auth.admin.listUsers({ page: 1, perPage: 200 });
     const users = list?.users ?? [];
     const ids = users.map((u) => u.id);
-    const { data: profiles } = await supabaseAdmin.from("profiles").select("id, full_name, role, is_pro").in("id", ids);
+    const { data: profiles } = await supabaseAdmin.from("profiles").select("id, full_name, role, is_pro, account_type").in("id", ids);
     const { data: roles } = await supabaseAdmin.from("user_roles").select("user_id, role").in("user_id", ids);
     const { data: founders } = await supabaseAdmin
       .from("founders")
@@ -71,6 +71,7 @@ export const adminListUsers = createServerFn({ method: "GET" })
       confirmed: !!(u as any).email_confirmed_at || !!(u as any).phone_confirmed_at,
       full_name: pmap.get(u.id)?.full_name ?? null,
       role: pmap.get(u.id)?.role ?? null,
+      account_type: pmap.get(u.id)?.account_type ?? null,
       is_pro: !!pmap.get(u.id)?.is_pro,
       is_admin: admins.has(u.id),
       founder_id: fmap.get(u.id)?.id ?? null,
@@ -136,6 +137,7 @@ export const adminStats = createServerFn({ method: "GET" })
     const [
       founders, complete, banned, posts, comments, convos, messages,
       requests, pending, blocks, newFounders, newPosts, pro,
+      investors, talent, openRoles, applications,
     ] = await Promise.all([
       count("founders"),
       count("founders", (q) => q.eq("profile_complete", true)),
@@ -150,10 +152,15 @@ export const adminStats = createServerFn({ method: "GET" })
       count("founders", (q) => q.gte("created_at", since)),
       count("forum_posts", (q) => q.gte("created_at", since)),
       count("profiles", (q) => q.eq("is_pro", true)),
+      count("investor_profiles"),
+      count("talent_profiles"),
+      count("open_roles", (q) => q.eq("status", "open")),
+      count("role_applications"),
     ]);
     return {
       founders, complete, banned, posts, comments, convos, messages,
       requests, pending, blocks, newFounders, newPosts, pro,
+      investors, talent, openRoles, applications,
     };
   });
 
@@ -305,4 +312,79 @@ export const adminListRequests = createServerFn({ method: "GET" })
       .order("created_at", { ascending: false }).limit(200);
     if (error) throw new Error(error.message);
     return data ?? [];
+  });
+
+
+/* ----------------------------- marketplace admin ---------------------------- */
+
+export const adminListMarketplace = createServerFn({ method: "GET" })
+  .middleware([requireSupabaseAuth])
+  .handler(async ({ context }) => {
+    await assertAdmin(context);
+    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+    const [investors, talent, roles, apps] = await Promise.all([
+      supabaseAdmin.from("investor_profiles")
+        .select("id, fund_name, firm_type, location, is_public, verified, is_demo, user_id, created_at, profiles(full_name)")
+        .order("created_at", { ascending: false }).limit(200),
+      supabaseAdmin.from("talent_profiles")
+        .select("id, full_name, headline, work_type, location, is_public, is_demo, user_id, created_at")
+        .order("created_at", { ascending: false }).limit(200),
+      supabaseAdmin.from("open_roles")
+        .select("id, title, company_name, role_type, status, is_demo, posted_by, created_at")
+        .order("created_at", { ascending: false }).limit(200),
+      supabaseAdmin.from("role_applications").select("id, role_id, status"),
+    ]);
+    const appCount = new Map<string, number>();
+    (apps.data ?? []).forEach((a: any) => appCount.set(a.role_id, (appCount.get(a.role_id) ?? 0) + 1));
+    return {
+      investors: investors.data ?? [],
+      talent: talent.data ?? [],
+      roles: (roles.data ?? []).map((r: any) => ({ ...r, applications: appCount.get(r.id) ?? 0 })),
+    };
+  });
+
+const MARKET_TABLES = ["investor_profiles", "talent_profiles", "open_roles"] as const;
+type MarketTable = (typeof MARKET_TABLES)[number];
+
+export const adminDeleteMarketRow = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((d: { table: MarketTable; id: string }) => {
+    if (!MARKET_TABLES.includes(d.table)) throw new Error("Unsupported table");
+    return d;
+  })
+  .handler(async ({ data, context }) => {
+    await assertAdmin(context);
+    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+    if (data.table === "open_roles") {
+      await supabaseAdmin.from("role_applications").delete().eq("role_id", data.id);
+    }
+    if (data.table === "investor_profiles") {
+      await supabaseAdmin.from("investor_pitches").delete().eq("investor_profile_id", data.id);
+    }
+    const { error } = await supabaseAdmin.from(data.table).delete().eq("id", data.id);
+    if (error) throw new Error(error.message);
+    return { ok: true };
+  });
+
+export const adminSetInvestorVerified = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((d: { id: string; verified: boolean }) => d)
+  .handler(async ({ data, context }) => {
+    await assertAdmin(context);
+    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+    const { error } = await supabaseAdmin.from("investor_profiles")
+      .update({ verified: data.verified }).eq("id", data.id);
+    if (error) throw new Error(error.message);
+    return { ok: true };
+  });
+
+export const adminSetRoleStatus = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((d: { id: string; status: "open" | "closed" }) => d)
+  .handler(async ({ data, context }) => {
+    await assertAdmin(context);
+    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+    const { error } = await supabaseAdmin.from("open_roles").update({ status: data.status }).eq("id", data.id);
+    if (error) throw new Error(error.message);
+    return { ok: true };
   });
