@@ -330,6 +330,14 @@
     100% { transform: none; opacity: 1; }
   }
 
+  .animate-slide-in-right { animation: slideInRight 240ms cubic-bezier(.2,.9,.2,1) both; }
+  @keyframes slideInRight {
+    0% { transform: translateX(100%); }
+    100% { transform: none; }
+  }
+
+
+
   .bg-grid {
     background-image:
       linear-gradient(var(--ink) 1px, transparent 1px),

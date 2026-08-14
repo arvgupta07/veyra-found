@@ -7,6 +7,9 @@ import { useMyFounder, useMyProfile } from "@/hooks/useMyFounder";
 import { useRequireAuth } from "@/hooks/useRequireAuth";
 import { AppShell } from "@/components/AppShell";
 import { Card, Chip, Empty, Field, PageHeader, Pill, TabBar, inputCls } from "@/components/MarketBits";
+import { FilterBar } from "@/components/FilterPanel";
+import { useAccountType } from "@/hooks/useAccountType";
+import { isJobSeeker } from "@/lib/account-types";
 import {
   EXPERIENCE_BUCKETS, REMOTE_PREFS, TALENT_SKILLS, WORK_TYPES, initialsAvatar, labelOf, normalizeUrl, toggleIn,
 } from "@/lib/marketplace";
@@ -66,6 +69,9 @@ function TalentPage() {
   const [work, setWork] = useState("all");
   const [skill, setSkill] = useState("all");
   const [q, setQ] = useState("");
+  const { accountType } = useAccountType();
+  // Account type is locked at sign-up — founders/investors can browse but not list themselves.
+  const canListSelf = isJobSeeker(accountType);
 
   const { data: people } = useQuery({
     queryKey: ["talent"],
@@ -116,32 +122,33 @@ function TalentPage() {
           title="Talent & interns"
           subtitle="People who want to join an early startup — engineers, designers, growth folks and interns. Founders: reach out from here."
           action={
-            <button onClick={() => setTab("profile")}
-              className="inline-flex items-center gap-2 border-2 border-ink bg-orange px-4 py-2 text-xs font-black uppercase tracking-wider text-white shadow-brutal-sm box-hover soft-corners">
-              <GraduationCap className="h-4 w-4" /> {mine ? "Edit my talent profile" : "I want to join a startup"}
-            </button>
+            canListSelf ? (
+              <button onClick={() => setTab("profile")}
+                className="inline-flex items-center gap-2 border-2 border-ink bg-orange px-4 py-2 text-xs font-black uppercase tracking-wider text-white shadow-brutal-sm box-hover soft-corners">
+                <GraduationCap className="h-4 w-4" /> {mine ? "Edit my talent profile" : "My talent profile"}
+              </button>
+            ) : undefined
           }
         />
 
         <TabBar<Tab> value={tab} onChange={setTab} tabs={[
           { v: "browse", label: "Browse talent", count: list.length },
-          { v: "profile", label: "My talent profile" },
+          ...(canListSelf ? [{ v: "profile" as Tab, label: "My talent profile" }] : []),
         ]} />
 
         {tab === "browse" && (
           <>
-            <div className="mt-5 space-y-2">
-              <input value={q} onChange={(e) => setQ(e.target.value)} placeholder="Search name, skill or headline…"
-                className="w-full border-2 border-ink bg-white px-3 py-2.5 text-sm font-medium outline-none soft-corners focus:shadow-brutal-sm" />
-              <div className="flex flex-wrap gap-2">
-                <Chip active={work === "all"} onClick={() => setWork("all")}>All availability</Chip>
-                {WORK_TYPES.map((t) => <Chip key={t.v} active={work === t.v} onClick={() => setWork(t.v)}>{t.label}</Chip>)}
-              </div>
-              <div className="flex flex-wrap gap-2">
-                <Chip active={skill === "all"} onClick={() => setSkill("all")}>All skills</Chip>
-                {TALENT_SKILLS.map((t) => <Chip key={t} active={skill === t} onClick={() => setSkill(t)}>{t}</Chip>)}
-              </div>
-            </div>
+            <FilterBar
+              resultCount={list.length}
+              resultNoun="people"
+              search={{ value: q, onChange: setQ, placeholder: "Search name, skill or headline…" }}
+              values={{ work, skill }}
+              onChange={(v) => { setWork(v.work ?? "all"); setSkill(v.skill ?? "all"); }}
+              groups={[
+                { key: "work", label: "Availability", options: WORK_TYPES.map((t) => ({ v: t.v, label: t.label })) },
+                { key: "skill", label: "Skill", options: TALENT_SKILLS.map((t) => ({ v: t, label: t })) },
+              ]}
+            />
 
             {list.length === 0 && <Empty>No one matches this filter yet.</Empty>}
             <div className="mt-5 grid gap-3">
@@ -155,7 +162,7 @@ function TalentPage() {
           </>
         )}
 
-        {tab === "profile" && (
+        {tab === "profile" && canListSelf && (
           <TalentForm mine={mine} userId={user?.id} defaultName={(profile as { full_name?: string } | null)?.full_name ?? ""}
             onSaved={() => qc.invalidateQueries({ queryKey: ["talent"] })} />
         )}

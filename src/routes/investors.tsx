@@ -6,6 +6,7 @@ import { useSession } from "@/hooks/useSession";
 import { useRequireAuth } from "@/hooks/useRequireAuth";
 import { AppShell } from "@/components/AppShell";
 import { Card, Chip, Empty, Field, Modal, PageHeader, Pill, TabBar, inputCls } from "@/components/MarketBits";
+import { FilterBar } from "@/components/FilterPanel";
 import {
   INDUSTRIES, INVEST_STAGES, checkRange, initialsAvatar, normalizeUrl, toggleIn,
 } from "@/lib/marketplace";
@@ -72,6 +73,8 @@ function InvestorsPage() {
   const [stage, setStage] = useState<string>("all");
   const [industry, setIndustry] = useState<string>("all");
   const [pitchTo, setPitchTo] = useState<Investor | null>(null);
+  // Account type is locked at sign-up — a founder can never become an investor here.
+  const isInvestor = accountType === "investor";
 
   const { data: investors } = useQuery({
     queryKey: ["investors"],
@@ -128,10 +131,12 @@ function InvestorsPage() {
           title="Investors"
           subtitle="Angels and early-stage funds who back Indian founders. Filter by stage and sector, then send one focused pitch."
           action={
-            <button onClick={() => setTab("profile")}
-              className="inline-flex items-center gap-2 border-2 border-ink bg-orange px-4 py-2 text-xs font-black uppercase tracking-wider text-white shadow-brutal-sm box-hover soft-corners">
-              <Sparkles className="h-4 w-4" /> {mine ? "Edit investor profile" : "I'm an investor"}
-            </button>
+            isInvestor ? (
+              <button onClick={() => setTab("profile")}
+                className="inline-flex items-center gap-2 border-2 border-ink bg-orange px-4 py-2 text-xs font-black uppercase tracking-wider text-white shadow-brutal-sm box-hover soft-corners">
+                <Sparkles className="h-4 w-4" /> {mine ? "Edit investor profile" : "My investor profile"}
+              </button>
+            ) : undefined
           }
         />
 
@@ -139,27 +144,23 @@ function InvestorsPage() {
           value={tab} onChange={setTab}
           tabs={[
             { v: "browse", label: "Browse", count: list.length },
-            { v: "profile", label: "My investor profile" },
+            ...(isInvestor ? [{ v: "profile" as Tab, label: "My investor profile" }] : []),
             { v: "pitches", label: "Pitches", count: (pitches ?? []).length },
           ]}
         />
 
         {tab === "browse" && (
           <>
-            <div className="mt-5 space-y-2">
-              <div className="flex flex-wrap gap-2">
-                <Chip active={stage === "all"} onClick={() => setStage("all")}>All stages</Chip>
-                {INVEST_STAGES.map((s) => (
-                  <Chip key={s} active={stage === s} onClick={() => setStage(s)}>{s}</Chip>
-                ))}
-              </div>
-              <div className="flex flex-wrap gap-2">
-                <Chip active={industry === "all"} onClick={() => setIndustry("all")}>All sectors</Chip>
-                {INDUSTRIES.map((s) => (
-                  <Chip key={s} active={industry === s} onClick={() => setIndustry(s)}>{s}</Chip>
-                ))}
-              </div>
-            </div>
+            <FilterBar
+              resultCount={list.length}
+              resultNoun="investors"
+              values={{ stage, industry }}
+              onChange={(v) => { setStage(v.stage ?? "all"); setIndustry(v.industry ?? "all"); }}
+              groups={[
+                { key: "stage", label: "Stage they back", options: INVEST_STAGES.map((s) => ({ v: s, label: s })) },
+                { key: "industry", label: "Sector", options: INDUSTRIES.map((s) => ({ v: s, label: s })) },
+              ]}
+            />
 
             {list.length === 0 && <Empty>No investors match this filter yet. Check back soon — or invite one you know.</Empty>}
 
@@ -172,7 +173,7 @@ function InvestorsPage() {
           </>
         )}
 
-        {tab === "profile" && <InvestorForm mine={mine ?? null} userId={user?.id} onSaved={() => qc.invalidateQueries()} />}
+        {tab === "profile" && isInvestor && <InvestorForm mine={mine ?? null} userId={user?.id} onSaved={() => qc.invalidateQueries()} />}
 
         {tab === "pitches" && (
           <div className="mt-6 space-y-6">

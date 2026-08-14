@@ -7,6 +7,7 @@ import { useMyFounder } from "@/hooks/useMyFounder";
 import { useRequireAuth } from "@/hooks/useRequireAuth";
 import { AppShell } from "@/components/AppShell";
 import { Card, Chip, Empty, Field, Modal, PageHeader, Pill, TabBar, inputCls } from "@/components/MarketBits";
+import { FilterBar } from "@/components/FilterPanel";
 import {
   REMOTE_PREFS, ROLE_TYPES, TALENT_SKILLS, compRange, labelOf, normalizeUrl, toggleIn,
 } from "@/lib/marketplace";
@@ -121,16 +122,16 @@ function RolesPage() {
 
         {tab === "board" && (
           <>
-            <div className="mt-5 space-y-2">
-              <div className="flex flex-wrap gap-2">
-                <Chip active={type === "all"} onClick={() => setType("all")}>All types</Chip>
-                {ROLE_TYPES.map((t) => <Chip key={t.v} active={type === t.v} onClick={() => setType(t.v)}>{t.label}</Chip>)}
-              </div>
-              <div className="flex flex-wrap gap-2">
-                <Chip active={remote === "all"} onClick={() => setRemote("all")}>Anywhere</Chip>
-                {REMOTE_PREFS.map((t) => <Chip key={t.v} active={remote === t.v} onClick={() => setRemote(t.v)}>{t.label}</Chip>)}
-              </div>
-            </div>
+            <FilterBar
+              resultCount={board.length}
+              resultNoun="roles"
+              values={{ type, remote }}
+              onChange={(v) => { setType(v.type ?? "all"); setRemote(v.remote ?? "all"); }}
+              groups={[
+                { key: "type", label: "Role type", options: ROLE_TYPES.map((t) => ({ v: t.v, label: t.label })) },
+                { key: "remote", label: "Work setup", options: REMOTE_PREFS.map((t) => ({ v: t.v, label: t.label })) },
+              ]}
+            />
 
             {board.length === 0 && <Empty>No roles match this filter yet. Be the first to post one.</Empty>}
             <div className="mt-5 grid gap-3">

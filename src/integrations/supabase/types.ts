@@ -907,6 +907,7 @@ export type Database = {
           headline: string | null
           id: string
           industries: string[] | null
+          is_demo: boolean
           is_public: boolean
           linkedin_url: string | null
           location: string | null
@@ -930,6 +931,7 @@ export type Database = {
           headline?: string | null
           id?: string
           industries?: string[] | null
+          is_demo?: boolean
           is_public?: boolean
           linkedin_url?: string | null
           location?: string | null
@@ -953,6 +955,7 @@ export type Database = {
           headline?: string | null
           id?: string
           industries?: string[] | null
+          is_demo?: boolean
           is_public?: boolean
           linkedin_url?: string | null
           location?: string | null
@@ -1046,8 +1049,9 @@ export type Database = {
           equity_note: string | null
           founder_id: string | null
           id: string
+          is_demo: boolean
           location: string | null
-          posted_by: string
+          posted_by: string | null
           remote_pref: string
           role_type: string
           skills: string[]
@@ -1065,8 +1069,9 @@ export type Database = {
           equity_note?: string | null
           founder_id?: string | null
           id?: string
+          is_demo?: boolean
           location?: string | null
-          posted_by: string
+          posted_by?: string | null
           remote_pref?: string
           role_type?: string
           skills?: string[]
@@ -1084,8 +1089,9 @@ export type Database = {
           equity_note?: string | null
           founder_id?: string | null
           id?: string
+          is_demo?: boolean
           location?: string | null
-          posted_by?: string
+          posted_by?: string | null
           remote_pref?: string
           role_type?: string
           skills?: string[]
@@ -1221,6 +1227,7 @@ export type Database = {
           full_name: string | null
           headline: string | null
           id: string
+          is_demo: boolean
           is_public: boolean
           linkedin_url: string | null
           location: string | null
@@ -1230,7 +1237,7 @@ export type Database = {
           resume_url: string | null
           skills: string[]
           updated_at: string
-          user_id: string
+          user_id: string | null
           work_type: string
         }
         Insert: {
@@ -1244,6 +1251,7 @@ export type Database = {
           full_name?: string | null
           headline?: string | null
           id?: string
+          is_demo?: boolean
           is_public?: boolean
           linkedin_url?: string | null
           location?: string | null
@@ -1253,7 +1261,7 @@ export type Database = {
           resume_url?: string | null
           skills?: string[]
           updated_at?: string
-          user_id: string
+          user_id?: string | null
           work_type?: string
         }
         Update: {
@@ -1267,6 +1275,7 @@ export type Database = {
           full_name?: string | null
           headline?: string | null
           id?: string
+          is_demo?: boolean
           is_public?: boolean
           linkedin_url?: string | null
           location?: string | null
@@ -1276,7 +1285,7 @@ export type Database = {
           resume_url?: string | null
           skills?: string[]
           updated_at?: string
-          user_id?: string
+          user_id?: string | null
           work_type?: string
         }
         Relationships: []
