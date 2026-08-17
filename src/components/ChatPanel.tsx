@@ -137,10 +137,20 @@ export function ChatPanel({
     if (!text.trim() || !me) return;
     const content = text.trim();
     setText("");
-    const { error } = await supabase.from("messages").insert({
+    const { data, error } = await supabase.from("messages").insert({
       conversation_id: conversationId, sender_id: me.user_id, content,
+    }).select("id,conversation_id,sender_id,seed_sender_founder_id,content,created_at,edited_at,deleted_at,reactions").single();
+    if (error) {
+      setText(content);
+      toast.error(error.message);
+      return;
+    }
+    const row = data as unknown as MessageRow;
+    qc.setQueryData<MessageRow[]>(["messages", conversationId], (previous) => {
+      const current = previous ?? [];
+      return current.some((message) => message.id === row.id) ? current : [...current, row];
     });
-    if (error) toast.error(error.message);
+    void qc.invalidateQueries({ queryKey: ["inbox-convos"] });
   }
 
   async function saveEdit(id: string) {
@@ -170,6 +180,8 @@ export function ChatPanel({
     if (next[emoji].length === 0) delete next[emoji];
     const { error } = await supabase.from("messages").update({ reactions: next }).eq("id", m.id);
     if (error) toast.error(error.message);
+    else qc.setQueryData<MessageRow[]>(["messages", conversationId], (previous) =>
+      (previous ?? []).map((message) => message.id === m.id ? { ...message, reactions: next } : message));
     setActiveMsg(null);
   }
 

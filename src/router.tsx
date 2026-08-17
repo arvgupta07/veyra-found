@@ -1,15 +1,24 @@
-import { QueryClient } from "@tanstack/react-query";
+import { MutationCache, QueryClient } from "@tanstack/react-query";
 import { createRouter } from "@tanstack/react-router";
 import { routeTree } from "./routeTree.gen";
 
 export const getRouter = () => {
-  const queryClient = new QueryClient({
+  let queryClient: QueryClient;
+  const mutationCache = new MutationCache({
+    onSuccess: () => {
+      // Individual screens can still update their cache optimistically, while
+      // this guarantees every successful app action refreshes visible data.
+      void queryClient.invalidateQueries({ refetchType: "active" });
+    },
+  });
+
+  queryClient = new QueryClient({
+    mutationCache,
     defaultOptions: {
       queries: {
-        // Cached data still renders instantly on tab switches, but anything
-        // older than a few seconds (or invalidated by a mutation) is refetched
-        // in the background so the UI never shows stale rows.
-        staleTime: 10_000,
+        // Keep cached data available during navigation, but always verify it
+        // in the background when a screen is revisited.
+        staleTime: 0,
         gcTime: 10 * 60_000,
         refetchOnWindowFocus: true,
         refetchOnReconnect: true,

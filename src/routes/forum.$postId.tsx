@@ -155,6 +155,7 @@ function PostView() {
     }
     qc.invalidateQueries({ queryKey: ["myvote", postId, me.id] });
     qc.invalidateQueries({ queryKey: ["post", postId] });
+    qc.invalidateQueries({ queryKey: ["forum"] });
   }
 
   async function toggleSave() {

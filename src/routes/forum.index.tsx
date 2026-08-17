@@ -1,5 +1,5 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { useMyFounder } from "@/hooks/useMyFounder";
@@ -38,10 +38,11 @@ export const Route = createFileRoute("/forum/")({
 function Forum() {
   const { ready } = useRequireAuth({ requireOnboarded: true });
   const { data: me } = useMyFounder();
+  const qc = useQueryClient();
   const [cat, setCat] = useState<string>("all");
   const [composeOpen, setComposeOpen] = useState(false);
 
-  const { data: posts, refetch } = useQuery({
+  const { data: posts } = useQuery({
     queryKey: ["forum", cat, me?.id ?? "anon"],
     queryFn: async () => {
       let q = supabase.from("forum_posts")
@@ -81,7 +82,8 @@ function Forum() {
         .update({ value: next }).eq("post_id", postId).eq("founder_id", me.id);
       if (error) toast.error(error.message);
     }
-    refetch();
+    await qc.invalidateQueries({ queryKey: ["forum"] });
+    await qc.invalidateQueries({ queryKey: ["post", postId] });
   }
 
   if (!ready) return null;
@@ -163,7 +165,7 @@ function Forum() {
                     <button
                       onClick={async () => {
                         if (!confirm("Delete this post? This also removes its replies and votes.")) return;
-                        try { await deleteForumPost(p.id); toast.success("Post deleted"); refetch(); }
+                        try { await deleteForumPost(p.id); toast.success("Post deleted"); await qc.invalidateQueries({ queryKey: ["forum"] }); }
                         catch (err) { toast.error(err instanceof Error ? err.message : "Delete failed"); }
                       }}
                       className="ml-auto inline-flex items-center gap-1 rounded-md border-2 border-ink bg-red px-2 py-0.5 text-[11px] font-black text-white shadow-brutal-sm">
@@ -180,7 +182,7 @@ function Forum() {
         </div>
       </div>
 
-      {composeOpen && me && <ComposeModal onClose={(postedCategory) => { setComposeOpen(false); if (postedCategory) setCat(postedCategory); refetch(); }} founderId={me.id} />}
+      {composeOpen && me && <ComposeModal onClose={(postedCategory) => { setComposeOpen(false); if (postedCategory) setCat(postedCategory); void qc.invalidateQueries({ queryKey: ["forum"] }); }} founderId={me.id} />}
     </AppShell>
   );
 }
