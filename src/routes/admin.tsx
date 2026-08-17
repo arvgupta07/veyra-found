@@ -153,10 +153,14 @@ function useRefresher(_keys?: string[]) {
   const qc = useQueryClient();
   return () =>
     qc.invalidateQueries({
-      predicate: (q) => String(q.queryKey[0] ?? "").startsWith("admin-"),
+      predicate: (q) => {
+        const k = String(q.queryKey[0] ?? "");
+        return k.startsWith("admin-") || k.startsWith("forum") || k.startsWith("post");
+      },
       refetchType: "all",
     });
 }
+
 
 /* -------------------------------- overview -------------------------------- */
 
