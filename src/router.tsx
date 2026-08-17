@@ -6,12 +6,14 @@ export const getRouter = () => {
   const queryClient = new QueryClient({
     defaultOptions: {
       queries: {
-        // Keep data warm between tab switches so navigating back to a page
-        // shows content instantly instead of a blank loading state.
-        staleTime: 60_000,
+        // Cached data still renders instantly on tab switches, but anything
+        // older than a few seconds (or invalidated by a mutation) is refetched
+        // in the background so the UI never shows stale rows.
+        staleTime: 10_000,
         gcTime: 10 * 60_000,
-        refetchOnWindowFocus: false,
-        refetchOnMount: false,
+        refetchOnWindowFocus: true,
+        refetchOnReconnect: true,
+        refetchOnMount: true,
         retry: 1,
       },
     },

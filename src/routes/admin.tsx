@@ -147,16 +147,22 @@ function Card({ children, className = "" }: any) {
   return <div className={`border-[3px] border-ink bg-white p-3 shadow-brutal-sm ${className}`}>{children}</div>;
 }
 
-function useRefresher(keys: string[]) {
+/** Admin actions touch many tables at once, so every admin query is
+ *  invalidated and refetched (even the panels you are not looking at). */
+function useRefresher(_keys?: string[]) {
   const qc = useQueryClient();
-  return () => { keys.forEach((k) => qc.invalidateQueries({ queryKey: [k] })); };
+  return () =>
+    qc.invalidateQueries({
+      predicate: (q) => String(q.queryKey[0] ?? "").startsWith("admin-"),
+      refetchType: "all",
+    });
 }
 
 /* -------------------------------- overview -------------------------------- */
 
 function OverviewPanel({ onJump }: { onJump: (t: Tab) => void }) {
   const stats = useServerFn(adminStats);
-  const { data, isLoading, refetch, isFetching } = useQuery({ queryKey: ["admin-stats"], queryFn: () => stats() });
+  const { data, isLoading, refetch, isFetching } = useQuery({ queryKey: ["admin-stats"], queryFn: () => stats(), staleTime: 0 });
 
   if (isLoading) return <div className="text-sm text-muted-text">Crunching numbers…</div>;
   const s = data!;
@@ -211,7 +217,7 @@ function UsersPanel({ meId }: { meId: string }) {
   const [q, setQ] = useState("");
   const [filter, setFilter] = useState<"all" | "banned" | "incomplete" | "admins" | "founder" | "investor" | "talent">("all");
 
-  const { data, isLoading } = useQuery({ queryKey: ["admin-users"], queryFn: () => list() });
+  const { data, isLoading } = useQuery({ queryKey: ["admin-users"], queryFn: () => list(), staleTime: 0 });
 
   const mDel = useMutation({ mutationFn: (userId: string) => del({ data: { userId } }), onSuccess: () => { toast.success("Account deleted"); refresh(); }, onError: (e: any) => toast.error(e.message) });
   const mBan = useMutation({ mutationFn: (v: { founderId: string; banned: boolean }) => ban({ data: v }), onSuccess: () => { toast.success("Updated"); refresh(); }, onError: (e: any) => toast.error(e.message) });
@@ -310,7 +316,7 @@ function PostsPanel() {
   const del = useServerFn(adminDeletePost);
   const pin = useServerFn(adminSetPostPinned);
   const [q, setQ] = useState("");
-  const { data, isLoading, error } = useQuery({ queryKey: ["admin-posts"], queryFn: () => list() });
+  const { data, isLoading, error } = useQuery({ queryKey: ["admin-posts"], queryFn: () => list(), staleTime: 0 });
   const mDel = useMutation({ mutationFn: (postId: string) => del({ data: { postId } }), onSuccess: () => { toast.success("Post deleted"); refresh(); }, onError: (e: any) => toast.error(e.message) });
   const mPin = useMutation({ mutationFn: (v: { postId: string; pinned: boolean }) => pin({ data: v }), onSuccess: () => { toast.success("Updated"); refresh(); }, onError: (e: any) => toast.error(e.message) });
 
@@ -365,7 +371,7 @@ function CommentsPanel() {
   const refresh = useRefresher(["admin-comments", "admin-stats"]);
   const list = useServerFn(adminListComments);
   const del = useServerFn(adminDeleteComment);
-  const { data, isLoading } = useQuery({ queryKey: ["admin-comments"], queryFn: () => list() });
+  const { data, isLoading } = useQuery({ queryKey: ["admin-comments"], queryFn: () => list(), staleTime: 0 });
   const mDel = useMutation({ mutationFn: (commentId: string) => del({ data: { commentId } }), onSuccess: () => { toast.success("Comment deleted"); refresh(); }, onError: (e: any) => toast.error(e.message) });
 
   if (isLoading) return <div className="text-sm text-muted-text">Loading comments…</div>;
@@ -400,7 +406,7 @@ function DmsPanel() {
   const delMsg = useServerFn(adminDeleteMessage);
   const delConvo = useServerFn(adminDeleteConversation);
   const [openId, setOpenId] = useState<string | null>(null);
-  const { data: convos, isLoading } = useQuery({ queryKey: ["admin-convos"], queryFn: () => listConvos() });
+  const { data: convos, isLoading } = useQuery({ queryKey: ["admin-convos"], queryFn: () => listConvos(), staleTime: 0 });
   const { data: msgs } = useQuery({
     queryKey: ["admin-msgs", openId], enabled: !!openId,
     queryFn: () => listMsgs({ data: { conversationId: openId! } }),
@@ -470,7 +476,7 @@ function DmsPanel() {
 
 function RequestsPanel() {
   const list = useServerFn(adminListRequests);
-  const { data, isLoading } = useQuery({ queryKey: ["admin-requests"], queryFn: () => list() });
+  const { data, isLoading } = useQuery({ queryKey: ["admin-requests"], queryFn: () => list(), staleTime: 0 });
   const [status, setStatus] = useState<"all" | "pending" | "accepted" | "declined" | "withdrawn">("all");
   if (isLoading) return <div className="text-sm text-muted-text">Loading requests…</div>;
   const rows = (data ?? []).filter((r: any) => status === "all" || r.status === status);
@@ -509,7 +515,7 @@ function BlocksPanel() {
   const refresh = useRefresher(["admin-blocks", "admin-stats"]);
   const list = useServerFn(adminListBlocks);
   const del = useServerFn(adminDeleteBlock);
-  const { data, isLoading } = useQuery({ queryKey: ["admin-blocks"], queryFn: () => list() });
+  const { data, isLoading } = useQuery({ queryKey: ["admin-blocks"], queryFn: () => list(), staleTime: 0 });
   const mDel = useMutation({ mutationFn: (blockId: string) => del({ data: { blockId } }), onSuccess: () => { toast.success("Block lifted"); refresh(); }, onError: (e: any) => toast.error(e.message) });
   const name = (f: any) => f?.profiles?.full_name ?? f?.seed_name ?? "unknown";
   if (isLoading) return <div className="text-sm text-muted-text">Loading blocks…</div>;
@@ -641,7 +647,7 @@ function MarketPanel() {
   const setStatus = useServerFn(adminSetRoleStatus);
   const [sub, setSub] = useState<"investors" | "talent" | "roles">("investors");
 
-  const { data, isLoading } = useQuery({ queryKey: ["admin-market"], queryFn: () => list() });
+  const { data, isLoading } = useQuery({ queryKey: ["admin-market"], queryFn: () => list(), staleTime: 0 });
 
   const mDel = useMutation({
     mutationFn: (v: { table: "investor_profiles" | "talent_profiles" | "open_roles"; id: string }) => del({ data: v }),
