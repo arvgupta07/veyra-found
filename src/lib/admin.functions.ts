@@ -39,10 +39,17 @@ export const adminDeletePost = createServerFn({ method: "POST" })
     await supabaseAdmin.from("forum_upvotes").delete().eq("post_id", data.postId);
     await supabaseAdmin.from("forum_saves").delete().eq("post_id", data.postId);
     await supabaseAdmin.from("forum_collaborators").delete().eq("post_id", data.postId);
+    await supabaseAdmin.from("forum_poll_votes").delete().eq("post_id", data.postId);
+    // Nested replies first, then top-level comments.
+    await supabaseAdmin.from("forum_comments").delete().eq("post_id", data.postId).not("parent_comment_id", "is", null);
     await supabaseAdmin.from("forum_comments").delete().eq("post_id", data.postId);
     const { error } = await supabaseAdmin.from("forum_posts").delete().eq("id", data.postId);
     if (error) throw new Error(error.message);
+    // Verify the row is really gone so the UI never shows a false success.
+    const { data: still } = await supabaseAdmin.from("forum_posts").select("id").eq("id", data.postId).maybeSingle();
+    if (still) throw new Error("Post could not be deleted (still referenced). Try again.");
     return { ok: true };
+
   });
 
 export const adminListUsers = createServerFn({ method: "GET" })
