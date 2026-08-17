@@ -147,9 +147,15 @@ function Card({ children, className = "" }: any) {
   return <div className={`border-[3px] border-ink bg-white p-3 shadow-brutal-sm ${className}`}>{children}</div>;
 }
 
-function useRefresher(keys: string[]) {
+/** Admin actions touch many tables at once, so every admin query is
+ *  invalidated and refetched (even the panels you are not looking at). */
+function useRefresher(_keys?: string[]) {
   const qc = useQueryClient();
-  return () => { keys.forEach((k) => qc.invalidateQueries({ queryKey: [k] })); };
+  return () =>
+    qc.invalidateQueries({
+      predicate: (q) => String(q.queryKey[0] ?? "").startsWith("admin-"),
+      refetchType: "all",
+    });
 }
 
 /* -------------------------------- overview -------------------------------- */
