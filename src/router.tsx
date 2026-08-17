@@ -5,10 +5,10 @@ import { routeTree } from "./routeTree.gen";
 export const getRouter = () => {
   let queryClient: QueryClient;
   const mutationCache = new MutationCache({
-    onSuccess: async () => {
+    onSuccess: () => {
       // Individual screens can still update their cache optimistically, while
       // this guarantees every successful app action refreshes visible data.
-      await queryClient.invalidateQueries({ refetchType: "active" });
+      void queryClient.invalidateQueries({ refetchType: "active" });
     },
   });
 
