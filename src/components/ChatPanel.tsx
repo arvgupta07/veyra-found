@@ -3,7 +3,7 @@ import { useEffect, useRef, useState } from "react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { useMyFounder } from "@/hooks/useMyFounder";
-import { founderAvatar } from "@/lib/founder-types";
+import { FOUNDER_COLS, founderAvatar } from "@/lib/founder-types";
 import { clearUnread } from "@/lib/unread-store";
 import { Send, ArrowLeft, Pencil, Trash2, Smile, Check, X, Minus, ShieldAlert, Loader2 } from "lucide-react";
 import { useMyVerification } from "@/hooks/useVerification";
@@ -85,7 +85,7 @@ export function ChatPanel({
     staleTime: 5 * 60_000,
     queryFn: async () => {
       const { data } = await supabase.from("conversations")
-        .select("*, a:founders!conversations_founder_a_id_fkey(*, profiles(full_name)), b:founders!conversations_founder_b_id_fkey(*, profiles(full_name))")
+        .select(`*, a:founders!conversations_founder_a_id_fkey(${FOUNDER_COLS}, profiles(full_name)), b:founders!conversations_founder_b_id_fkey(${FOUNDER_COLS}, profiles(full_name))`)
         .eq("id", conversationId).maybeSingle();
       return data;
     },

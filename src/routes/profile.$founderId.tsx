@@ -8,7 +8,7 @@ import { AppShell } from "@/components/AppShell";
 import { RoleBadge } from "@/components/RoleBadge";
 import { useRequireAuth } from "@/hooks/useRequireAuth";
 import { SkillTag, TierBadge, VerifiedBadges } from "@/components/FounderBits";
-import { founderAvatar } from "@/lib/founder-types";
+import { FOUNDER_COLS, founderAvatar } from "@/lib/founder-types";
 import { ProfileLinkChips } from "@/components/ProfileLinkChips";
 import { parseLinks } from "@/lib/profile-links";
 import { useMyVerification } from "@/hooks/useVerification";
@@ -87,7 +87,7 @@ function FounderProfile() {
     queryKey: ["founder-profile", founderId],
     queryFn: async () => {
       const { data: f } = await supabase.from("founders")
-        .select("*, profiles(full_name), founder_prompts(prompt_question, prompt_answer, display_order), assessments(*)")
+        .select(`${FOUNDER_COLS}, profiles(full_name), founder_prompts(prompt_question, prompt_answer, display_order), assessments(*)`)
         .eq("id", founderId).maybeSingle();
       return f;
     },

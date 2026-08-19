@@ -220,3 +220,11 @@ export const ASSESSMENT_QUESTIONS: { q: string; opts: [string, string, string, s
   { q: "You handle boredom by:", opts: ["Starting a new project","Going for a long walk","Calling someone","Sitting with it — boredom is data"] },
   { q: "Ten years from now you want to be someone who:", opts: ["Built something the world uses","Grew into their best self","Has deep, chosen family","Lives on their own terms"] },
 ];
+
+/**
+ * Safe column list for founder reads from the browser.
+ * Internal moderation fields (shadow_banned, spam_strikes) are not readable by
+ * members — the database hides banned content itself via row-level policies.
+ */
+export const FOUNDER_COLS =
+  "id, user_id, headline, bio, location, background, years_experience, education, commitment, has_idea, idea_description, idea_industry, idea_stage, equity_offer, exit_vision, skills, industry_focus, active_status, linkedin_url, github_url, linkedin_verified, github_verified, aadhaar_verified, video_intro_url, vouches_count, trust_tier, profile_complete, seed_name, seed_avatar, created_at, remote_pref, looking_for, age, assessment_public, links, verified, verified_at, account_type";

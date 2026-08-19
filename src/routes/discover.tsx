@@ -10,7 +10,7 @@ import { AppShell } from "@/components/AppShell";
 import { SkillTag, VerifiedBadges } from "@/components/FounderBits";
 import { MapPin, Sparkles, Send, X, Loader2, Keyboard, ChevronDown, Check } from "lucide-react";
 import { toast } from "sonner";
-import { founderAvatar } from "@/lib/founder-types";
+import { FOUNDER_COLS, founderAvatar } from "@/lib/founder-types";
 import { useRequireAuth } from "@/hooks/useRequireAuth";
 import { useConnectedIds } from "@/hooks/useConnectedIds";
 import { useMyVerification } from "@/hooks/useVerification";
@@ -55,7 +55,7 @@ function Discover() {
     enabled: !!me?.id,
     queryFn: async () => {
       const { data: fs } = await supabase.from("founders")
-        .select("*, founder_prompts(prompt_question, prompt_answer, display_order), profiles(full_name)")
+        .select(`${FOUNDER_COLS}, founder_prompts(prompt_question, prompt_answer, display_order), profiles(full_name)`)
         .eq("profile_complete", true).eq("account_type", "founder").neq("id", me!.id).limit(60);
       return fs ?? [];
     },

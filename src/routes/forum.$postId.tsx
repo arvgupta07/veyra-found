@@ -6,12 +6,12 @@ import { sendConnectionRequest } from "@/lib/connect-requests";
 import { useMyFounder } from "@/hooks/useMyFounder";
 import { AppShell } from "@/components/AppShell";
 import { useRequireAuth } from "@/hooks/useRequireAuth";
-import { founderAvatar } from "@/lib/founder-types";
+import { FOUNDER_COLS, founderAvatar } from "@/lib/founder-types";
 import { PostMedia } from "@/components/forum/PostMedia";
 import { PollBlock } from "@/components/forum/PollBlock";
 import {
   deleteForumPost, deleteForumComment, updateForumPost, updateForumComment,
-  addForumCollaborator, removeForumCollaborator, visibleToViewer,
+  addForumCollaborator, removeForumCollaborator,
 } from "@/lib/forum-actions";
 import { ArrowBigUp, ArrowBigDown, ArrowLeft, Loader2, Bookmark, MessageSquareText, Send, Trash2, Pencil, Users, X, Save } from "lucide-react";
 import { toast } from "sonner";
@@ -97,7 +97,7 @@ function PostView() {
     queryKey: ["post", postId],
     queryFn: async () => {
       const { data } = await supabase.from("forum_posts")
-        .select("*, author:founders!forum_posts_author_id_fkey(*, profiles(full_name))").eq("id", postId).maybeSingle();
+        .select(`*, author:founders!forum_posts_author_id_fkey(${FOUNDER_COLS}, profiles(full_name))`).eq("id", postId).maybeSingle();
       return data;
     },
   });
@@ -116,7 +116,7 @@ function PostView() {
     queryKey: ["comments", postId],
     queryFn: async () => {
       const { data } = await supabase.from("forum_comments")
-        .select("*, author:founders!forum_comments_author_id_fkey(*, profiles(full_name))")
+        .select(`*, author:founders!forum_comments_author_id_fkey(${FOUNDER_COLS}, profiles(full_name))`)
         .eq("post_id", postId).order("created_at", { ascending: true });
       return data ?? [];
     },
@@ -228,25 +228,9 @@ function PostView() {
   const canEdit = !!me && (me.id === post.author_id || collabIds.includes(me.id));
   const isAuthor = me?.id === post.author_id;
 
-  // Shadow-banned posts stay visible to their own author only.
-  const postHidden = !!post.author?.shadow_banned && post.author_id !== me?.id;
-  if (postHidden) {
-    return (
-      <AppShell>
-        <div className="mx-auto max-w-2xl px-4 py-16 text-center">
-          <div className="rounded-2xl border-2 border-dashed border-ink p-10 text-sm font-bold text-muted-text">
-            This post isn't available.
-          </div>
-          <Link to="/forum" className="mt-4 inline-flex items-center gap-1 text-xs font-black text-orange">
-            <ArrowLeft className="h-3 w-3" /> Back to forum
-          </Link>
-        </div>
-      </AppShell>
-    );
-  }
-
-  // group into top-level + replies (shadow-banned authors filtered out)
-  const visible = visibleToViewer(comments ?? [], me?.id);
+  // Shadow-banned posts/comments are hidden by database policies, so anything
+  // that arrives here is already safe to render.
+  const visible = comments ?? [];
   const topLevel = visible.filter((c) => !c.parent_comment_id);
   const repliesOf = (id: string) => visible.filter((c) => c.parent_comment_id === id);
   const isLFC = post.category === "looking_for_cofounder";

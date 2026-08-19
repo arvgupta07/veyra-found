@@ -8,7 +8,7 @@ import { isDockViewport, openDockedChat } from "@/lib/chat-dock";
 import { AppShell } from "@/components/AppShell";
 import { VerifyBanner } from "@/components/VerifyGate";
 import { useRequireAuth } from "@/hooks/useRequireAuth";
-import { founderAvatar } from "@/lib/founder-types";
+import { FOUNDER_COLS, founderAvatar } from "@/lib/founder-types";
 import { Check, X, Loader2, MessageSquare, Tag, Plus, Pin, PinOff, UserMinus, Trash2 } from "lucide-react";
 import { useUnreadConversations } from "@/hooks/useLiveInbox";
 import { toast } from "sonner";
@@ -62,7 +62,7 @@ function Inbox() {
     enabled: !!me?.id,
     queryFn: async () => {
       const { data } = await supabase.from("connection_requests")
-        .select("*, founder:founders!connection_requests_from_founder_id_fkey(*, profiles(full_name))")
+        .select(`*, founder:founders!connection_requests_from_founder_id_fkey(${FOUNDER_COLS}, profiles(full_name))`)
         .eq("to_founder_id", me!.id).eq("status", "pending").order("created_at", { ascending: false });
       return data ?? [];
     },
@@ -73,7 +73,7 @@ function Inbox() {
     enabled: !!me?.id,
     queryFn: async () => {
       const { data } = await supabase.from("connection_requests")
-        .select("*, founder:founders!connection_requests_to_founder_id_fkey(*, profiles(full_name))")
+        .select(`*, founder:founders!connection_requests_to_founder_id_fkey(${FOUNDER_COLS}, profiles(full_name))`)
         .eq("from_founder_id", me!.id)
         .neq("status", "accepted")
         .order("created_at", { ascending: false });
@@ -88,7 +88,7 @@ function Inbox() {
       // Only the latest message per conversation is needed for the preview row,
       // so cap the embedded messages instead of pulling entire chat histories.
       const { data } = await supabase.from("conversations")
-        .select("*, a:founders!conversations_founder_a_id_fkey(*, profiles(full_name)), b:founders!conversations_founder_b_id_fkey(*, profiles(full_name)), messages(content, created_at)")
+        .select(`*, a:founders!conversations_founder_a_id_fkey(${FOUNDER_COLS}, profiles(full_name)), b:founders!conversations_founder_b_id_fkey(${FOUNDER_COLS}, profiles(full_name)), messages(content, created_at)`)
         .or(`founder_a_id.eq.${me!.id},founder_b_id.eq.${me!.id}`)
         .order("created_at", { ascending: false })
         .order("created_at", { referencedTable: "messages", ascending: false })

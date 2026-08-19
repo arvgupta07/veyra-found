@@ -5,9 +5,9 @@ import { supabase } from "@/integrations/supabase/client";
 import { useMyFounder } from "@/hooks/useMyFounder";
 import { AppShell } from "@/components/AppShell";
 import { useRequireAuth } from "@/hooks/useRequireAuth";
-import { founderAvatar } from "@/lib/founder-types";
+import { FOUNDER_COLS, founderAvatar } from "@/lib/founder-types";
 import { uploadImage, uploadVideo } from "@/lib/uploads";
-import { deleteForumPost, visibleToViewer } from "@/lib/forum-actions";
+import { deleteForumPost } from "@/lib/forum-actions";
 import { ArrowBigUp, ArrowBigDown, MessageCircle, Plus, Loader2, X, MessageSquareText, ImagePlus, Trash2, Video, BarChart3, Type, Link2 } from "lucide-react";
 import { PostMedia } from "@/components/forum/PostMedia";
 import { PollBlock } from "@/components/forum/PollBlock";
@@ -46,7 +46,7 @@ function Forum() {
     queryKey: ["forum", cat, me?.id ?? "anon"],
     queryFn: async () => {
       let q = supabase.from("forum_posts")
-        .select("*, author:founders!forum_posts_author_id_fkey(*, profiles(full_name)), my_vote:forum_upvotes(value, founder_id)")
+        .select(`*, author:founders!forum_posts_author_id_fkey(${FOUNDER_COLS}, profiles(full_name)), my_vote:forum_upvotes(value, founder_id)`)
         .order("created_at", { ascending: false }).limit(50);
       // Only my own vote row is needed per post — pulling every voter made the
       // feed slower with each new upvote in the whole forum.
@@ -58,8 +58,8 @@ function Forum() {
         ...p,
         my_value: (p.my_vote ?? []).find((v: any) => v.founder_id === me?.id)?.value ?? 0,
       }));
-      // Hide shadow-banned spammers from everyone but themselves.
-      return visibleToViewer(rows, me?.id);
+      // Shadow-banned authors are filtered out by database policies.
+      return rows;
     },
 
   });
