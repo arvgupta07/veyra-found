@@ -59,16 +59,3 @@ export async function removeForumCollaborator(postId: string, founderId: string)
     .delete().eq("post_id", postId).eq("founder_id", founderId);
   if (error) throw new Error(error.message);
 }
-
-/**
- * Shadow-ban filter. A shadow-banned author still sees their own content
- * (so spammers don't realise), but nobody else does. Admins see everything.
- */
-export function visibleToViewer<T extends { author_id?: string | null; author?: { shadow_banned?: boolean | null } | null }>(
-  rows: T[],
-  viewerFounderId?: string | null,
-  isAdmin = false,
-) {
-  if (isAdmin) return rows;
-  return rows.filter((r) => !r.author?.shadow_banned || (!!viewerFounderId && r.author_id === viewerFounderId));
-}
