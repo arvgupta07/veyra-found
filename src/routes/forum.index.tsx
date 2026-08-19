@@ -7,7 +7,7 @@ import { AppShell } from "@/components/AppShell";
 import { useRequireAuth } from "@/hooks/useRequireAuth";
 import { FOUNDER_COLS, founderAvatar } from "@/lib/founder-types";
 import { uploadImage, uploadVideo } from "@/lib/uploads";
-import { deleteForumPost, visibleToViewer } from "@/lib/forum-actions";
+import { deleteForumPost } from "@/lib/forum-actions";
 import { ArrowBigUp, ArrowBigDown, MessageCircle, Plus, Loader2, X, MessageSquareText, ImagePlus, Trash2, Video, BarChart3, Type, Link2 } from "lucide-react";
 import { PostMedia } from "@/components/forum/PostMedia";
 import { PollBlock } from "@/components/forum/PollBlock";
@@ -58,8 +58,8 @@ function Forum() {
         ...p,
         my_value: (p.my_vote ?? []).find((v: any) => v.founder_id === me?.id)?.value ?? 0,
       }));
-      // Hide shadow-banned spammers from everyone but themselves.
-      return visibleToViewer(rows, me?.id);
+      // Shadow-banned authors are filtered out by database policies.
+      return rows;
     },
 
   });

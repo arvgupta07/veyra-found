@@ -11,7 +11,7 @@ import { PostMedia } from "@/components/forum/PostMedia";
 import { PollBlock } from "@/components/forum/PollBlock";
 import {
   deleteForumPost, deleteForumComment, updateForumPost, updateForumComment,
-  addForumCollaborator, removeForumCollaborator, visibleToViewer,
+  addForumCollaborator, removeForumCollaborator,
 } from "@/lib/forum-actions";
 import { ArrowBigUp, ArrowBigDown, ArrowLeft, Loader2, Bookmark, MessageSquareText, Send, Trash2, Pencil, Users, X, Save } from "lucide-react";
 import { toast } from "sonner";
