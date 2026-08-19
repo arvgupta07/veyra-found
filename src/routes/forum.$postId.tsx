@@ -228,25 +228,9 @@ function PostView() {
   const canEdit = !!me && (me.id === post.author_id || collabIds.includes(me.id));
   const isAuthor = me?.id === post.author_id;
 
-  // Shadow-banned posts stay visible to their own author only.
-  const postHidden = !!post.author?.shadow_banned && post.author_id !== me?.id;
-  if (postHidden) {
-    return (
-      <AppShell>
-        <div className="mx-auto max-w-2xl px-4 py-16 text-center">
-          <div className="rounded-2xl border-2 border-dashed border-ink p-10 text-sm font-bold text-muted-text">
-            This post isn't available.
-          </div>
-          <Link to="/forum" className="mt-4 inline-flex items-center gap-1 text-xs font-black text-orange">
-            <ArrowLeft className="h-3 w-3" /> Back to forum
-          </Link>
-        </div>
-      </AppShell>
-    );
-  }
-
-  // group into top-level + replies (shadow-banned authors filtered out)
-  const visible = visibleToViewer(comments ?? [], me?.id);
+  // Shadow-banned posts/comments are hidden by database policies, so anything
+  // that arrives here is already safe to render.
+  const visible = comments ?? [];
   const topLevel = visible.filter((c) => !c.parent_comment_id);
   const repliesOf = (id: string) => visible.filter((c) => c.parent_comment_id === id);
   const isLFC = post.category === "looking_for_cofounder";
