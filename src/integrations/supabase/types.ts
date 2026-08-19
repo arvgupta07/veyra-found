@@ -1427,6 +1427,7 @@ export type Database = {
           votes: number
         }[]
       }
+      founder_is_hidden: { Args: { _founder_id: string }; Returns: boolean }
       has_role: {
         Args: {
           _role: Database["public"]["Enums"]["app_role"]
