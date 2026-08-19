@@ -16,6 +16,7 @@ import { VerifiedTick, VerifyRequiredCard } from "@/components/VerifyGate";
 import { ArrowLeft, MapPin, Briefcase, Loader2, Send, X, Ban, ShieldCheck, EyeOff, UserMinus } from "lucide-react";
 
 import { toast } from "sonner";
+import { FOUNDER_COLS } from "@/lib/founder-types";
 
 export const Route = createFileRoute("/profile/$founderId")({
   component: FounderProfile,
@@ -87,7 +88,7 @@ function FounderProfile() {
     queryKey: ["founder-profile", founderId],
     queryFn: async () => {
       const { data: f } = await supabase.from("founders")
-        .select("*, profiles(full_name), founder_prompts(prompt_question, prompt_answer, display_order), assessments(*)")
+        .select(`${FOUNDER_COLS}, profiles(full_name), founder_prompts(prompt_question, prompt_answer, display_order), assessments(*)`)
         .eq("id", founderId).maybeSingle();
       return f;
     },

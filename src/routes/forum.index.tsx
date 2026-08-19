@@ -12,6 +12,7 @@ import { ArrowBigUp, ArrowBigDown, MessageCircle, Plus, Loader2, X, MessageSquar
 import { PostMedia } from "@/components/forum/PostMedia";
 import { PollBlock } from "@/components/forum/PollBlock";
 import { toast } from "sonner";
+import { FOUNDER_COLS } from "@/lib/founder-types";
 
 const CATEGORIES = [
   { v: "idea_validation", label: "💡 Idea Validation" },
@@ -46,7 +47,7 @@ function Forum() {
     queryKey: ["forum", cat, me?.id ?? "anon"],
     queryFn: async () => {
       let q = supabase.from("forum_posts")
-        .select("*, author:founders!forum_posts_author_id_fkey(*, profiles(full_name)), my_vote:forum_upvotes(value, founder_id)")
+        .select(`*, author:founders!forum_posts_author_id_fkey(${FOUNDER_COLS}, profiles(full_name)), my_vote:forum_upvotes(value, founder_id)`)
         .order("created_at", { ascending: false }).limit(50);
       // Only my own vote row is needed per post — pulling every voter made the
       // feed slower with each new upvote in the whole forum.

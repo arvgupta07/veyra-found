@@ -9,6 +9,7 @@ import { Send, ArrowLeft, Pencil, Trash2, Smile, Check, X, Minus, ShieldAlert, L
 import { useMyVerification } from "@/hooks/useVerification";
 import { openVerifyModal } from "@/components/VerifyModal";
 import { toast } from "sonner";
+import { FOUNDER_COLS } from "@/lib/founder-types";
 
 const REACTIONS = ["👍", "❤️", "😂", "🎉", "🔥", "🤔"];
 
@@ -85,7 +86,7 @@ export function ChatPanel({
     staleTime: 5 * 60_000,
     queryFn: async () => {
       const { data } = await supabase.from("conversations")
-        .select("*, a:founders!conversations_founder_a_id_fkey(*, profiles(full_name)), b:founders!conversations_founder_b_id_fkey(*, profiles(full_name))")
+        .select(`*, a:founders!conversations_founder_a_id_fkey(${FOUNDER_COLS}, profiles(full_name)), b:founders!conversations_founder_b_id_fkey(${FOUNDER_COLS}, profiles(full_name))`)
         .eq("id", conversationId).maybeSingle();
       return data;
     },

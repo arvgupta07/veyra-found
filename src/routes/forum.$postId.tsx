@@ -15,6 +15,7 @@ import {
 } from "@/lib/forum-actions";
 import { ArrowBigUp, ArrowBigDown, ArrowLeft, Loader2, Bookmark, MessageSquareText, Send, Trash2, Pencil, Users, X, Save } from "lucide-react";
 import { toast } from "sonner";
+import { FOUNDER_COLS } from "@/lib/founder-types";
 
 const CATEGORY_OPTIONS = [
   ["idea_validation", "💡 Idea Validation"],
@@ -97,7 +98,7 @@ function PostView() {
     queryKey: ["post", postId],
     queryFn: async () => {
       const { data } = await supabase.from("forum_posts")
-        .select("*, author:founders!forum_posts_author_id_fkey(*, profiles(full_name))").eq("id", postId).maybeSingle();
+        .select(`*, author:founders!forum_posts_author_id_fkey(${FOUNDER_COLS}, profiles(full_name))`).eq("id", postId).maybeSingle();
       return data;
     },
   });
@@ -116,7 +117,7 @@ function PostView() {
     queryKey: ["comments", postId],
     queryFn: async () => {
       const { data } = await supabase.from("forum_comments")
-        .select("*, author:founders!forum_comments_author_id_fkey(*, profiles(full_name))")
+        .select(`*, author:founders!forum_comments_author_id_fkey(${FOUNDER_COLS}, profiles(full_name))`)
         .eq("post_id", postId).order("created_at", { ascending: true });
       return data ?? [];
     },

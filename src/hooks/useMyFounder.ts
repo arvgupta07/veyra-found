@@ -2,6 +2,7 @@ import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { useSession } from "./useSession";
 import type { Founder } from "@/lib/founder-types";
+import { FOUNDER_COLS } from "@/lib/founder-types";
 
 export function useMyProfile() {
   const { user } = useSession();
@@ -23,7 +24,7 @@ export function useMyFounder() {
     enabled: !!user,
     staleTime: 5 * 60_000,
     queryFn: async () => {
-      const { data } = await supabase.from("founders").select("*").eq("user_id", user!.id).maybeSingle();
+      const { data } = await supabase.from("founders").select(FOUNDER_COLS).eq("user_id", user!.id).maybeSingle();
       return data as Founder | null;
     },
   });
