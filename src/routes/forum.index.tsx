@@ -5,14 +5,13 @@ import { supabase } from "@/integrations/supabase/client";
 import { useMyFounder } from "@/hooks/useMyFounder";
 import { AppShell } from "@/components/AppShell";
 import { useRequireAuth } from "@/hooks/useRequireAuth";
-import { founderAvatar } from "@/lib/founder-types";
+import { FOUNDER_COLS, founderAvatar } from "@/lib/founder-types";
 import { uploadImage, uploadVideo } from "@/lib/uploads";
 import { deleteForumPost, visibleToViewer } from "@/lib/forum-actions";
 import { ArrowBigUp, ArrowBigDown, MessageCircle, Plus, Loader2, X, MessageSquareText, ImagePlus, Trash2, Video, BarChart3, Type, Link2 } from "lucide-react";
 import { PostMedia } from "@/components/forum/PostMedia";
 import { PollBlock } from "@/components/forum/PollBlock";
 import { toast } from "sonner";
-import { FOUNDER_COLS } from "@/lib/founder-types";
 
 const CATEGORIES = [
   { v: "idea_validation", label: "💡 Idea Validation" },

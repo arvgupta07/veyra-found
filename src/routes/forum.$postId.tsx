@@ -6,7 +6,7 @@ import { sendConnectionRequest } from "@/lib/connect-requests";
 import { useMyFounder } from "@/hooks/useMyFounder";
 import { AppShell } from "@/components/AppShell";
 import { useRequireAuth } from "@/hooks/useRequireAuth";
-import { founderAvatar } from "@/lib/founder-types";
+import { FOUNDER_COLS, founderAvatar } from "@/lib/founder-types";
 import { PostMedia } from "@/components/forum/PostMedia";
 import { PollBlock } from "@/components/forum/PollBlock";
 import {
@@ -15,7 +15,6 @@ import {
 } from "@/lib/forum-actions";
 import { ArrowBigUp, ArrowBigDown, ArrowLeft, Loader2, Bookmark, MessageSquareText, Send, Trash2, Pencil, Users, X, Save } from "lucide-react";
 import { toast } from "sonner";
-import { FOUNDER_COLS } from "@/lib/founder-types";
 
 const CATEGORY_OPTIONS = [
   ["idea_validation", "💡 Idea Validation"],

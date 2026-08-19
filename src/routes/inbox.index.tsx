@@ -8,11 +8,10 @@ import { isDockViewport, openDockedChat } from "@/lib/chat-dock";
 import { AppShell } from "@/components/AppShell";
 import { VerifyBanner } from "@/components/VerifyGate";
 import { useRequireAuth } from "@/hooks/useRequireAuth";
-import { founderAvatar } from "@/lib/founder-types";
+import { FOUNDER_COLS, founderAvatar } from "@/lib/founder-types";
 import { Check, X, Loader2, MessageSquare, Tag, Plus, Pin, PinOff, UserMinus, Trash2 } from "lucide-react";
 import { useUnreadConversations } from "@/hooks/useLiveInbox";
 import { toast } from "sonner";
-import { FOUNDER_COLS } from "@/lib/founder-types";
 
 
 export const Route = createFileRoute("/inbox/")({

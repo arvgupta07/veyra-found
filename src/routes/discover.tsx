@@ -10,14 +10,13 @@ import { AppShell } from "@/components/AppShell";
 import { SkillTag, VerifiedBadges } from "@/components/FounderBits";
 import { MapPin, Sparkles, Send, X, Loader2, Keyboard, ChevronDown, Check } from "lucide-react";
 import { toast } from "sonner";
-import { founderAvatar } from "@/lib/founder-types";
+import { FOUNDER_COLS, founderAvatar } from "@/lib/founder-types";
 import { useRequireAuth } from "@/hooks/useRequireAuth";
 import { useConnectedIds } from "@/hooks/useConnectedIds";
 import { useMyVerification } from "@/hooks/useVerification";
 import { VerifyBanner, VerifyRequiredCard } from "@/components/VerifyGate";
 import { getDiscoverCursor, setDiscoverCursor } from "@/lib/discover-cursor";
 import { FilterBar, type FilterValues } from "@/components/FilterPanel";
-import { FOUNDER_COLS } from "@/lib/founder-types";
 
 
 export const Route = createFileRoute("/discover")({

@@ -8,7 +8,7 @@ import { AppShell } from "@/components/AppShell";
 import { RoleBadge } from "@/components/RoleBadge";
 import { useRequireAuth } from "@/hooks/useRequireAuth";
 import { SkillTag, TierBadge, VerifiedBadges } from "@/components/FounderBits";
-import { founderAvatar } from "@/lib/founder-types";
+import { FOUNDER_COLS, founderAvatar } from "@/lib/founder-types";
 import { ProfileLinkChips } from "@/components/ProfileLinkChips";
 import { parseLinks } from "@/lib/profile-links";
 import { useMyVerification } from "@/hooks/useVerification";
@@ -16,7 +16,6 @@ import { VerifiedTick, VerifyRequiredCard } from "@/components/VerifyGate";
 import { ArrowLeft, MapPin, Briefcase, Loader2, Send, X, Ban, ShieldCheck, EyeOff, UserMinus } from "lucide-react";
 
 import { toast } from "sonner";
-import { FOUNDER_COLS } from "@/lib/founder-types";
 
 export const Route = createFileRoute("/profile/$founderId")({
   component: FounderProfile,

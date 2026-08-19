@@ -1,8 +1,7 @@
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { useSession } from "./useSession";
-import type { Founder } from "@/lib/founder-types";
-import { FOUNDER_COLS } from "@/lib/founder-types";
+import { type Founder, FOUNDER_COLS } from "@/lib/founder-types";
 
 export function useMyProfile() {
   const { user } = useSession();
