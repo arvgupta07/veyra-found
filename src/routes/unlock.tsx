@@ -3,6 +3,7 @@ import { useServerFn } from "@tanstack/react-start";
 import { useState } from "react";
 import { Loader2 } from "lucide-react";
 import { unlockSite } from "@/lib/gate.functions";
+import { useSession } from "@/hooks/useSession";
 
 export const Route = createFileRoute("/unlock")({
   component: Unlock,
@@ -19,6 +20,7 @@ export const Route = createFileRoute("/unlock")({
 
 function Unlock() {
   const router = useRouter();
+  const { session } = useSession();
   const unlock = useServerFn(unlockSite);
   const [password, setPassword] = useState("");
   const [error, setError] = useState(false);
@@ -26,14 +28,20 @@ function Unlock() {
 
   async function onSubmit(e: React.FormEvent) {
     e.preventDefault();
+    if (busy) return;
     setBusy(true);
     setError(false);
     try {
-      const { ok } = await unlock({ data: { password } });
+      const { ok } = await unlock({ data: { password: password.trim() } });
       if (ok) {
         await router.invalidate();
-        await router.navigate({ to: "/dashboard" });
-      } else setError(true);
+        // Hard navigation so the freshly-set gate cookie is applied server-side.
+        window.location.href = session ? "/dashboard" : "/auth/login";
+        return;
+      }
+      setError(true);
+    } catch {
+      setError(true);
     } finally {
       setBusy(false);
     }
