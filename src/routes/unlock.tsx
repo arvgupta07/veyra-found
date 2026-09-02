@@ -3,6 +3,7 @@ import { useServerFn } from "@tanstack/react-start";
 import { useState } from "react";
 import { Loader2 } from "lucide-react";
 import { unlockSite } from "@/lib/gate.functions";
+import { useSession } from "@/hooks/useSession";
 
 export const Route = createFileRoute("/unlock")({
   component: Unlock,
