@@ -1406,6 +1406,24 @@ export type Database = {
           },
         ]
       }
+      waitlist: {
+        Row: {
+          created_at: string
+          email: string
+          id: string
+        }
+        Insert: {
+          created_at?: string
+          email: string
+          id?: string
+        }
+        Update: {
+          created_at?: string
+          email?: string
+          id?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
@@ -1442,6 +1460,7 @@ export type Database = {
         Args: { _a: string; _b: string }
         Returns: undefined
       }
+      waitlist_count: { Args: never; Returns: number }
     }
     Enums: {
       app_role: "admin" | "user"
