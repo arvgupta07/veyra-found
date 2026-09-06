@@ -41,11 +41,11 @@ Everyone picks a role **before sign-up** (`/auth/role`). The choice is locked af
 | UI | React 19, TypeScript, Tailwind CSS v4, [shadcn/ui](https://ui.shadcn.com) |
 | Data | Supabase (Auth, Postgres, Realtime, Storage) |
 | State | TanStack Query (server state), React hooks (local state) |
-| AI | Lovable AI Gateway → Gemini (server-side compatibility reports) |
+| AI | Google Gemini via `@ai-sdk/google` (server-side compatibility reports) |
 | Charts | Recharts |
 | Icons | Lucide React |
 | Toasts | Sonner |
-| Deploy | Lovable / Vercel-compatible Nitro build |
+| Deploy | Vercel (Nitro) |
 
 ---
 
@@ -161,8 +161,10 @@ SUPABASE_SERVICE_ROLE_KEY=YOUR-SERVICE-ROLE-KEY
 SUPABASE_PROJECT_ID=YOUR-PROJECT-ID
 
 # AI compatibility reports (server-only)
-LOVABLE_API_KEY=YOUR-LOVABLE-API-KEY
+GEMINI_API_KEY=YOUR-GEMINI-API-KEY
 ```
+
+Get a Gemini API key at [Google AI Studio](https://aistudio.google.com/apikey).
 
 Never commit `.env` or expose the service role key or API key in client code.
 
@@ -170,25 +172,46 @@ Never commit `.env` or expose the service role key or API key in client code.
 
 ## Development
 
-**Requirements:** Node.js 18+ (or [Bun](https://bun.sh)), npm or bun.
+**Requirements:** Node.js 18+ (or [Bun](https://bun.sh)), npm or bun, and a [Supabase](https://supabase.com) project.
 
 ```sh
-git clone <repository-url>
+git clone https://github.com/arvgupta07/veyra-found.git
 cd veyra-found
-npm install   # or: bun install
-npm run dev   # or: bun run dev
+npm install
+cp .env.example .env   # fill in Supabase + Gemini keys
+npm run dev            # http://localhost:3000
 ```
+
+### Supabase setup
+
+1. Create a project at [supabase.com](https://supabase.com).
+2. Apply migrations: `npx supabase link --project-ref YOUR-PROJECT-ID && npx supabase db push`
+3. Enable **Google** (and Email) under Authentication → Providers.
+4. Add redirect URLs: `http://localhost:3000/auth/callback` and your production URL.
+5. Copy API keys from Project Settings → API into `.env`.
+
+### Deploy to Vercel
+
+1. Import `arvgupta07/veyra-found` at [vercel.com/new](https://vercel.com/new).
+2. Add all environment variables from `.env` in Vercel project settings.
+3. Deploy — Vercel auto-detects TanStack Start + Nitro.
+4. Add your production callback URL to Supabase Auth redirect URLs.
+5. Point your custom domain (e.g. `veyrafound.in`) in Vercel → Domains.
 
 | Script | Purpose |
 | --- | --- |
-| `npm run dev` | Start dev server |
-| `npm run build` | Production build |
+| `npm run dev` | Start dev server at http://localhost:3000 |
+| `npm run build` | Production build (Nitro + Vercel preset) |
 | `npm run start` | Run production server (after build) |
 | `npm run preview` | Preview production build locally |
 | `npm run lint` | ESLint |
 | `npm run format` | Prettier |
 
-Database schema lives in `supabase/migrations/`. Apply migrations through the Supabase dashboard or CLI against your project.
+Database schema lives in `supabase/migrations/`. Apply with `supabase db push` or run each file in order in the Supabase SQL Editor.
+
+### Local development with Cursor
+
+Open the repo in [Cursor](https://cursor.com), run `npm run dev`, and use AI-assisted editing to iterate. Push to GitHub when ready — Vercel deploys automatically from the connected branch.
 
 ---
 
@@ -213,20 +236,6 @@ Neo-brutalist cream/ink aesthetic with bold borders and orange accents — disti
 
 ---
 
-## Build with Lovable
-
-This project is connected to [Lovable](https://lovable.dev). Changes pushed to the connected branch sync back to the Lovable editor.
-
-- **Ship faster:** describe features in Lovable and it handles the code.
-- **Stay in sync:** Lovable commits directly to this repository.
-- **Full ownership:** the code is yours — push to GitHub and continue in Lovable or locally.
-
-Continue in the [Lovable editor](https://lovable.dev/projects/84e55a29-f76e-4519-ae0b-7ac49d2c396e).
-
-> **Note:** Avoid force-pushing or rebasing commits already pushed to the connected branch — that rewrites history on Lovable's side.
-
----
-
-## License
+## Design
 
 Private project. All rights reserved unless otherwise specified by the repository owner.

@@ -1,7 +1,7 @@
 import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
 import { generateText } from "ai";
-import { createLovableAiGatewayProvider } from "./ai-gateway.server";
+import { createGeminiProvider } from "./ai-gateway.server";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 
 const Input = z.object({ conversationId: z.string().uuid() });
@@ -10,8 +10,8 @@ export const generateCompatibilityReport = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .inputValidator((raw: unknown) => Input.parse(raw))
   .handler(async ({ data, context }) => {
-    const key = process.env.LOVABLE_API_KEY;
-    if (!key) throw new Error("Missing LOVABLE_API_KEY");
+    const key = process.env.GEMINI_API_KEY;
+    if (!key) throw new Error("Missing GEMINI_API_KEY");
 
     // Verify the caller is a participant of the target conversation before
     // triggering paid AI work or writing a report row. Uses the caller's
@@ -40,8 +40,8 @@ export const generateCompatibilityReport = createServerFn({ method: "POST" })
       return { name: p?.full_name ?? f?.seed_name ?? "Founder", founder: f, assessment: assess };
     }));
 
-    const gateway = createLovableAiGatewayProvider(key);
-    const model = gateway("google/gemini-3-flash-preview");
+    const gemini = createGeminiProvider(key);
+    const model = gemini("gemini-2.0-flash");
 
     const system = `You are a co-founder compatibility analyst for an Indian startup platform. Return ONLY valid minified JSON (no markdown fences). Shape:
 {"compatibility_score": <int 0-100>, "rationale_summary": "<2-3 sentences>", "alignment_points": ["...","...","..."], "divergence_points": ["...","..."], "risk_flags": ["..."], "conversation_starters": ["...","...","..."]}
