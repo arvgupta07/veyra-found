@@ -12,7 +12,6 @@ import { Route as rootRouteImport } from './routes/__root'
 import { Route as TalentRouteImport } from './routes/talent'
 import { Route as RolesRouteImport } from './routes/roles'
 import { Route as OnboardingRouteImport } from './routes/onboarding'
-import { Route as InvestorsRouteImport } from './routes/investors'
 import { Route as DiscoverRouteImport } from './routes/discover'
 import { Route as DashboardRouteImport } from './routes/dashboard'
 import { Route as AdminRouteImport } from './routes/admin'
@@ -42,11 +41,6 @@ const RolesRoute = RolesRouteImport.update({
 const OnboardingRoute = OnboardingRouteImport.update({
   id: '/onboarding',
   path: '/onboarding',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const InvestorsRoute = InvestorsRouteImport.update({
-  id: '/investors',
-  path: '/investors',
   getParentRoute: () => rootRouteImport,
 } as any)
 const DiscoverRoute = DiscoverRouteImport.update({
@@ -130,7 +124,6 @@ export interface FileRoutesByFullPath {
   '/admin': typeof AdminRoute
   '/dashboard': typeof DashboardRoute
   '/discover': typeof DiscoverRoute
-  '/investors': typeof InvestorsRoute
   '/onboarding': typeof OnboardingRoute
   '/roles': typeof RolesRoute
   '/talent': typeof TalentRoute
@@ -151,7 +144,6 @@ export interface FileRoutesByTo {
   '/admin': typeof AdminRoute
   '/dashboard': typeof DashboardRoute
   '/discover': typeof DiscoverRoute
-  '/investors': typeof InvestorsRoute
   '/onboarding': typeof OnboardingRoute
   '/roles': typeof RolesRoute
   '/talent': typeof TalentRoute
@@ -173,7 +165,6 @@ export interface FileRoutesById {
   '/admin': typeof AdminRoute
   '/dashboard': typeof DashboardRoute
   '/discover': typeof DiscoverRoute
-  '/investors': typeof InvestorsRoute
   '/onboarding': typeof OnboardingRoute
   '/roles': typeof RolesRoute
   '/talent': typeof TalentRoute
@@ -196,7 +187,6 @@ export interface FileRouteTypes {
     | '/admin'
     | '/dashboard'
     | '/discover'
-    | '/investors'
     | '/onboarding'
     | '/roles'
     | '/talent'
@@ -217,7 +207,6 @@ export interface FileRouteTypes {
     | '/admin'
     | '/dashboard'
     | '/discover'
-    | '/investors'
     | '/onboarding'
     | '/roles'
     | '/talent'
@@ -238,7 +227,6 @@ export interface FileRouteTypes {
     | '/admin'
     | '/dashboard'
     | '/discover'
-    | '/investors'
     | '/onboarding'
     | '/roles'
     | '/talent'
@@ -260,7 +248,6 @@ export interface RootRouteChildren {
   AdminRoute: typeof AdminRoute
   DashboardRoute: typeof DashboardRoute
   DiscoverRoute: typeof DiscoverRoute
-  InvestorsRoute: typeof InvestorsRoute
   OnboardingRoute: typeof OnboardingRoute
   RolesRoute: typeof RolesRoute
   TalentRoute: typeof TalentRoute
@@ -298,13 +285,6 @@ declare module '@tanstack/react-router' {
       path: '/onboarding'
       fullPath: '/onboarding'
       preLoaderRoute: typeof OnboardingRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/investors': {
-      id: '/investors'
-      path: '/investors'
-      fullPath: '/investors'
-      preLoaderRoute: typeof InvestorsRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/discover': {
@@ -420,7 +400,6 @@ const rootRouteChildren: RootRouteChildren = {
   AdminRoute: AdminRoute,
   DashboardRoute: DashboardRoute,
   DiscoverRoute: DiscoverRoute,
-  InvestorsRoute: InvestorsRoute,
   OnboardingRoute: OnboardingRoute,
   RolesRoute: RolesRoute,
   TalentRoute: TalentRoute,

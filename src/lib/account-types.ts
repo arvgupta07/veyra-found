@@ -48,8 +48,11 @@ export const ACCOUNT_TYPES: {
 /**
  * Cards shown on the pre-sign-in picker. Interns and talent share one card —
  * the internship-vs-job question is asked inside their onboarding instead.
+ * Investors are not being onboarded right now.
  */
-export const PICKER_TYPES = ACCOUNT_TYPES.filter((a) => a.value !== "intern");
+export const PICKER_TYPES = ACCOUNT_TYPES.filter(
+  (a) => a.value !== "intern" && a.value !== "investor",
+);
 
 const BY_VALUE = new Map(ACCOUNT_TYPES.map((a) => [a.value, a]));
 
@@ -99,10 +102,8 @@ export function clearPendingAccountType() {
 }
 
 /** Which nav destinations each account type may reach. */
-export function canSee(type: AccountType, path: string): boolean {
-  if (isJobSeeker(type)) {
-    // Interns and talent don't get the investor directory or co-founder matching.
-    if (path.startsWith("/investors")) return false;
-  }
+export function canSee(_type: AccountType, path: string): boolean {
+  // The investor directory is switched off for now.
+  if (path.startsWith("/investors")) return false;
   return true;
 }

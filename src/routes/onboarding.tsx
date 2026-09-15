@@ -11,7 +11,7 @@ import { LocationInput } from "@/components/LocationInput";
 import { AgeField } from "@/components/AgeField";
 import { clearPendingAccountType } from "@/lib/account-types";
 import { useAccountType } from "@/hooks/useAccountType";
-import { InvestorOnboarding } from "@/components/onboarding/InvestorOnboarding";
+
 import { TalentOnboarding } from "@/components/onboarding/TalentOnboarding";
 
 export const Route = createFileRoute("/onboarding")({
@@ -57,7 +57,7 @@ function OnboardingRouter() {
   }
 
   const name = profile?.full_name ?? "";
-  if (accountType === "investor") return <InvestorOnboarding fullName={name} />;
+  
   if (accountType === "intern" || accountType === "talent") return <TalentOnboarding fullName={name} kind={accountType} />;
   return <Onboarding />;
 

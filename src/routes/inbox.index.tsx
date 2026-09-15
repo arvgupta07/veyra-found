@@ -53,7 +53,7 @@ function Inbox() {
   const [tab, setTab] = useState<"requests" | "sent" | "talking">("requests");
   const [labelFilter, setLabelFilter] = useState<string | null>(null);
   // Requests come from every kind of member — founders can narrow the list down.
-  const [roleFilter, setRoleFilter] = useState<"all" | "founder" | "investor" | "talent">("all");
+  const [roleFilter, setRoleFilter] = useState<"all" | "founder" | "talent">("all");
   const unread = useUnreadConversations();
 
 
@@ -286,7 +286,7 @@ function Inbox() {
             {([
               { v: "all", label: "Everyone" },
               { v: "founder", label: "Founders" },
-              { v: "investor", label: "Investors" },
+              
               { v: "talent", label: "Talent & interns" },
             ] as const).map((o) => {
               const on = roleFilter === o.v;
