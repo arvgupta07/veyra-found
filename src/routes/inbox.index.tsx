@@ -53,7 +53,7 @@ function Inbox() {
   const [tab, setTab] = useState<"requests" | "sent" | "talking">("requests");
   const [labelFilter, setLabelFilter] = useState<string | null>(null);
   // Requests come from every kind of member — founders can narrow the list down.
-  const [roleFilter, setRoleFilter] = useState<"all" | "founder" | "investor" | "talent">("all");
+  const [roleFilter, setRoleFilter] = useState<"all" | "founder" | "talent">("all");
   const unread = useUnreadConversations();
 
 
