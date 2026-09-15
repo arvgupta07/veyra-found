@@ -1,10 +1,8 @@
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import {
   Outlet, Link, createRootRouteWithContext, useRouter,
-  HeadContent, Scripts, redirect,
+  HeadContent, Scripts,
 } from "@tanstack/react-router";
-import { getGateStatus } from "@/lib/gate.functions";
-
 import { useEffect, useState, type ReactNode } from "react";
 import { Toaster } from "sonner";
 
@@ -46,16 +44,7 @@ function ErrorComponent({ error, reset }: { error: Error; reset: () => void }) {
   );
 }
 
-const PUBLIC_PATHS = new Set(["/", "/unlock"]);
-
 export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()({
-  beforeLoad: async ({ location }) => {
-    const path = location.pathname.replace(/\/+$/, "") || "/";
-    if (PUBLIC_PATHS.has(path) || path.startsWith("/api")) return;
-    const { unlocked } = await getGateStatus();
-    if (!unlocked) throw redirect({ to: "/unlock" });
-  },
-
   head: () => ({
     meta: [
       { charSet: "utf-8" },

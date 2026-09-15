@@ -9,7 +9,6 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
-import { Route as UnlockRouteImport } from './routes/unlock'
 import { Route as TalentRouteImport } from './routes/talent'
 import { Route as RolesRouteImport } from './routes/roles'
 import { Route as OnboardingRouteImport } from './routes/onboarding'
@@ -30,11 +29,6 @@ import { Route as AuthResetPasswordRouteImport } from './routes/auth.reset-passw
 import { Route as AuthLoginRouteImport } from './routes/auth.login'
 import { Route as AuthCallbackRouteImport } from './routes/auth.callback'
 
-const UnlockRoute = UnlockRouteImport.update({
-  id: '/unlock',
-  path: '/unlock',
-  getParentRoute: () => rootRouteImport,
-} as any)
 const TalentRoute = TalentRouteImport.update({
   id: '/talent',
   path: '/talent',
@@ -140,7 +134,6 @@ export interface FileRoutesByFullPath {
   '/onboarding': typeof OnboardingRoute
   '/roles': typeof RolesRoute
   '/talent': typeof TalentRoute
-  '/unlock': typeof UnlockRoute
   '/auth/callback': typeof AuthCallbackRoute
   '/auth/login': typeof AuthLoginRoute
   '/auth/reset-password': typeof AuthResetPasswordRoute
@@ -162,7 +155,6 @@ export interface FileRoutesByTo {
   '/onboarding': typeof OnboardingRoute
   '/roles': typeof RolesRoute
   '/talent': typeof TalentRoute
-  '/unlock': typeof UnlockRoute
   '/auth/callback': typeof AuthCallbackRoute
   '/auth/login': typeof AuthLoginRoute
   '/auth/reset-password': typeof AuthResetPasswordRoute
@@ -185,7 +177,6 @@ export interface FileRoutesById {
   '/onboarding': typeof OnboardingRoute
   '/roles': typeof RolesRoute
   '/talent': typeof TalentRoute
-  '/unlock': typeof UnlockRoute
   '/auth/callback': typeof AuthCallbackRoute
   '/auth/login': typeof AuthLoginRoute
   '/auth/reset-password': typeof AuthResetPasswordRoute
@@ -209,7 +200,6 @@ export interface FileRouteTypes {
     | '/onboarding'
     | '/roles'
     | '/talent'
-    | '/unlock'
     | '/auth/callback'
     | '/auth/login'
     | '/auth/reset-password'
@@ -231,7 +221,6 @@ export interface FileRouteTypes {
     | '/onboarding'
     | '/roles'
     | '/talent'
-    | '/unlock'
     | '/auth/callback'
     | '/auth/login'
     | '/auth/reset-password'
@@ -253,7 +242,6 @@ export interface FileRouteTypes {
     | '/onboarding'
     | '/roles'
     | '/talent'
-    | '/unlock'
     | '/auth/callback'
     | '/auth/login'
     | '/auth/reset-password'
@@ -276,7 +264,6 @@ export interface RootRouteChildren {
   OnboardingRoute: typeof OnboardingRoute
   RolesRoute: typeof RolesRoute
   TalentRoute: typeof TalentRoute
-  UnlockRoute: typeof UnlockRoute
   AuthCallbackRoute: typeof AuthCallbackRoute
   AuthLoginRoute: typeof AuthLoginRoute
   AuthResetPasswordRoute: typeof AuthResetPasswordRoute
@@ -292,13 +279,6 @@ export interface RootRouteChildren {
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
-    '/unlock': {
-      id: '/unlock'
-      path: '/unlock'
-      fullPath: '/unlock'
-      preLoaderRoute: typeof UnlockRouteImport
-      parentRoute: typeof rootRouteImport
-    }
     '/talent': {
       id: '/talent'
       path: '/talent'
@@ -444,7 +424,6 @@ const rootRouteChildren: RootRouteChildren = {
   OnboardingRoute: OnboardingRoute,
   RolesRoute: RolesRoute,
   TalentRoute: TalentRoute,
-  UnlockRoute: UnlockRoute,
   AuthCallbackRoute: AuthCallbackRoute,
   AuthLoginRoute: AuthLoginRoute,
   AuthResetPasswordRoute: AuthResetPasswordRoute,
