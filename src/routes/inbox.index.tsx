@@ -286,7 +286,7 @@ function Inbox() {
             {([
               { v: "all", label: "Everyone" },
               { v: "founder", label: "Founders" },
-              { v: "investor", label: "Investors" },
+              
               { v: "talent", label: "Talent & interns" },
             ] as const).map((o) => {
               const on = roleFilter === o.v;
