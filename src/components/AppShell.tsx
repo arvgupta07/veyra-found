@@ -1,5 +1,5 @@
 import { Link, useRouter, useRouterState } from "@tanstack/react-router";
-import { Compass, Inbox, MessagesSquare, User, LogOut, Moon, Sun, ShieldCheck, Landmark, Briefcase, GraduationCap } from "lucide-react";
+import { Compass, Inbox, MessagesSquare, User, LogOut, Moon, Sun, ShieldCheck, Briefcase, GraduationCap } from "lucide-react";
 import { useEffect, useState, useSyncExternalStore } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { useMyProfile, useMyFounder } from "@/hooks/useMyFounder";
@@ -23,7 +23,7 @@ type NavItem = { to?: string; label: string; icon: typeof Compass; onClick?: () 
 const founderNav: NavItem[] = [
   { to: "/discover", label: "Discover", icon: Compass },
   { to: "/inbox", label: "Inbox", icon: Inbox },
-  { to: "/investors", label: "Investors", icon: Landmark },
+  
   { to: "/roles", label: "Opportunities", icon: Briefcase },
   { to: "/talent", label: "Talent", icon: GraduationCap },
   { to: "/forum", label: "Forum", icon: MessagesSquare },
@@ -63,7 +63,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
   );
   const forumStale = isStale("forum", seen);
   const talentStale = isStale("talent", seen);
-  const investorsStale = isStale("investors", seen);
+  
   const { data: roleAlerts = 0 } = useRolesAlert();
   const { data: newConnections = 0 } = useNewConnectionsAlert(myFounder?.id);
   const { data: pendingRequests = 0 } = usePendingRequestsAlert(myFounder?.id);
@@ -72,7 +72,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
     if (pathname.startsWith("/forum")) markSeen("forum");
     if (pathname.startsWith("/roles")) markSeen("roles");
     if (pathname.startsWith("/talent")) markSeen("talent");
-    if (pathname.startsWith("/investors")) markSeen("investors");
+    
     if (pathname.startsWith("/inbox")) markSeen("inbox");
   }, [pathname]);
 
@@ -80,7 +80,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
     if (to === "/inbox") return hasUnread || newConnections > 0 || pendingRequests > 0;
     if (to === "/roles") return roleAlerts > 0;
     if (to === "/talent") return talentStale;
-    if (to === "/investors") return investorsStale;
+    
     if (to === "/forum") return forumStale;
     if (to === "/profile/me") return profileIncomplete;
     return false;
