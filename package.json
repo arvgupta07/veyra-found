@@ -10,7 +10,9 @@
     "build:dev": "vite build --mode development",
     "preview": "vite preview",
     "lint": "eslint .",
-    "format": "prettier --write ."
+    "format": "prettier --write .",
+    "supabase:link": "npx supabase link --project-ref lyqkzunsqworhvwphsia",
+    "db:push": "node scripts/supabase-db-push.mjs"
   },
   "dependencies": {
     "@ai-sdk/google": "^3.0.121",
