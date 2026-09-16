@@ -155,16 +155,17 @@ VITE_SUPABASE_URL=https://YOUR-PROJECT-ID.supabase.co
 VITE_SUPABASE_PUBLISHABLE_KEY=YOUR-SUPABASE-PUBLISHABLE-KEY
 
 # Server (TanStack Start / Nitro)
-SUPABASE_URL=https://YOUR-PROJECT-ID.supabase.co
+SUPABASE_URL=https://lyqkzunsqworhvwphsia.supabase.co
 SUPABASE_PUBLISHABLE_KEY=YOUR-SUPABASE-PUBLISHABLE-KEY
 SUPABASE_SERVICE_ROLE_KEY=YOUR-SERVICE-ROLE-KEY
-SUPABASE_PROJECT_ID=YOUR-PROJECT-ID
 
 # AI compatibility reports (server-only)
 GEMINI_API_KEY=YOUR-GEMINI-API-KEY
 ```
 
 Get a Gemini API key at [Google AI Studio](https://aistudio.google.com/apikey).
+
+Do **not** set `SUPABASE_PROJECT_ID` in `.env` — the Supabase CLI reads it and throws "Invalid project ref format" when the value is wrong (e.g. `YOUR-PROJECT-ID`). The project ref lives in `supabase/config.toml` instead.
 
 Never commit `.env` or expose the service role key or API key in client code.
 
@@ -185,7 +186,7 @@ npm run dev            # http://localhost:3000
 ### Supabase setup
 
 1. Create a project at [supabase.com](https://supabase.com).
-2. Apply migrations: `npx supabase link --project-ref YOUR-PROJECT-ID && npx supabase db push`
+2. Apply migrations: `npx supabase link --project-ref lyqkzunsqworhvwphsia && npx supabase db push`
 3. Enable **Google** (and Email) under Authentication → Providers.
 4. Add redirect URLs: `http://localhost:3000/auth/callback` and your production URL.
 5. Copy API keys from Project Settings → API into `.env`.

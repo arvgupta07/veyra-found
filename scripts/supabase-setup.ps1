@@ -9,7 +9,12 @@ param(
 )
 
 $ErrorActionPreference = "Stop"
-Set-Location (Split-Path $Parent -Parent (Split-Path -Parent $MyInvocation.MyCommand.Path))
+Set-Location (Join-Path $PSScriptRoot "..")
+
+# SUPABASE_PROJECT_ID in .env overrides the CLI and causes
+# "Invalid project ref format" if set to YOUR-PROJECT-ID or a URL.
+Remove-Item Env:SUPABASE_PROJECT_ID -ErrorAction SilentlyContinue
+Remove-Item Env:VITE_SUPABASE_PROJECT_ID -ErrorAction SilentlyContinue
 
 Write-Host "Logging in to Supabase..."
 npx supabase login --token $AccessToken
