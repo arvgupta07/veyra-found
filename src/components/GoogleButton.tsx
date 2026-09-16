@@ -1,43 +1,25 @@
 import { toast } from "sonner";
-import { lovable } from "@/integrations/lovable/index";
 import { supabase } from "@/integrations/supabase/client";
-import { useRouter } from "@tanstack/react-router";
 import { useState } from "react";
 import { Loader2 } from "lucide-react";
 
 export function GoogleButton({ label = "Continue with Google" }: { label?: string }) {
-  const router = useRouter();
   const [busy, setBusy] = useState(false);
 
   async function onClick() {
     setBusy(true);
-    const result = await lovable.auth.signInWithOAuth("google", {
-      redirect_uri: `${window.location.origin}/auth/callback`,
+    const { error } = await supabase.auth.signInWithOAuth({
+      provider: "google",
+      options: {
+        redirectTo: `${window.location.origin}/auth/callback`,
+      },
     });
 
-    if (result.error) {
+    if (error) {
       setBusy(false);
-      toast.error(result.error.message ?? "Google sign-in failed");
-      return;
+      toast.error(error.message ?? "Google sign-in failed");
     }
-    if (result.redirected) return; // browser is redirecting to Google
-
-    // Popup flow: session is set — confirm it, then route by onboarding state.
-    const { data: u } = await supabase.auth.getUser();
-    if (!u.user) {
-      setBusy(false);
-      toast.error("Signed in but no session was created. Please try again.");
-      return;
-    }
-    const { data: founder } = await supabase
-      .from("founders")
-      .select("profile_complete")
-      .eq("user_id", u.user.id)
-      .maybeSingle();
-    router.navigate({ to: founder?.profile_complete ? "/discover" : "/onboarding" });
   }
-
-
 
   return (
     <button
